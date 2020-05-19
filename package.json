@@ -1,0 +1,60 @@
+{
+  "name": "vue-condition-watcher",
+  "version": "0.0.1",
+  "description": "Vue Composition API for automatic fetch data when condition has been changed",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:cjs": "ncc build src/index.ts -o dist -m -e vue",
+    "build:esm": "tsc --target ESNext --module ES6 --outDir esm",
+    "types:check": "tsc --noEmit",
+    "format": "prettier --write \"{src,test,examples}/**/*.ts\"",
+    "lint": "eslint \"{src,test,examples}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,test,examples}/**/*.ts\" --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/runkids/vue-condition-watcher.git"
+  },
+  "author": "runkids",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/runkids/vue-condition-watcher/issues"
+  },
+  "homepage": "https://github.com/runkids/vue-condition-watcher#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run  lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts}": [
+      "npm run lint:fix",
+      "npm run format",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "vue": "^3.0.0-beta.14"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.20",
+    "@types/node": "11.12.0",
+    "@types/vue": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "2.5.0",
+    "@typescript-eslint/parser": "2.5.0",
+    "@zeit/ncc": "0.22.2",
+    "eslint": "6.6.0",
+    "eslint-config-prettier": "6.5.0",
+    "husky": "^4.2.5",
+    "jest": "24.9.0",
+    "lint-staged": "8.2.1",
+    "prettier": "^2.0.5",
+    "ts-jest": "24.1.0",
+    "typescript": "^3.9.2"
+  }
+}
