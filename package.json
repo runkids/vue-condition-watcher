@@ -20,6 +20,15 @@
     "type": "git",
     "url": "git+https://github.com/runkids/vue-condition-watcher.git"
   },
+  "keywords": [
+    "vue",
+    "vuejs",
+    "conditions",
+    "watcher",
+    "hook",
+    "composition-api",
+    "vue-hooks"
+  ],
   "author": "runkids",
   "license": "MIT",
   "bugs": {
