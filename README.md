@@ -7,6 +7,7 @@
     <img alt="" src="https://badgen.net/bundlephobia/minzip/vue-condition-watcher">
   </a>
 </p>
+
 ## Introduction
 Vue Composition API for automatic fetch data when condition has been changed
 
