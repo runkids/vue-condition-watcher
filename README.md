@@ -41,7 +41,7 @@ Example for vue 3.x
 </template>
 
 <script>
-import {useConditionWatcher} from "useConditionWatcher";
+import {useConditionWatcher} from "vue-condition-watcher";
 import axios from "axios";
 
 export default {
