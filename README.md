@@ -6,6 +6,9 @@
   <a aria-label="Package size" href="https://bundlephobia.com/result?p=vue-condition-watcher">
     <img alt="" src="https://badgen.net/bundlephobia/minzip/vue-condition-watcher">
   </a>
+  <a aria-label="Downloads" href="https://www.npmjs.com/package/vue-condition-watcher">
+    <img alt="" src="https://badgen.net/npm/dt/vue-condition-watcher">
+  </a>
 </p>
 
 ## Introduction
@@ -46,7 +49,7 @@ import axios from "axios";
 
 export default {
   setup() {
-    const settings = {
+    const config = {
       fetcher: params => axios.get("/users/", { params }),
       defaultParams: {
         type: 'member'
@@ -64,7 +67,7 @@ export default {
       }
     };
 
-    const { conditions, data, error, loading, refresh } = useConditionWatcher(settings);
+    const { conditions, data, error, loading, refresh } = useConditionWatcher(config);
 
     return { 
       conditions, 
@@ -97,8 +100,8 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
 #### Parameters
 
 - `config` : An object of config for vue-condition-watcher
-  * `fetcher` : A promise returning function to fetch data
-  * `conditions` : An object of conditions, also be initial value
+  * `fetcher` (🚧Required) : A promise returning function to fetch data
+  * `conditions` (🚧Required) : An object of conditions, also be initial value
   * `defaultParams`: An object of fetcher's default parameters
   * `beforeFetchData`: A function you can do before fetch data
 ```javascript
