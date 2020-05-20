@@ -84,7 +84,7 @@ function useFetchData(fetcher) {
   })
 
   let lastPromise
-  const use = async (...args) => {
+  const use = async (...args:any) => {
     state.error = null
     state.loading = true
     const promise = (lastPromise = fetcher(...args))

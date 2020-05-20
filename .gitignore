@@ -8,4 +8,5 @@ esm
 .DS_Store
 .idea
 examples/**/yarn.lock
+examples/**/node_modules
 package-lock.json

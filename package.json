@@ -3,9 +3,11 @@
   "version": "0.0.3",
   "description": "Vue Composition API for automatic fetch data when condition has been changed",
   "main": "./dist/index.js",
+  "module": "./esm/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist/**"
+    "dist/**",
+    "esm/**"
   ],
   "scripts": {
     "build": "npm run build:esm && npm run build:cjs",
@@ -37,7 +39,7 @@
   "homepage": "https://github.com/runkids/vue-condition-watcher#readme",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run  lint-staged"
+      "pre-commit": "npm run lint-staged"
     }
   },
   "lint-staged": {
@@ -48,7 +50,6 @@
     ]
   },
   "devDependencies": {
-    "vue": "^3.0.0-beta.14",
     "@types/jest": "24.0.20",
     "@types/node": "11.12.0",
     "@types/vue": "^2.0.0",
@@ -62,6 +63,7 @@
     "lint-staged": "8.2.1",
     "prettier": "^2.0.5",
     "ts-jest": "24.1.0",
-    "typescript": "^3.9.2"
+    "typescript": "^3.9.2",
+    "vue": "^3.0.0-beta.14"
   }
 }
