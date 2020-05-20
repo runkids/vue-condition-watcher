@@ -1,0 +1,17 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "vue": "^3.0.0-beta.14",
+    "axios": "^0.19.2",
+    "vue-condition-watcher": "^0.0.4"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.0.0-beta.14",
+    "vite": "^0.16.0"
+  }
+}
