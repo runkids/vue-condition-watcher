@@ -16,7 +16,8 @@
     "types:check": "tsc --noEmit",
     "format": "prettier --write \"{src,test,examples}/**/*.ts\"",
     "lint": "eslint \"{src,test,examples}/**/*.ts\"",
-    "lint:fix": "eslint \"{src,test,examples}/**/*.ts\" --fix"
+    "lint:fix": "eslint \"{src,test,examples}/**/*.ts\" --fix",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,7 @@
   "homepage": "https://github.com/runkids/vue-condition-watcher#readme",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint-staged"
+      "pre-commit": "npm run types:check && npm run lint-staged"
     }
   },
   "lint-staged": {
@@ -56,6 +57,7 @@
     "@typescript-eslint/eslint-plugin": "2.5.0",
     "@typescript-eslint/parser": "2.5.0",
     "@zeit/ncc": "0.22.2",
+    "axios": "^0.19.2",
     "eslint": "6.6.0",
     "eslint-config-prettier": "6.5.0",
     "husky": "^4.2.5",
