@@ -45,6 +45,7 @@
   },
   "lint-staged": {
     "*.{ts, js}": [
+      "npm run test",
       "npm run lint:fix",
       "npm run format",
       "git add"
@@ -60,7 +61,7 @@
     "axios": "^0.19.2",
     "eslint": "6.6.0",
     "eslint-config-prettier": "6.5.0",
-    "husky": "^4.2.5",
+    "husky": "2.4.1",
     "jest": "24.9.0",
     "lint-staged": "8.2.1",
     "prettier": "^2.0.5",
