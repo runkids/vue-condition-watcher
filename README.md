@@ -63,7 +63,7 @@ export default {
         skills: [],
         created_at: new Date()
       },
-      beforeFetchData: conditions => {
+      beforeFetch: conditions => {
         conditions.created_at = dayjs(conditions.created_at, "YYYY-MM-DD");
         return conditions
       }
@@ -105,7 +105,7 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
   * `fetcher` (🚧Required) : A promise returning function to fetch data
   * `conditions` (🚧Required) : An object of conditions, also be initial value
   * `defaultParams`: An object of fetcher's default parameters
-  * `beforeFetchData`: A function you can do before fetch data
+  * `beforeFetch`: A function you can do before fetch data
 ```javascript
 
 const config = {
@@ -123,7 +123,7 @@ const config = {
     created_at: new Date()
   },
 
-  beforeFetchData: conditions => {
+  beforeFetch: conditions => {
     // conditions is an object clone deep from config.conditions
     conditions.created_at = dayjs(conditions.created_at, 'YYYY-MM-DD');
     return conditions

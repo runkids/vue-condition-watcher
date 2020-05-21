@@ -1,15 +1,14 @@
 import { reactive, toRefs, ref, watch, watchEffect, Ref } from 'vue'
+import { ConditionsType } from './types'
+import { filterNoneValueObject, createParams } from './utils'
 
-type ConditionsType = {
-  [propName: string]: any
-}
 type FetcherType = (params: ConditionsType) => Promise<any>
 
 interface Config {
   fetcher: FetcherType
   conditions: ConditionsType
   defaultParams?: ConditionsType
-  beforeFetchData?: (conditions: ConditionsType) => ConditionsType
+  beforeFetch?: (conditions: ConditionsType) => ConditionsType
 }
 
 interface ResultInterface {
@@ -36,8 +35,8 @@ export default function useConditionWatcher<T extends Config>(
       JSON.stringify(conditions2Object)
     )
 
-    if (typeof config.beforeFetchData === 'function') {
-      customConditions = config.beforeFetchData(cloneDeepCondition)
+    if (typeof config.beforeFetch === 'function') {
+      customConditions = config.beforeFetch(cloneDeepCondition)
     }
 
     const validateCustomConditions = Object.keys(customConditions).length !== 0
@@ -110,34 +109,4 @@ function useFetchData<T>(fetcher: () => Promise<T>) {
     ...toRefs(state),
     use,
   }
-}
-
-function createParams(
-  conditions: ConditionsType,
-  defaultParams: ConditionsType
-): ConditionsType {
-  const _conditions = {
-    ...conditions,
-    ...defaultParams,
-  }
-  Object.entries(_conditions).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      _conditions[key] = value.join(',')
-    }
-  })
-  return _conditions
-}
-
-function filterNoneValueObject(object: ConditionsType): ConditionsType {
-  return Object.fromEntries(
-    Object.entries(object).filter((item) => {
-      const value: any = item[1]
-      return (
-        typeof value !== 'undefined' &&
-        value !== null &&
-        value !== '' &&
-        value.length !== 0
-      )
-    })
-  )
 }

@@ -17,7 +17,8 @@
     "format": "prettier --write \"{src,test,examples}/**/*.ts\"",
     "lint": "eslint \"{src,test,examples}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test,examples}/**/*.ts\" --fix",
-    "test": "jest"
+    "test": "jest",
+    "watch": "tsc --watch"
   },
   "repository": {
     "type": "git",
@@ -45,7 +46,6 @@
   },
   "lint-staged": {
     "*.{ts, js}": [
-      "npm run test",
       "npm run lint:fix",
       "npm run format",
       "git add"
@@ -67,6 +67,9 @@
     "prettier": "^2.0.5",
     "ts-jest": "24.1.0",
     "typescript": "^3.9.2",
+    "vue": "^3.0.0-beta.14"
+  },
+  "peerDependencies": {
     "vue": "^3.0.0-beta.14"
   }
 }
