@@ -1,69 +1,75 @@
-import { reactive, toRefs, ref, watch, watchEffect } from 'vue'
+import { reactive, toRefs, ref, watch, watchEffect, Ref } from 'vue'
 
-export default function useConditionWatcher({
-  fetcher,
-  conditions,
-  defaultParams = {},
-  beforeFetchData = (params: object) => params,
-}) {
-  const _conditions = reactive(conditions)
+type ConditionsType = {
+  [propName: string]: any
+}
+type FetcherType = (params: ConditionsType) => Promise<any>
+
+interface Config {
+  fetcher: FetcherType
+  conditions: ConditionsType
+  defaultParams?: ConditionsType
+  beforeFetchData?: (conditions: ConditionsType) => ConditionsType
+}
+
+interface ResultInterface {
+  conditions: { [x: string]: any }
+  loading: Ref<boolean | false>
+  data: Ref<any[]>
+  refresh: Ref<() => void>
+  error: Ref<any | null>
+}
+
+export default function useConditionWatcher<T extends Config>(
+  config: T
+): ResultInterface {
+  const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref([])
   const error = ref(null)
   const refresh = ref(() => {})
 
-  if (typeof beforeFetchData !== 'function') {
-    throw new Error(
-      `[useConditionWatcher]: argument has to be function, but received ${typeof beforeFetchData}`
-    )
-  }
-
   watchEffect(() => {
-    const conditions2Object: object = { ..._conditions }
-    const cloneDeepCondition: object = JSON.parse(
+    const conditions2Object: ConditionsType = { ..._conditions }
+    let customConditions: ConditionsType = {}
+    const cloneDeepCondition: ConditionsType = JSON.parse(
       JSON.stringify(conditions2Object)
     )
-    const customConditions: object = beforeFetchData(cloneDeepCondition)
 
-    if (
-      !customConditions ||
-      typeof customConditions !== 'object' ||
-      customConditions.constructor !== Object
-    ) {
-      throw new Error(
-        `[useConditionWatcher]: beforeFetchData return value should to be an object`
-      )
+    if (typeof config.beforeFetchData === 'function') {
+      customConditions = config.beforeFetchData(cloneDeepCondition)
     }
 
-    const validateCustomConditions =
-      Object.keys(customConditions).length !== 0 &&
-      customConditions.constructor === Object
+    const validateCustomConditions = Object.keys(customConditions).length !== 0
 
-    // if custom conditions has value, just use custom conditions
-    // filterNoneValueObject will filter no value like [] , '', null, undefined
-    // example. {name: '', items: [], age: 0, tags: null}
-    // return result will be {age: 0}
+    /*
+     * if custom conditions has value, just use custom conditions
+     * filterNoneValueObject will filter no value like [] , '', null, undefined
+     * example. {name: '', items: [], age: 0, tags: null}
+     * return result will be {age: 0}
+     */
+
     const finalCondition = filterNoneValueObject(
       validateCustomConditions ? customConditions : conditions2Object
     )
 
-    const params = createParams(finalCondition, defaultParams)
+    const params = createParams(finalCondition, config.defaultParams)
 
     const {
       loading: fetchDataLoading,
       result: fetchDataResult,
       error: fetchDataError,
       use: fetchData,
-    } = useFetchData(() => fetcher(params))
+    } = useFetchData(() => config.fetcher(params))
 
     refresh.value = fetchData
 
     fetchData()
 
-    watch([fetchDataResult, fetchDataLoading, fetchDataError], (values) => {
+    watch([fetchDataResult, fetchDataError, fetchDataLoading], (values) => {
       data.value = values[0]
-      loading.value = values[1]
-      error.value = values[2]
+      error.value = values[1]
+      loading.value = values[2] as boolean
     })
   })
 
@@ -76,18 +82,18 @@ export default function useConditionWatcher({
   }
 }
 
-function useFetchData(fetcher) {
+function useFetchData<T>(fetcher: () => Promise<T>) {
   const state = reactive({
     loading: false,
     error: null,
     result: null,
   })
 
-  let lastPromise
-  const use = async (...args:any) => {
+  let lastPromise: Promise<T>
+  const use = async () => {
     state.error = null
     state.loading = true
-    const promise = (lastPromise = fetcher(...args))
+    const promise = (lastPromise = fetcher())
     try {
       const result = await promise
       if (lastPromise === promise) {
@@ -106,12 +112,14 @@ function useFetchData(fetcher) {
   }
 }
 
-function createParams(conditions, defaultParams) {
+function createParams(
+  conditions: ConditionsType,
+  defaultParams: ConditionsType
+): ConditionsType {
   const _conditions = {
     ...conditions,
     ...defaultParams,
   }
-
   Object.entries(_conditions).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       _conditions[key] = value.join(',')
@@ -120,7 +128,7 @@ function createParams(conditions, defaultParams) {
   return _conditions
 }
 
-function filterNoneValueObject(object) {
+function filterNoneValueObject(object: ConditionsType): ConditionsType {
   return Object.fromEntries(
     Object.entries(object).filter((item) => {
       const value: any = item[1]

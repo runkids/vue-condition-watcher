@@ -32,7 +32,7 @@
     "composition-api",
     "vue-hooks"
   ],
-  "author": "runkids",
+  "author": "Willy Hong",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/runkids/vue-condition-watcher/issues"
@@ -40,11 +40,11 @@
   "homepage": "https://github.com/runkids/vue-condition-watcher#readme",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run types:check && npm run lint-staged"
+      "pre-commit": "npm run types:check && lint-staged"
     }
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.{ts, js}": [
       "npm run lint:fix",
       "npm run format",
       "git add"
