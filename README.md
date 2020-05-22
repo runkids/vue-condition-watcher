@@ -1,15 +1,6 @@
 # vue-condition-watcher 🕶
-<p>
-  <a aria-label="NPM version" href="https://www.npmjs.com/package/vue-condition-watcher">
-    <img alt="" src="https://badgen.net/npm/v/vue-condition-watcher">
-  </a>
-  <a aria-label="Package size" href="https://bundlephobia.com/result?p=vue-condition-watcher">
-    <img alt="" src="https://badgen.net/bundlephobia/minzip/vue-condition-watcher">
-  </a>
-  <a aria-label="Downloads" href="https://www.npmjs.com/package/vue-condition-watcher">
-    <img alt="" src="https://badgen.net/npm/dt/vue-condition-watcher">
-  </a>
-</p>
+
+[![CircleCI](https://circleci.com/gh/runkids/vue-condition-watcher.svg?style=svg)](https://circleci.com/gh/runkids/vue-condition-watcher) [![vue3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/) [![npm](https://img.shields.io/npm/v/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher)  [![npm](https://img.shields.io/npm/dt/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher) [![bundle size](https://badgen.net/bundlephobia/minzip/vue-condition-watcher)](https://bundlephobia.com/result?p=vue-condition-watcher) [![npm](https://img.shields.io/npm/l/vue-condition-watcher.svg)](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE)
 
 ## Introduction
 Vue Composition API for automatic fetch data when condition has been changed
