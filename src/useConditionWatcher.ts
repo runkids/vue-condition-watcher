@@ -1,6 +1,7 @@
 import { reactive, toRefs, ref, watch, watchEffect, Ref } from 'vue'
 import { ConditionsType } from './types'
 import { filterNoneValueObject, createParams } from './utils'
+import clone from 'rfdc'
 
 type FetcherType = (params: ConditionsType) => Promise<any>
 
@@ -14,7 +15,7 @@ interface Config {
 interface ResultInterface {
   conditions: { [x: string]: any }
   loading: Ref<boolean | false>
-  data: Ref<any[]>
+  data: Ref<any | null>
   refresh: Ref<() => void>
   error: Ref<any | null>
 }
@@ -24,19 +25,19 @@ export default function useConditionWatcher<T extends Config>(
 ): ResultInterface {
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
-  const data = ref([])
+  const data = ref(null)
   const error = ref(null)
   const refresh = ref(() => {})
 
   watchEffect(() => {
     const conditions2Object: ConditionsType = { ..._conditions }
     let customConditions: ConditionsType = {}
-    const cloneDeepCondition: ConditionsType = JSON.parse(
-      JSON.stringify(conditions2Object)
+    const deepCopyCondition: ConditionsType = clone({ proto: true })(
+      conditions2Object
     )
 
     if (typeof config.beforeFetch === 'function') {
-      customConditions = config.beforeFetch(cloneDeepCondition)
+      customConditions = config.beforeFetch(deepCopyCondition)
     }
 
     const validateCustomConditions: boolean =
@@ -66,6 +67,7 @@ export default function useConditionWatcher<T extends Config>(
     } = useFetchData(() => config.fetcher(params))
 
     refresh.value = fetchData
+    loading.value = true
 
     fetchData()
 
