@@ -20,9 +20,7 @@ interface ResultInterface {
   error: Ref<any | null>
 }
 
-export default function useConditionWatcher<T extends Config>(
-  config: T
-): ResultInterface {
+export default function useConditionWatcher<T extends Config>(config: T): ResultInterface {
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref(null)
@@ -32,16 +30,16 @@ export default function useConditionWatcher<T extends Config>(
   watchEffect(() => {
     const conditions2Object: ConditionsType = { ..._conditions }
     let customConditions: ConditionsType = {}
-    const deepCopyCondition: ConditionsType = clone({ proto: true })(
-      conditions2Object
-    )
+    const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
 
     if (typeof config.beforeFetch === 'function') {
       customConditions = config.beforeFetch(deepCopyCondition)
+      if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
+        throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
+      }
     }
 
-    const validateCustomConditions: boolean =
-      Object.keys(customConditions).length !== 0
+    const validateCustomConditions: boolean = Object.keys(customConditions).length !== 0
 
     /*
      * if custom conditions has value, just use custom conditions
@@ -54,10 +52,7 @@ export default function useConditionWatcher<T extends Config>(
       validateCustomConditions ? customConditions : conditions2Object
     )
 
-    const params: ConditionsType = createParams(
-      finalCondition,
-      config.defaultParams
-    )
+    const params: ConditionsType = createParams(finalCondition, config.defaultParams)
 
     const {
       loading: fetchDataLoading,

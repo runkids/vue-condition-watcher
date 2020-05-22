@@ -34,13 +34,12 @@ export default {
       conditions: {
         gender: []
       },
+      beforeFetch(conditions){
+        return conditions
+      }
     }
 
-    const {conditions, data, loading, error, refresh}= useConditionWatcher(config)
-
-    return {
-      conditions, data, loading, error, refresh
-    }
+    return useConditionWatcher(config)
   }
 }
 </script>

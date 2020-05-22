@@ -2,8 +2,7 @@ import { useConditionWatcher } from '../src/index'
 import { isRef, isReactive, createApp, nextTick } from 'vue'
 
 jest.useFakeTimers()
-const timeout: Function = (milliseconds: number) =>
-  jest.advanceTimersByTime(milliseconds)
+const timeout: Function = (milliseconds: number) => jest.advanceTimersByTime(milliseconds)
 const tick: Function = async (times: number) => {
   for (let _ in [...Array(times).keys()]) {
     await nextTick()
@@ -25,9 +24,7 @@ describe('useConditionWatcher', () => {
         results: 9,
       },
     }
-    const { conditions, data, error, loading, refresh } = useConditionWatcher(
-      config
-    )
+    const { conditions, data, error, loading, refresh } = useConditionWatcher(config)
 
     expect(isReactive(conditions)).toBeTruthy()
     expect(isRef(data)).toBeTruthy()
@@ -86,10 +83,7 @@ describe('useConditionWatcher', () => {
       template: `<div>loading:{{loading}}, result:{{data}}</div>`,
       setup() {
         const config = {
-          fetcher: () =>
-            new Promise((resolve) =>
-              setTimeout(() => resolve('ConditionWatcher'), 200)
-            ),
+          fetcher: () => new Promise((resolve) => setTimeout(() => resolve('ConditionWatcher'), 200)),
           conditions: {
             gender: ['male'],
             results: 9,
@@ -110,8 +104,7 @@ describe('useConditionWatcher', () => {
       template: `<div>{{data}}</div>`,
       setup() {
         const config = {
-          fetcher: (params) =>
-            new Promise((resolve) => resolve(JSON.stringify(params))),
+          fetcher: (params) => new Promise((resolve) => resolve(JSON.stringify(params))),
           conditions: {
             results: 9,
             name: 'runkids',
@@ -139,17 +132,14 @@ describe('useConditionWatcher', () => {
       template: `<div>{{data}}</div>`,
       setup() {
         const config = {
-          fetcher: (params) =>
-            new Promise((resolve) => resolve(JSON.stringify(params))),
+          fetcher: (params) => new Promise((resolve) => resolve(JSON.stringify(params))),
           conditions: {
             results: 9,
             date: new Date('2020-05-22'),
           },
           beforeFetch(conditions) {
             const d = conditions.date
-            conditions.date = `${d.getFullYear()}-${
-              d.getMonth() + 1
-            }-${d.getDate()}`
+            conditions.date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
             return conditions
           },
         }

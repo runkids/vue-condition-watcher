@@ -7,14 +7,9 @@ declare global {
 }
 
 const fromEntries = (xs: [string | number | symbol, any][]) =>
-  Object.fromEntries
-    ? Object.fromEntries(xs)
-    : xs.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+  Object.fromEntries ? Object.fromEntries(xs) : xs.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
 
-export function createParams(
-  conditions: ConditionsType,
-  defaultParams: ConditionsType
-): ConditionsType {
+export function createParams(conditions: ConditionsType, defaultParams: ConditionsType): ConditionsType {
   const _conditions = {
     ...conditions,
     ...defaultParams,
@@ -31,12 +26,7 @@ export function filterNoneValueObject(object: ConditionsType): ConditionsType {
   return fromEntries(
     Object.entries(object).filter((item) => {
       const value: any = item[1]
-      return (
-        typeof value !== 'undefined' &&
-        value !== null &&
-        value !== '' &&
-        value.length !== 0
-      )
+      return typeof value !== 'undefined' && value !== null && value !== '' && value.length !== 0
     })
   )
 }
