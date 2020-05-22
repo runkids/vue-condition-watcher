@@ -3,8 +3,8 @@
   <a aria-label="NPM version" href="https://www.npmjs.com/package/vue-condition-watcher">
     <img alt="" src="https://badgen.net/npm/v/vue-condition-watcher">
   </a>
-  <a aria-label="Package size" href="https://bundlephobia.com/result?p=vue-condition-watcher@0.0.4">
-    <img alt="" src="https://badgen.net/bundlephobia/minzip/vue-condition-watcher@0.0.4">
+  <a aria-label="Package size" href="https://bundlephobia.com/result?p=vue-condition-watcher">
+    <img alt="" src="https://badgen.net/bundlephobia/minzip/vue-condition-watcher">
   </a>
   <a aria-label="Downloads" href="https://www.npmjs.com/package/vue-condition-watcher">
     <img alt="" src="https://badgen.net/npm/dt/vue-condition-watcher">
