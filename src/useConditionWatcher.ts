@@ -39,7 +39,8 @@ export default function useConditionWatcher<T extends Config>(
       customConditions = config.beforeFetch(cloneDeepCondition)
     }
 
-    const validateCustomConditions = Object.keys(customConditions).length !== 0
+    const validateCustomConditions: boolean =
+      Object.keys(customConditions).length !== 0
 
     /*
      * if custom conditions has value, just use custom conditions
@@ -48,11 +49,14 @@ export default function useConditionWatcher<T extends Config>(
      * return result will be {age: 0}
      */
 
-    const finalCondition = filterNoneValueObject(
+    const finalCondition: ConditionsType = filterNoneValueObject(
       validateCustomConditions ? customConditions : conditions2Object
     )
 
-    const params = createParams(finalCondition, config.defaultParams)
+    const params: ConditionsType = createParams(
+      finalCondition,
+      config.defaultParams
+    )
 
     const {
       loading: fetchDataLoading,
