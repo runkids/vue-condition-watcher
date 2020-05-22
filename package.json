@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Vue Composition API for automatic fetch data when condition has been changed",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
@@ -26,12 +26,13 @@
   },
   "keywords": [
     "vue",
-    "vuejs",
     "conditions",
     "watcher",
     "hook",
+    "vue-hooks",
     "composition-api",
-    "vue-hooks"
+    "vue-composable",
+    "composable"
   ],
   "author": "Willy Hong",
   "license": "MIT",
