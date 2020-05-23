@@ -176,11 +176,11 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
       }
     }
     ```
-  🚧 `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.
   
 * `queryOptions`: An object of options to sync query string with conditions
-  * `sync`: key of provide name ( String | Symbol ).
-    main.js: register router
+  🚧 `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.
+  * `sync`: key of provide name ( String | Symbol )
+    * main.js: register router
     ```javascript
       import {createApp} from 'vue'
       import App from './App.vue'
@@ -191,7 +191,7 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
         .use(router)
         .mount('#app')
     ```
-    then
+    * then
     ```javascript
     useConditionWatcher(config, {sync: 'router'})
     ```
