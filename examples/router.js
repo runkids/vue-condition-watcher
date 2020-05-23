@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import App from 'App.vue'
+import Home from './views/Home.vue'
 
 export const routerHistory = createWebHistory()
 export const router = createRouter({
@@ -9,7 +9,7 @@ export const router = createRouter({
     { path: '/home', redirect: '/' },
     {
       path: '/',
-      components: { default: App },
+      components: { default: Home },
       props: to => ({ waited: to.meta.waitedFor }),
     }
   ]
