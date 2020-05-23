@@ -9,6 +9,12 @@ const tick: Function = async (times: number) => {
   }
 }
 
+let root: any
+
+beforeEach(() => {
+  root = document.createElement('div') as any
+})
+
 describe('useConditionWatcher', () => {
   const consoleWarnSpy = jest.spyOn(console, 'warn')
 
@@ -71,7 +77,7 @@ describe('useConditionWatcher', () => {
         }
         return useConditionWatcher(config)
       },
-    }).mount(document.createElement('div'))
+    }).mount(root)
 
     expect(vm.$el.textContent).toBe('')
     await tick(1)
@@ -91,8 +97,9 @@ describe('useConditionWatcher', () => {
         }
         return useConditionWatcher(config)
       },
-    }).mount(document.createElement('div'))
+    }).mount(root)
 
+    await tick(1)
     expect(vm.$el.textContent).toBe('loading:true, result:')
     timeout(200)
     await tick(1)
@@ -116,7 +123,7 @@ describe('useConditionWatcher', () => {
         }
         return useConditionWatcher(config)
       },
-    }).mount(document.createElement('div'))
+    }).mount(root)
 
     await tick(1)
     expect(JSON.parse(vm.$el.textContent)).toMatchObject({
@@ -145,7 +152,7 @@ describe('useConditionWatcher', () => {
         }
         return useConditionWatcher(config)
       },
-    }).mount(document.createElement('div'))
+    }).mount(root)
 
     await tick(1)
     expect(JSON.parse(vm.$el.textContent)).toMatchObject({
@@ -166,7 +173,7 @@ describe('useConditionWatcher', () => {
         }
         return useConditionWatcher(config)
       },
-    }).mount(document.createElement('div'))
+    }).mount(root)
 
     await tick(1)
     expect(vm.$el.textContent).toBe('male,female')

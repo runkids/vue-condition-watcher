@@ -1,3 +1,9 @@
+### [0.0.7](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.7) (2020-05-26)
+
+### Feature
+  * Sync the state with the query string and initialize off of that so that refresh work.
+(back/forward) not finish
+
 ### [0.0.6](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.6) (2020-05-23)
 
 ### Bug Fix
