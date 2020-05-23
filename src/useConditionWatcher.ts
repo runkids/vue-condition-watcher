@@ -1,4 +1,4 @@
-import { reactive, toRefs, ref, watch, watchEffect, Ref } from 'vue'
+import { reactive, toRefs, ref, watch, Ref, watchEffect } from 'vue'
 import { ConditionsType } from './types'
 import { filterNoneValueObject, createParams } from './utils'
 import clone from 'rfdc'
@@ -27,7 +27,24 @@ export default function useConditionWatcher<T extends Config>(config: T): Result
   const error = ref(null)
   const refresh = ref(() => {})
 
-  watchEffect(() => {
+  const fetch = (conditions: ConditionsType) => {
+    const { loading: fetchLoading, result: fetchResult, error: fetchError, use: fetchData } = useFetchData(() =>
+      config.fetcher(conditions)
+    )
+
+    refresh.value = fetchData
+    loading.value = true
+
+    fetchData()
+
+    watch([fetchResult, fetchError, fetchLoading], (values) => {
+      data.value = values[0]
+      error.value = values[1]
+      loading.value = values[2] as boolean
+    })
+  }
+
+  watchEffect((onInvalidate) => {
     const conditions2Object: ConditionsType = { ..._conditions }
     let customConditions: ConditionsType = {}
     const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
@@ -48,28 +65,16 @@ export default function useConditionWatcher<T extends Config>(config: T): Result
      * return result will be {age: 0}
      */
 
-    const finalCondition: ConditionsType = filterNoneValueObject(
+    const finalConditions: ConditionsType = filterNoneValueObject(
       validateCustomConditions ? customConditions : conditions2Object
     )
 
-    const params: ConditionsType = createParams(finalCondition, config.defaultParams)
+    const fetchParams = createParams(finalConditions, config.defaultParams)
 
-    const {
-      loading: fetchDataLoading,
-      result: fetchDataResult,
-      error: fetchDataError,
-      use: fetchData,
-    } = useFetchData(() => config.fetcher(params))
+    fetch(fetchParams)
 
-    refresh.value = fetchData
-    loading.value = true
-
-    fetchData()
-
-    watch([fetchDataResult, fetchDataError, fetchDataLoading], (values) => {
-      data.value = values[0]
-      error.value = values[1]
-      loading.value = values[2] as boolean
+    onInvalidate(() => {
+      //todo cancel promise
     })
   })
 
