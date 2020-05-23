@@ -75,7 +75,7 @@ Now vue3 is going on beta, that's why i created this project. Can't wait vue3 re
   * Auto convert the corresponding type. (string, number, array, date)
   * Sync the state with the query string and initialize off of that and that back/forward/refresh work.
 
-  <img src="https://github.com/runkids/MessageBot-Helper_LINE/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
+  <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
 
 [Download example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples) (Use [Vite](https://github.com/vuejs/vite))
 ```bash
