@@ -1,9 +1,16 @@
-import { reactive, toRefs, ref, watch, watchEffect, Ref } from 'vue'
+import { reactive, toRefs, ref, watch, Ref, watchEffect, inject, InjectionKey } from 'vue'
 import { ConditionsType } from './types'
-import { filterNoneValueObject, createParams } from './utils'
+import { filterNoneValueObject, createParams, createQueryString, syncQuery2Conditions } from './utils'
 import clone from 'rfdc'
+import { Router } from 'vue-router'
 
 type FetcherType = (params: ConditionsType) => Promise<any>
+type ProvideKeyName<T> = InjectionKey<T> | string
+
+interface QueryOptions<T> {
+  sync?: ProvideKeyName<T>
+  ignore?: string[]
+}
 
 interface Config {
   fetcher: FetcherType
@@ -20,58 +27,96 @@ interface ResultInterface {
   error: Ref<any | null>
 }
 
-export default function useConditionWatcher<T extends Config>(config: T): ResultInterface {
+export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
+  config: T,
+  queryOptions?: E
+): ResultInterface {
+  let router: Router
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref(null)
   const error = ref(null)
   const refresh = ref(() => {})
+  const query = ref({})
+  const completeInitialConditions = ref(false)
 
-  watchEffect(() => {
-    const conditions2Object: ConditionsType = { ..._conditions }
-    let customConditions: ConditionsType = {}
-    const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
-
-    if (typeof config.beforeFetch === 'function') {
-      customConditions = config.beforeFetch(deepCopyCondition)
-      if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
-        throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
-      }
-    }
-
-    const validateCustomConditions: boolean = Object.keys(customConditions).length !== 0
-
-    /*
-     * if custom conditions has value, just use custom conditions
-     * filterNoneValueObject will filter no value like [] , '', null, undefined
-     * example. {name: '', items: [], age: 0, tags: null}
-     * return result will be {age: 0}
-     */
-
-    const finalCondition: ConditionsType = filterNoneValueObject(
-      validateCustomConditions ? customConditions : conditions2Object
+  const fetch = (conditions: ConditionsType) => {
+    const { loading: fetchLoading, result: fetchResult, error: fetchError, use: fetchData } = useFetchData(() =>
+      config.fetcher(conditions)
     )
-
-    const params: ConditionsType = createParams(finalCondition, config.defaultParams)
-
-    const {
-      loading: fetchDataLoading,
-      result: fetchDataResult,
-      error: fetchDataError,
-      use: fetchData,
-    } = useFetchData(() => config.fetcher(params))
 
     refresh.value = fetchData
     loading.value = true
 
     fetchData()
 
-    watch([fetchDataResult, fetchDataError, fetchDataLoading], (values) => {
+    watch([fetchResult, fetchError, fetchLoading], (values) => {
       data.value = values[0]
       error.value = values[1]
       loading.value = values[2] as boolean
     })
-  })
+  }
+
+  watchEffect(
+    (onInvalidate) => {
+      if (!completeInitialConditions.value) return
+      const conditions2Object: ConditionsType = { ..._conditions }
+      let customConditions: ConditionsType = {}
+      const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
+
+      if (typeof config.beforeFetch === 'function') {
+        customConditions = config.beforeFetch(deepCopyCondition)
+        if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
+          throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
+        }
+      }
+
+      const validateCustomConditions: boolean = Object.keys(customConditions).length !== 0
+
+      /*
+       * if custom conditions has value, just use custom conditions
+       * filterNoneValueObject will filter no value like [] , '', null, undefined
+       * example. {name: '', items: [], age: 0, tags: null}
+       * return result will be {age: 0}
+       */
+
+      query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
+
+      const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
+
+      fetch(finalConditions)
+
+      onInvalidate(() => {
+        //todo cancel promise
+      })
+    },
+    {
+      flush: 'pre',
+    }
+  )
+
+  if (
+    queryOptions &&
+    (typeof queryOptions.sync === 'string' || typeof queryOptions.sync === 'function') &&
+    queryOptions.sync.length
+  ) {
+    router = inject(queryOptions.sync)
+    if (router && router.isReady && router.isReady()) {
+      // do once when created
+      syncQuery2Conditions(_conditions, router.currentRoute.value.query)
+      // watch query changed
+      watch(query, async () => {
+        const path: string = router.currentRoute.value.path
+        const queryString = createQueryString(query.value, queryOptions.ignore || [])
+        await router.push(path + '?' + queryString)
+      })
+    } else {
+      throw new ReferenceError('[vue-condition-watcher] Could not found vue-router instance.')
+    }
+  }
+
+  //sync query object before fetch
+  completeInitialConditions.value = true
 
   return {
     conditions: _conditions,

@@ -9,9 +9,15 @@
 .filters {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
+
 .filters .btn {
   cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.filters .date-picker {
   margin-left: 0.5rem;
 }
 
