@@ -31,9 +31,36 @@ export function filterNoneValueObject(object: ConditionsType): ConditionsType {
   )
 }
 
-export function createQueryString(params: ConditionsType): string {
+export function createQueryString(params: ConditionsType, ignoreKeys?: string[]): string {
   const esc = encodeURIComponent
-  return Object.keys(params)
-    .map((k) => esc(k) + '=' + esc(params[k]))
+  return Object.entries(params)
+    .filter(
+      ([key, value]) =>
+        typeof value !== 'undefined' &&
+        value !== null &&
+        value !== '' &&
+        value.length !== 0 &&
+        (ignoreKeys && ignoreKeys.length ? !ignoreKeys.includes(key) : true)
+    )
+    .map(([key, value]) => {
+      return esc(key) + (value != null ? '=' + esc(value) : '')
+    })
     .join('&')
+}
+
+export function syncQuery2Conditions(conditions: ConditionsType, query: ConditionsType): void {
+  const conditions2Object = { ...conditions }
+  Object.keys(conditions2Object).forEach((key) => {
+    if (key in query) {
+      if (conditions2Object[key] instanceof Date) {
+        conditions[key] = new Date(query[key])
+        return
+      }
+      conditions[key] = Array.isArray(conditions2Object[key])
+        ? query[key].split(',')
+        : typeof conditions2Object[key] === 'number'
+        ? +query[key]
+        : query[key]
+    }
+  })
 }

@@ -1,4 +1,4 @@
-import { filterNoneValueObject, createParams, createQueryString } from '../src/utils'
+import { filterNoneValueObject, createParams, createQueryString, syncQuery2Conditions } from '../src/utils'
 
 describe('utils: filterNoneValueObject', () => {
   it(`Should be return empty object`, () => {
@@ -37,5 +37,44 @@ describe('utils: createQueryString', () => {
     const params = createParams(conditions)
     const query = createQueryString(params)
     expect(query).toBe('age=20&tags=react%2Cvue')
+  })
+
+  it('should return query string and filter keys', () => {
+    const conditions = {
+      age: 20,
+      tags: ['react', 'vue'],
+    }
+    const params = createParams(conditions)
+    const query = createQueryString(params, ['age'])
+    expect(query).toBe('tags=react%2Cvue')
+  })
+})
+
+describe('utils: syncQuery2Conditions', () => {
+  it('should sync query object to conditions', () => {
+    const query = {
+      age: 50,
+      tags: 'react,vue',
+    }
+    const conditions = {
+      age: 20,
+      tags: ['react', 'vue'],
+    }
+    syncQuery2Conditions(conditions, query)
+    expect(conditions).toMatchObject({
+      age: 50,
+      tags: ['react', 'vue'],
+    })
+  })
+
+  it('should sync query object to conditions with date', () => {
+    const query = {
+      date: '2020-01-02',
+    }
+    const conditions = {
+      date: new Date(),
+    }
+    syncQuery2Conditions(conditions, query)
+    expect(Object.prototype.toString.call(conditions.date) === '[object Date]').toBeTruthy()
   })
 })
