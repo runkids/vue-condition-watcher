@@ -4,6 +4,7 @@
     <label for="male">Male</label>
     <input type="checkbox" id="female" value="female" v-model="conditions.gender">
     <label for="female">Female</label>
+    <input class="date-picker" type="date" v-model="conditions.date">
     <button class="btn" @click="refresh">Refresh</button>
   </div>
 
@@ -32,14 +33,18 @@ export default {
         results: 9,
       },
       conditions: {
-        gender: []
+        gender: [],
+        date: '',
+        offset: 0,
+        limit: 9
       },
       beforeFetch(conditions){
+        console.log(conditions)
         return conditions
       }
     }
 
-    return useConditionWatcher(config)
+    return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']})
   }
 }
 </script>
