@@ -81,9 +81,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
        */
 
       query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
-
       const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
-
       fetch(finalConditions)
 
       onInvalidate(() => {
@@ -102,20 +100,31 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   ) {
     router = inject(queryOptions.sync)
     if (router && router.isReady && router.isReady()) {
-      // do once when created
-      syncQuery2Conditions(_conditions, router.currentRoute.value.query)
       // watch query changed
       watch(query, async () => {
         const path: string = router.currentRoute.value.path
         const queryString = createQueryString(query.value, queryOptions.ignore || [])
         await router.push(path + '?' + queryString)
       })
+      // watch router changed
+      watch(
+        router.currentRoute,
+        (currentRoute, preCurrentRoute) => {
+          const oldFullPath = preCurrentRoute ? preCurrentRoute.fullPath : ''
+          if (currentRoute.fullPath !== oldFullPath) {
+            //back/forward page sync query string to _conditions
+            syncQuery2Conditions(_conditions, currentRoute.query)
+          }
+        },
+        {
+          immediate: true,
+        }
+      )
     } else {
       throw new ReferenceError('[vue-condition-watcher] Could not found vue-router instance.')
     }
   }
 
-  //sync query object before fetch
   completeInitialConditions.value = true
 
   return {

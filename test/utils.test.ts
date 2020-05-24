@@ -77,4 +77,19 @@ describe('utils: syncQuery2Conditions', () => {
     syncQuery2Conditions(conditions, query)
     expect(Object.prototype.toString.call(conditions.date) === '[object Date]').toBeTruthy()
   })
+
+  it('if query is empty conditions should set init value', () => {
+    const query = {}
+    const conditions = {
+      date: new Date(),
+      name: 'runkids',
+      tags: ['react'],
+    }
+    syncQuery2Conditions(conditions, query)
+    expect(conditions).toMatchObject({
+      date: null,
+      name: '',
+      tags: [],
+    })
+  })
 })

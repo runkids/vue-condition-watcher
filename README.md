@@ -8,11 +8,10 @@ Vue Composition API for automatic fetch data when condition has been changed
 ⚠️⚠️⚠️ This project is experimental.
 
 #### Features
-  * You can write less code in list data page with filters.
-  * Auto watch conditions changed to fetch new data.
-  * Auto filtter falsy value in conditions.
-  * Auto convert the corresponding type. (string, number, array, date)
-  * Sync the state with the query string and initialize off of that and that back/forward/refresh work.
+  ✔ Auto watch conditions changed to fetch new data.
+  ✔ Auto filtter falsy value in conditions.
+  ✔ Auto convert the corresponding type. (string, number, array, date)
+  ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.
 
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
 

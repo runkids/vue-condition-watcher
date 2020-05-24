@@ -50,16 +50,23 @@ export function createQueryString(params: ConditionsType, ignoreKeys?: string[])
 
 export function syncQuery2Conditions(conditions: ConditionsType, query: ConditionsType): void {
   const conditions2Object = { ...conditions }
+  const noQuery = Object.keys(query).length === 0
   Object.keys(conditions2Object).forEach((key) => {
-    if (key in query) {
+    if (key in query || noQuery) {
       if (conditions2Object[key] instanceof Date) {
-        conditions[key] = new Date(query[key])
+        conditions[key] = noQuery ? null : new Date(query[key])
         return
       }
       conditions[key] = Array.isArray(conditions2Object[key])
-        ? query[key].split(',')
+        ? noQuery
+          ? []
+          : query[key].split(',')
         : typeof conditions2Object[key] === 'number'
-        ? +query[key]
+        ? noQuery
+          ? 0
+          : +query[key]
+        : noQuery
+        ? ''
         : query[key]
     }
   })
