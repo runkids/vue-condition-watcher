@@ -5,68 +5,7 @@
 ## Introduction
 Vue Composition API for automatic fetch data when condition has been changed
 
-##### Why did i created this project ?
-I write backstage use Vuejs 2. After a period of time, I noticed i need write same code every time, like [this page](https://online-metrics.com/wp-content/uploads/2016/05/standard-table-filter-example-1024x333.png) with many filters.
-
-I add conditions, loading, results in data
-```javascript
-data(){
-  return {
-    loading: false,
-    results: [],
-    conditions: {
-      name: '',
-      type: '',
-      // and more
-    }
-  }
-}
-```
-Then watch the conditions changed to fetch data
-```javascript
-watch: {
-  conditions: {
-    immediate: true,
-    handler: 'fetchData'
-  }
-}
-```
-Before fetch data, i use computed to get query object and filter falsy value like '', null, []
-```javascript
-computed: {
-  queryObject () {
-    // do something with this.conditions
-    return query
-  }
-}
-```
-Update the uri before fetch data
-```javascript
-this.$router.push('new path')
-```
-Okay, now doing fetch data
-
-```javascript
-methods: {
-  fetchData () {
-    this.loading = true
-    //do something
-    api(this.queryObject).then(res=>{
-      this.results = res.data
-    }).finally(()=>{
-      this.loading = false
-    })
-    //do something
-  }
-}
-```
-All done ! ...🤪
-Wait ! I need handle user refresh page to sync query object value to conditions
-....just keep fighting 😇
-
-Until i used [composition-api](https://github.com/vuejs/composition-api) create `vue-condition-watcher` prototype last year. It's really really save my time.
-
-Now vue3 is going on beta, that's why i created this project. Can't wait vue3 release! Hope this project can help someone experiencing the same troubles.
+⚠️⚠️⚠️ This project is experimental.
 
 #### Features
   * You can write less code in list data page with filters.
@@ -77,7 +16,7 @@ Now vue3 is going on beta, that's why i created this project. Can't wait vue3 re
 
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
 
-[Download example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples) (Use [Vite](https://github.com/vuejs/vite))
+[👉 Download example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples) (Use [Vite](https://github.com/vuejs/vite))
 ```bash
 $ cd examples/
 $ yarn 
@@ -147,8 +86,8 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
 #### Parameters
 
 - `config` : An object of config for vue-condition-watcher
-  * `fetcher` (🚧Required) : A promise returning function to fetch data
-  * `conditions` (🚧Required) : An object of conditions, also be initial value
+  * `fetcher` (⚠️Required) : A promise returning function to fetch data
+  * `conditions` (⚠️Required) : An object of conditions, also be initial value
   * `defaultParams`: An object of fetcher's default parameters
   * `beforeFetch`: A function you can do before fetch data
 
@@ -178,7 +117,7 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
     ```
   
 * `queryOptions`: An object of options to sync query string with conditions
-  🚧 `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.
+  * ⚠️ `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.
   * `sync`: key of provide name ( String | Symbol )
     * main.js: register router
     ```javascript
