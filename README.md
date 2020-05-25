@@ -24,8 +24,8 @@ $ yarn dev
 ````
 
 Todo 
-  * back/forward page sync query string
   * add test for router
+  
 ## Quick Start
 
 Simple example for `vue-next` and `vue-router-next`
