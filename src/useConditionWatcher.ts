@@ -96,13 +96,15 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     queryOptions.sync.length
   ) {
     router = inject(queryOptions.sync)
-    if (router && router.isReady && router.isReady()) {
-      // watch query changed
-      watch(query, async () => {
-        const path: string = router.currentRoute.value.path
-        const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
-        completeInitialConditions.value = false
-        await router.push(path + '?' + queryString)
+    if (router && router.isReady) {
+      router.isReady().then(() => {
+        // watch query changed
+        watch(query, async () => {
+          const path: string = router.currentRoute.value.path
+          const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
+          completeInitialConditions.value = false
+          await router.push(path + '?' + queryString)
+        })
       })
       // watch router changed
       watch(

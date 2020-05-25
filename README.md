@@ -66,6 +66,10 @@ Or with npm
 ```bash
 $ npm install vue-condition-watcher
 ```
+CDN
+```javascript
+https://unpkg.com/vue-condition-watcher/dist/index.js
+```
 
 ### API
 
