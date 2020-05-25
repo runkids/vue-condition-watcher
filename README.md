@@ -8,9 +8,10 @@ Vue Composition API for automatic fetch data when condition has been changed
 ⚠️⚠️⚠️ This project is experimental.
 
 #### Features
-  ✔ Auto watch conditions changed to fetch new data.<br>
+  ✔ Auto fetch data when conditions changed.<br>
   ✔ Auto filtter falsy value in conditions.<br>
   ✔ Auto convert the corresponding type. (string, number, array, date)<br>
+  ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.
 
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
@@ -32,30 +33,19 @@ Simple example for `vue-next` and `vue-router-next`
 createApp({
   template: `
     <div class="filter">
-      <input type="checkbox" id="male" value="male" v-model="conditions.gender">
-      <label for="male">Male</label>
-      <input type="checkbox" id="female" value="female" v-model="conditions.gender">
-      <label for="female">Female</label>
+      <input v-model="conditions.name">
       <button @click="refresh">Refresh</button>
     </div>
-
-    <div class="container" v-if="!loading && data">
-      <div class="card" v-for="item in data.results" :key="item.id.value">
-        <div>
-          <img :src="item.picture.thumbnail"/>
-        </div>
-        <h4>{{`${item.name.first} ${item.name.last}`}}</h4>
-        <div>{{item.email}}</div>
-        <div>{{item.phone}}</div>
-      </div>
+    <div class="container" v-if="!loading">
+      {{ data }}
     </div>
     <div class="loading" v-else>Loading...</div>
   `,
   setup() {
     const config = {
-      fetcher: params => api.users(params),
+      fetcher: params => axios.get('/user/', params),
       conditions: {
-        gender: [],
+        name: ''
       },
     }
     return useConditionWatcher(config, {sync: 'router'})

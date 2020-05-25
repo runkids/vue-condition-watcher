@@ -52,6 +52,9 @@
       "git add"
     ]
   },
+  "dependencies": {
+    "rfdc": "^1.1.4"
+  },
   "devDependencies": {
     "@types/jest": "24.0.20",
     "@types/node": "11.12.0",
@@ -73,7 +76,6 @@
     "vue-router": "^4.0.0-alpha.12"
   },
   "peerDependencies": {
-    "vue": "^3.0.0-beta.14",
-    "rfdc": "^1.1.4"
+    "vue": "^3.0.0-beta.14"
   }
 }
