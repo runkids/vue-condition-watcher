@@ -31,7 +31,7 @@ export function filterNoneValueObject(object: ConditionsType): ConditionsType {
   )
 }
 
-export function createQueryString(params: ConditionsType, ignoreKeys?: string[]): string {
+export function stringifyQuery(params: ConditionsType, ignoreKeys?: string[]): string {
   const esc = encodeURIComponent
   return Object.entries(params)
     .filter(

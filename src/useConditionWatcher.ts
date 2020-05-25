@@ -1,6 +1,6 @@
 import { reactive, toRefs, ref, watch, Ref, watchEffect, inject, InjectionKey } from 'vue'
 import { ConditionsType } from './types'
-import { filterNoneValueObject, createParams, createQueryString, syncQuery2Conditions } from './utils'
+import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from './utils'
 import clone from 'rfdc'
 import { Router } from 'vue-router'
 
@@ -58,8 +58,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   }
 
   watchEffect(
-    (onInvalidate) => {
-      if (!completeInitialConditions.value) return
+    () => {
       const conditions2Object: ConditionsType = { ..._conditions }
       let customConditions: ConditionsType = {}
       const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
@@ -82,11 +81,9 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
 
       query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
       const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
-      fetch(finalConditions)
 
-      onInvalidate(() => {
-        //todo cancel promise
-      })
+      if (!completeInitialConditions.value) return
+      fetch(finalConditions)
     },
     {
       flush: 'pre',
@@ -103,7 +100,8 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
       // watch query changed
       watch(query, async () => {
         const path: string = router.currentRoute.value.path
-        const queryString = createQueryString(query.value, queryOptions.ignore || [])
+        const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
+        completeInitialConditions.value = false
         await router.push(path + '?' + queryString)
       })
       // watch router changed
@@ -114,6 +112,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
           if (currentRoute.fullPath !== oldFullPath) {
             //back/forward page sync query string to _conditions
             syncQuery2Conditions(_conditions, currentRoute.query)
+            completeInitialConditions.value = true
           }
         },
         {

@@ -1,4 +1,4 @@
-import { filterNoneValueObject, createParams, createQueryString, syncQuery2Conditions } from '../src/utils'
+import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from '../src/utils'
 
 describe('utils: filterNoneValueObject', () => {
   it(`Should be return empty object`, () => {
@@ -28,14 +28,14 @@ describe('utils: filterNoneValueObject', () => {
   })
 })
 
-describe('utils: createQueryString', () => {
+describe('utils: stringifyQuery', () => {
   it('should return query string', () => {
     const conditions = {
       age: 20,
       tags: ['react', 'vue'],
     }
     const params = createParams(conditions)
-    const query = createQueryString(params)
+    const query = stringifyQuery(params)
     expect(query).toBe('age=20&tags=react%2Cvue')
   })
 
@@ -45,7 +45,7 @@ describe('utils: createQueryString', () => {
       tags: ['react', 'vue'],
     }
     const params = createParams(conditions)
-    const query = createQueryString(params, ['age'])
+    const query = stringifyQuery(params, ['age'])
     expect(query).toBe('tags=react%2Cvue')
   })
 })
