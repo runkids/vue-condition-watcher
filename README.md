@@ -23,8 +23,9 @@ $ yarn
 $ yarn dev
 ````
 
-Todo 
-  * add test for router
+#### Todo
+  - [ ] Add test for router
+  - [ ] Support for vue 2.7
   
 ## Quick Start
 
@@ -43,7 +44,7 @@ createApp({
   `,
   setup() {
     const config = {
-      fetcher: params => axios.get('/user/', params),
+      fetcher: params => axios.get('/user/', {params}),
       conditions: {
         name: ''
       },
