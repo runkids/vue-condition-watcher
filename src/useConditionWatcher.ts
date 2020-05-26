@@ -40,7 +40,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   const query = ref({})
   const completeInitialConditions = ref(false)
 
-  const fetch = (conditions: ConditionsType) => {
+  const fetch = (conditions: ConditionsType): void => {
     const { loading: fetchLoading, result: fetchResult, error: fetchError, use: fetchData } = useFetchData(() =>
       config.fetcher(conditions)
     )
