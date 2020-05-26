@@ -35,11 +35,11 @@ export function stringifyQuery(params: ConditionsType, ignoreKeys?: string[]): s
   const esc = encodeURIComponent
   return Object.entries(params)
     .filter(
-      ([key, value]) =>
+      ([key, value]: [string, unknown]): boolean =>
         typeof value !== 'undefined' &&
         value !== null &&
         value !== '' &&
-        value.length !== 0 &&
+        (Array.isArray(value) ? value.length !== 0 : true) &&
         (ignoreKeys && ignoreKeys.length ? !ignoreKeys.includes(key) : true)
     )
     .map(([key, value]) => {
