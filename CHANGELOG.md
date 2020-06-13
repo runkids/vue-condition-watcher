@@ -1,3 +1,8 @@
+### [0.0.9](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.9) (2020-06-13)
+
+### Chore
+  * Update Vue to beta 15
+
 ### [0.0.8](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.8) (2020-05-25)
 
 ### Feature
