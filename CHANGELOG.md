@@ -1,3 +1,9 @@
+### [0.0.10](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-06-30)
+
+### Chore
+  * Update Vue to beta 16
+  * Update Vue Router to Alpha 13
+
 ### [0.0.9](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.9) (2020-06-13)
 
 ### Chore
