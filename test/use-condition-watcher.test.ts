@@ -1,4 +1,4 @@
-import { useConditionWatcher } from '../src/index'
+import { useConditionWatcher } from '../src'
 import { isRef, isReactive, createApp, nextTick } from 'vue'
 
 jest.useFakeTimers()

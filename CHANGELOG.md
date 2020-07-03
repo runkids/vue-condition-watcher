@@ -1,3 +1,9 @@
+### [0.0.11](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-07-03)
+
+### Chore
+  * Update Vue to beta 18
+  * Use vue-demi to support vue2.x
+
 ### [0.0.10](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-06-30)
 
 ### Chore

@@ -1,4 +1,4 @@
-import { reactive, toRefs, ref, watch, Ref, watchEffect, inject, InjectionKey } from 'vue'
+import { reactive, toRefs, ref, watch, Ref, watchEffect, inject, InjectionKey } from 'vue-demi'
 import { ConditionsType } from './types'
 import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from './utils'
 import clone from 'rfdc'
