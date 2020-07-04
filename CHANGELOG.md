@@ -1,4 +1,4 @@
-### [0.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-07-04)
+### [0.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.0) (2020-07-04)
 
 ### Bug Fix
   * Fix history back and forward bug ([9bdca25](https://github.com/runkids/vue-condition-watcher/commit/f997f3117e8ff848905f547f5c063e3319c3ae6f))
