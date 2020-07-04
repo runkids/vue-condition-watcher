@@ -1,4 +1,4 @@
 dist/**/*
 esm/**/*
 node_modules
-examples
+examples/*
