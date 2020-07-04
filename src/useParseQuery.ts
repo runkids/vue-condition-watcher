@@ -30,7 +30,9 @@ function parseQuery(search: string) {
 }
 
 export function useParseQuery(queryString?: string) {
-  let query = queryString ? queryString : window.location.search.substring(1)
+  const href = window.location.href.split('?')
+  const search = href.length === 1 ? '' : '?' + href[1]
+  let query = queryString ? queryString : search
   return {
     query: parseQuery(query),
   }
