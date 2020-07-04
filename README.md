@@ -23,6 +23,13 @@ $ cd examples/vue3
 $ yarn 
 $ yarn dev
 ````
+
+[👉 Download vue@2 @vue/composition-api example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
+```bash
+$ cd examples/vue2
+$ yarn 
+$ yarn dev
+````
   
 ## Quick Start
 
@@ -139,3 +146,38 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
 - `error`: Error thrown by `config.fetcher`  
 - `loading`: Request is loading
 - `refresh`: A function to re-fetch data  
+
+#### How to use in vue@2 with vue-composition-api
+* Same to use `provide("router", router);` in current file
+  ```javascript
+  import { useConditionWatcher } from "vue-condition-watcher";
+  import { provide } from "@vue/composition-api";
+  import router from "@/router";
+  import api from "../api";
+
+  export default {
+    setup() {
+      provide("router", router);
+      const config = {
+        fetcher: api.users,
+        defaultParams: {
+          results: 9
+        },
+        conditions: {
+          gender: [],
+          date: "",
+          offset: 0,
+          limit: 9
+        },
+        beforeFetch(conditions) {
+          return conditions;
+        }
+      };
+
+      return useConditionWatcher(config, {
+        sync: "router",
+        ignore: ["offset", "limit"]
+      });
+    }
+  };
+  ```

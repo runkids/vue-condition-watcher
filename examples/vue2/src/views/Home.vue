@@ -54,7 +54,6 @@ export default {
         limit: 9
       },
       beforeFetch(conditions) {
-        console.log(conditions)
         return conditions;
       }
     };
