@@ -82,7 +82,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
       syncConditionsByQuery()
       // watch query changed
       watch(query, async () => {
-        const path: string = router.currentRoute ? router.currentRoute.value.path : router.history.current.path
+        const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
         const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
         await router.push(path + '?' + queryString).catch((e) => e)
       })
