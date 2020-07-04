@@ -1,6 +1,6 @@
 # vue-condition-watcher 🕶
 
-[![CircleCI](https://circleci.com/gh/runkids/vue-condition-watcher.svg?style=svg)](https://circleci.com/gh/runkids/vue-condition-watcher) [![vue3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/) [![npm](https://img.shields.io/npm/v/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher)  [![npm](https://img.shields.io/npm/dt/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher) [![bundle size](https://badgen.net/bundlephobia/minzip/vue-condition-watcher)](https://bundlephobia.com/result?p=vue-condition-watcher) [![npm](https://img.shields.io/npm/l/vue-condition-watcher.svg)](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/runkids/vue-condition-watcher.svg?style=svg)](https://circleci.com/gh/runkids/vue-condition-watcher) [![vue3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/) [![vue3](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://composition-api.vuejs.org/) [![npm](https://img.shields.io/npm/v/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher)  [![npm](https://img.shields.io/npm/dt/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher) [![bundle size](https://badgen.net/bundlephobia/minzip/vue-condition-watcher)](https://bundlephobia.com/result?p=vue-condition-watcher) [![npm](https://img.shields.io/npm/l/vue-condition-watcher.svg)](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE)
 
 ## Introduction
 Vue Composition API for automatic fetch data when condition has been changed
@@ -12,20 +12,17 @@ Vue Composition API for automatic fetch data when condition has been changed
   ✔ Auto filtter falsy value in conditions.<br>
   ✔ Auto convert the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
-  ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.
+  ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.<br>
+  ✔ Support `vue@2 @vue/composition-api`
 
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
 
-[👉 Download example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples) (Use [Vite](https://github.com/vuejs/vite))
+[👉 Download vue@next example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
 ```bash
-$ cd examples/
+$ cd examples/vue3
 $ yarn 
 $ yarn dev
 ````
-
-#### Todo
-  - [ ] Add test for router
-  - [ ] Support for vue 2.7
   
 ## Quick Start
 
