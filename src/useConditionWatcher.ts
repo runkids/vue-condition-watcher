@@ -98,8 +98,10 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
         `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
       )
     }
+  } else {
+    completeInitialConditions.value = true
+    conditionChangeHandler({ ..._conditions })
   }
-  completeInitialConditions.value = true
 
   return {
     conditions: _conditions,
