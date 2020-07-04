@@ -1,3 +1,7 @@
+### [0.1.2](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.2) (2020-07-05)
+### Bug Fix
+  * Check new condition and prev condition is equivalent before fetch data. ([24680f2](https://github.com/runkids/vue-condition-watcher/commit/24680f22b1ee6c1b7c820c5a4722cb77c80fabeb))
+
 ### [0.1.1](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.1) (2020-07-05)
 ### Chore
   * Move rfdc to dependencies.
@@ -6,10 +10,10 @@
 ### [0.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.0) (2020-07-04)
 
 ### Bug Fix
-  * Fix history back and forward bug ([9bdca25](https://github.com/runkids/vue-condition-watcher/commit/f997f3117e8ff848905f547f5c063e3319c3ae6f))
-  * If not use router, fetch data when instance created ([fa0f03e](https://github.com/runkids/vue-condition-watcher/commit/0f7dababcf1dd3255e216e758230012deb50907d))
+  * Fix history back and forward bug ([f997f31](https://github.com/runkids/vue-condition-watcher/commit/f997f3117e8ff848905f547f5c063e3319c3ae6f))
+  * If not use router, fetch data when instance created ([0f7daba](https://github.com/runkids/vue-condition-watcher/commit/0f7dababcf1dd3255e216e758230012deb50907d))
 ### Refactor
-  * Remove watchEffect, change use watch ([f997f31](https://github.com/runkids/vue-condition-watcher/commit/fa0f03e51340e0d10de97bdc400edf115728cbc6))
+  * Remove watchEffect, change use watch ([fa0f03e](https://github.com/runkids/vue-condition-watcher/commit/fa0f03e51340e0d10de97bdc400edf115728cbc6))
 ### Chore
   * Add vue2 with vue-composition-api example
 ### Feature
