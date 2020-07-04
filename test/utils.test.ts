@@ -1,4 +1,24 @@
-import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from '../src/utils'
+import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions, isEquivalent } from '../src/utils'
+
+describe('utils: isEquivalent', () => {
+  it(`Check Object Equality`, () => {
+    const current = {
+      name: '',
+      tags: [],
+      phone: undefined,
+      address: null,
+      data: new Date(),
+    }
+    const old = {
+      name: '',
+      tags: [],
+      phone: undefined,
+      address: null,
+      data: new Date(),
+    }
+    expect(isEquivalent(current, old)).toBeTruthy()
+  })
+})
 
 describe('utils: filterNoneValueObject', () => {
   it(`Should be return empty object`, () => {
