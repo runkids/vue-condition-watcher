@@ -1,37 +1,15 @@
-import { reactive, toRefs, ref, watch, Ref, watchEffect, inject, InjectionKey } from 'vue-demi'
-import { ConditionsType } from './types'
+import { reactive, ref, watch, watchEffect, inject, onMounted, onUnmounted } from 'vue-demi'
+import { ConditionsType, Config, QueryOptions, ResultInterface } from './types'
 import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from './utils'
+import { useFetchData } from './useFetchData'
+import { useParseQuery } from './useParseQuery'
 import clone from 'rfdc'
-import { Router } from 'vue-router'
-
-type FetcherType = (params: ConditionsType) => Promise<any>
-type ProvideKeyName<T> = InjectionKey<T> | string
-
-interface QueryOptions<T> {
-  sync?: ProvideKeyName<T>
-  ignore?: string[]
-}
-
-interface Config {
-  fetcher: FetcherType
-  conditions: ConditionsType
-  defaultParams?: ConditionsType
-  beforeFetch?: (conditions: ConditionsType) => ConditionsType
-}
-
-interface ResultInterface {
-  conditions: { [x: string]: any }
-  loading: Ref<boolean | false>
-  data: Ref<any | null>
-  refresh: Ref<() => void>
-  error: Ref<any | null>
-}
 
 export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
   config: T,
   queryOptions?: E
 ): ResultInterface {
-  let router: Router
+  let router = null
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref(null)
@@ -39,6 +17,13 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   const refresh = ref(() => {})
   const query = ref({})
   const completeInitialConditions = ref(false)
+
+  const syncConditionsByQuery = () => {
+    const { query: initQuery } = useParseQuery()
+    console.log('initQuery== ', initQuery)
+    syncQuery2Conditions(_conditions, initQuery)
+    completeInitialConditions.value = true
+  }
 
   const fetch = (conditions: ConditionsType): void => {
     const { loading: fetchLoading, result: fetchResult, error: fetchError, use: fetchData } = useFetchData(() =>
@@ -90,42 +75,30 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     }
   )
 
-  if (
-    queryOptions &&
-    (typeof queryOptions.sync === 'string' || typeof queryOptions.sync === 'function') &&
-    queryOptions.sync.length
-  ) {
+  if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
     router = inject(queryOptions.sync)
-    if (router && router.isReady) {
-      router.isReady().then(() => {
-        // watch query changed
-        watch(query, async () => {
-          const path: string = router.currentRoute.value.path
-          const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
-          completeInitialConditions.value = false
-          await router.push(path + '?' + queryString)
-        })
+    if (router) {
+      // initial conditions by window.location.search. just do once.
+      syncConditionsByQuery()
+      // watch query changed
+      watch(query, async () => {
+        const path: string = router.currentRoute.value.path
+        const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
+        await router.push(path + '?' + queryString)
       })
-      // watch router changed
-      watch(
-        router.currentRoute,
-        (currentRoute, preCurrentRoute) => {
-          const oldFullPath = preCurrentRoute ? preCurrentRoute.fullPath : ''
-          if (currentRoute.fullPath !== oldFullPath) {
-            //back/forward page sync query string to _conditions
-            syncQuery2Conditions(_conditions, currentRoute.query)
-            completeInitialConditions.value = true
-          }
-        },
-        {
-          immediate: true,
-        }
-      )
+
+      onMounted(() => {
+        window.addEventListener('popstate', syncConditionsByQuery)
+      })
+      onUnmounted(() => {
+        window.removeEventListener('popstate', syncConditionsByQuery)
+      })
     } else {
-      throw new ReferenceError('[vue-condition-watcher] Could not found vue-router instance.')
+      throw new ReferenceError(
+        `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
+      )
     }
   }
-
   completeInitialConditions.value = true
 
   return {
@@ -134,35 +107,5 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     data,
     refresh,
     error,
-  }
-}
-
-function useFetchData<T>(fetcher: () => Promise<T>) {
-  const state = reactive({
-    loading: false,
-    error: null,
-    result: null,
-  })
-
-  let lastPromise: Promise<T>
-  const use = async () => {
-    state.error = null
-    state.loading = true
-    const promise = (lastPromise = fetcher())
-    try {
-      const result = await promise
-      if (lastPromise === promise) {
-        state.result = result
-      }
-    } catch (e) {
-      state.error = e
-    } finally {
-      state.loading = false
-    }
-  }
-
-  return {
-    ...toRefs(state),
-    use,
   }
 }

@@ -4502,10 +4502,10 @@ vue-demi@^0.1.3:
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.1.3.tgz#e16321d20b025e95227fba01607f86e1fc9726e4"
   integrity sha512-0h9/PwtrJx8oZeOd4ftGNlpnWUxp9HoGy+Wengw4pvdUi0o1+PLMaCpoQZ9tNGnTom8cz90M1ydxJgJg3InCpA==
 
-vue-router@^4.0.0-alpha.13:
-  version "4.0.0-alpha.14"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.0-alpha.14.tgz#4bc5fed1db61b8d04fd95ad9c499c7428f039a0e"
-  integrity sha512-ydWSXxXAsTCiJ31V4x4ZAKI1CdpPMhf7b2LPi4AmG5SCgduu1zf+LhzWWHXmgbmheEiJpfecigVIZp4ABpZJmw==
+vue-router@^4.0.0-beta.1:
+  version "4.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.0-beta.1.tgz#8ccdc37c991efa30d1519f885dd772307715503a"
+  integrity sha512-byqdBiKISN9Qrse6A0fgR6tePQNwlAdx+wBgO2x08MEn6hy8ds19uKvosfruVjw5vhpFmjvGR15Z68an+7fRAQ==
 
 vue@*:
   version "2.6.11"
