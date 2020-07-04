@@ -1,3 +1,8 @@
+### [0.1.1](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.1) (2020-07-05)
+### Chore
+  * Move rfdc to dependencies.
+  * Update vue-demi version
+
 ### [0.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.0) (2020-07-04)
 
 ### Bug Fix
