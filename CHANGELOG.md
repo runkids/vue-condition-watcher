@@ -1,3 +1,15 @@
+### [0.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-07-04)
+
+### Bug Fix
+  * Fix history back and forward bug ([9bdca25](https://github.com/runkids/vue-condition-watcher/commit/f997f3117e8ff848905f547f5c063e3319c3ae6f))
+  * If not use router, fetch data when instance created ([fa0f03e](https://github.com/runkids/vue-condition-watcher/commit/0f7dababcf1dd3255e216e758230012deb50907d))
+### Refactor
+  * Remove watchEffect, change use watch ([f997f31](https://github.com/runkids/vue-condition-watcher/commit/fa0f03e51340e0d10de97bdc400edf115728cbc6))
+### Chore
+  * Add vue2 with vue-composition-api example
+### Feature
+  * support vue2 with vue-composition-api
+
 ### [0.0.11](https://github.com/runkids/vue-condition-watcher/releases/tag/0.0.10) (2020-07-03)
 
 ### Chore
