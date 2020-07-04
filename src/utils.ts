@@ -58,7 +58,7 @@ export function syncQuery2Conditions(conditions: ConditionsType, query: Conditio
         return
       }
       conditions[key] = Array.isArray(conditions2Object[key])
-        ? noQuery
+        ? noQuery || !query[key].length
           ? []
           : query[key].split(',')
         : typeof conditions2Object[key] === 'number'

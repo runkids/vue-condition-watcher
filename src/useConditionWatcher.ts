@@ -1,4 +1,4 @@
-import { reactive, ref, watch, watchEffect, inject, onMounted, onUnmounted } from 'vue-demi'
+import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
 import { ConditionsType, Config, QueryOptions, ResultInterface } from './types'
 import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions } from './utils'
 import { useFetchData } from './useFetchData'
@@ -10,6 +10,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   queryOptions?: E
 ): ResultInterface {
   let router = null
+  const backupIntiConditions = clone({ proto: true })(config.conditions)
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref(null)
@@ -20,8 +21,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
 
   const syncConditionsByQuery = () => {
     const { query: initQuery } = useParseQuery()
-    console.log('initQuery== ', initQuery)
-    syncQuery2Conditions(_conditions, initQuery)
+    syncQuery2Conditions(_conditions, Object.keys(initQuery).length ? initQuery : backupIntiConditions)
     completeInitialConditions.value = true
   }
 
@@ -42,37 +42,37 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     })
   }
 
-  watchEffect(
-    () => {
-      const conditions2Object: ConditionsType = { ..._conditions }
-      let customConditions: ConditionsType = {}
-      const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
+  const conditionChangeHandler = (conditions) => {
+    const conditions2Object: ConditionsType = conditions
+    let customConditions: ConditionsType = {}
+    const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
 
-      if (typeof config.beforeFetch === 'function') {
-        customConditions = config.beforeFetch(deepCopyCondition)
-        if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
-          throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
-        }
+    if (typeof config.beforeFetch === 'function') {
+      customConditions = config.beforeFetch(deepCopyCondition)
+      if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
+        throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
       }
-
-      const validateCustomConditions: boolean = Object.keys(customConditions).length !== 0
-
-      /*
-       * if custom conditions has value, just use custom conditions
-       * filterNoneValueObject will filter no value like [] , '', null, undefined
-       * example. {name: '', items: [], age: 0, tags: null}
-       * return result will be {age: 0}
-       */
-
-      query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
-      const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
-
-      if (!completeInitialConditions.value) return
-      fetch(finalConditions)
-    },
-    {
-      flush: 'pre',
     }
+
+    const validateCustomConditions: boolean = Object.keys(customConditions).length !== 0
+
+    /*
+     * if custom conditions has value, just use custom conditions
+     * filterNoneValueObject will filter no value like [] , '', null, undefined
+     * example. {name: '', items: [], age: 0, tags: null}
+     * return result will be {age: 0}
+     */
+
+    query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
+    const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
+
+    if (!completeInitialConditions.value) return
+    fetch(finalConditions)
+  }
+
+  watch(
+    () => ({ ..._conditions }),
+    (conditions) => conditionChangeHandler(conditions)
   )
 
   if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
