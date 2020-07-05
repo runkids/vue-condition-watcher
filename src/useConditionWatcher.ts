@@ -1,6 +1,6 @@
 import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
 import { ConditionsType, Config, QueryOptions, ResultInterface } from './types'
-import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions, isEquivalent } from './utils'
+import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions, isEquivalentString } from './utils'
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 import clone from 'rfdc'
@@ -82,7 +82,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
       syncConditionsByQuery()
       // watch query changed
       watch(query, async (newQuery, prevQuery) => {
-        if (isEquivalent(newQuery, prevQuery)) return
+        if (isEquivalentString(newQuery, prevQuery, queryOptions.ignore || [])) return
         const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
         const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
         await router.push(path + '?' + queryString).catch((e) => e)

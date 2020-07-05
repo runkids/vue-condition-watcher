@@ -72,6 +72,10 @@ export function syncQuery2Conditions(conditions: ConditionsType, query: Conditio
   })
 }
 
+export function isEquivalentString(a, b, ignore) {
+  return stringifyQuery(a, ignore) === stringifyQuery(b, ignore)
+}
+
 export function isEquivalent(x, y) {
   if (x === null || x === undefined || y === null || y === undefined) {
     return x === y
