@@ -32,10 +32,13 @@ $ yarn dev
 ````
 
 
-### 👉 Online demo with vue-infinite-scroll.
+### 👉 Online demo with vue-infinite-scroll
 
-[![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&theme=dark)
-  
+[![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&theme=dark) 
+
+<br>
+<img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher-demo2.gif?raw=true"/>
+
 ## Quick Start
 
 Simple example for `vue-next` and `vue-router-next`
@@ -118,6 +121,8 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
       }
     }
     ```
+  * `afterFetch`: A function you can do after fetch data. Return `data`.
+
   
 * `queryOptions`: An object of options to sync query string with conditions
   * ⚠️ `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.

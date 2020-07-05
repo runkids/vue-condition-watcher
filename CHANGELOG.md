@@ -1,3 +1,8 @@
+### [0.1.4](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.4) (2020-07-05)
+### Feature
+  * Add function `afterFetch` and return `data`.
+  * Add demo for vue2 with vue-infinite-scroll
+
 ### [0.1.3](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.3) (2020-07-05)
 ### Chore
   * Remove rfdc ([cae3ea7](https://github.com/runkids/vue-condition-watcher/commit/cae3ea792ace46526e8a993ddf90dbaa5c37c8eb))
