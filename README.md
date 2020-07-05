@@ -30,6 +30,11 @@ $ cd examples/vue2
 $ yarn 
 $ yarn dev
 ````
+
+
+### 👉 Online demo with vue-infinite-scroll.
+
+[![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&theme=dark)
   
 ## Quick Start
 

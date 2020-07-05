@@ -44,4 +44,9 @@
   flex-direction: column;
   align-items: center;
 }
+
+.link {
+  cursor: pointer;
+  color: blue;
+}
 </style>

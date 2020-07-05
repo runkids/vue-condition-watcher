@@ -1,19 +1,11 @@
 <template>
   <div>
+    <div class="link" @click="$router.push('/infinite')">Demo Infinite Scrolling</div>
+    <br />
     <div class="filters">
-      <input
-        type="checkbox"
-        id="male"
-        value="male"
-        v-model="conditions.gender"
-      />
+      <input type="checkbox" id="male" value="male" v-model="conditions.gender" />
       <label for="male">Male</label>
-      <input
-        type="checkbox"
-        id="female"
-        value="female"
-        v-model="conditions.gender"
-      />
+      <input type="checkbox" id="female" value="female" v-model="conditions.gender" />
       <label for="female">Female</label>
       <input class="date-picker" type="date" v-model="conditions.date" />
       <button class="btn" @click="refresh">Refresh</button>
@@ -34,14 +26,14 @@
 </template>
 
 <script>
-import { useConditionWatcher } from "vue-condition-watcher";
-import { provide } from "@vue/composition-api";
-import router from "@/router";
-import api from "../api";
+import { useConditionWatcher } from 'vue-condition-watcher'
+import { provide } from '@vue/composition-api'
+import router from '@/router'
+import api from '../api'
 
 export default {
   setup() {
-    provide("router", router);
+    provide('router', router)
     const config = {
       fetcher: api.users,
       defaultParams: {
@@ -49,19 +41,19 @@ export default {
       },
       conditions: {
         gender: [],
-        date: "",
+        date: '',
         offset: 0,
         limit: 9
       },
       beforeFetch(conditions) {
-        return conditions;
+        return conditions
       }
-    };
+    }
 
     return useConditionWatcher(config, {
-      sync: "router",
-      ignore: ["offset", "limit"]
-    });
+      sync: 'router',
+      ignore: ['offset', 'limit']
+    })
   }
-};
+}
 </script>

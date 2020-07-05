@@ -17,6 +17,7 @@ export interface Config {
   conditions: ConditionsType
   defaultParams?: ConditionsType
   beforeFetch?: (conditions: ConditionsType) => ConditionsType
+  afterFetch?: (data: any) => void
 }
 
 export interface ResultInterface {

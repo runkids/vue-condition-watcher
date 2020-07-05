@@ -42,6 +42,9 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     fetchData()
 
     watch([fetchResult, fetchError, fetchLoading], (values) => {
+      if (typeof config.afterFetch === 'function') {
+        config.afterFetch(values[0])
+      }
       data.value = values[0]
       error.value = values[1]
       loading.value = values[2] as boolean
