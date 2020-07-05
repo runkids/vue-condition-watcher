@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Vue Composition API for automatic fetch data when condition has been changed",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
