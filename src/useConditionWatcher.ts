@@ -1,16 +1,22 @@
 import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
 import { ConditionsType, Config, QueryOptions, ResultInterface } from './types'
-import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions, isEquivalentString } from './utils'
+import {
+  filterNoneValueObject,
+  createParams,
+  stringifyQuery,
+  syncQuery2Conditions,
+  isEquivalent,
+  deepClone,
+} from './utils'
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
-import clone from 'rfdc'
 
 export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
   config: T,
   queryOptions?: E
 ): ResultInterface {
   let router = null
-  const backupIntiConditions = clone({ proto: true })(config.conditions)
+  const backupIntiConditions = deepClone(config.conditions)
   const _conditions = reactive(config.conditions)
   const loading = ref(false)
   const data = ref(null)
@@ -45,7 +51,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   const conditionChangeHandler = (conditions) => {
     const conditions2Object: ConditionsType = conditions
     let customConditions: ConditionsType = {}
-    const deepCopyCondition: ConditionsType = clone({ proto: true })(conditions2Object)
+    const deepCopyCondition: ConditionsType = deepClone(conditions2Object)
 
     if (typeof config.beforeFetch === 'function') {
       customConditions = config.beforeFetch(deepCopyCondition)
@@ -72,7 +78,10 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
 
   watch(
     () => ({ ..._conditions }),
-    (conditions) => conditionChangeHandler(conditions)
+    (nc, oc) => {
+      if (completeInitialConditions.value && isEquivalent(nc, oc)) return
+      conditionChangeHandler(nc)
+    }
   )
 
   if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
@@ -80,9 +89,9 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
     if (router) {
       // initial conditions by window.location.search. just do once.
       syncConditionsByQuery()
-      // watch query changed
-      watch(query, async (newQuery, prevQuery) => {
-        if (isEquivalentString(newQuery, prevQuery, queryOptions.ignore || [])) return
+      conditionChangeHandler({ ..._conditions })
+      // watch query changed to push
+      watch(query, async () => {
         const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
         const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
         await router.push(path + '?' + queryString).catch((e) => e)

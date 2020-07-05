@@ -1,4 +1,11 @@
-import { filterNoneValueObject, createParams, stringifyQuery, syncQuery2Conditions, isEquivalent } from '../src/utils'
+import {
+  filterNoneValueObject,
+  createParams,
+  stringifyQuery,
+  syncQuery2Conditions,
+  isEquivalent,
+  deepClone,
+} from '../src/utils'
 
 describe('utils: isEquivalent', () => {
   it(`Check Object Equality`, () => {
@@ -17,6 +24,21 @@ describe('utils: isEquivalent', () => {
       data: new Date(),
     }
     expect(isEquivalent(current, old)).toBeTruthy()
+  })
+})
+
+describe('utils: deepClone', () => {
+  it(`Check Object deepClone`, () => {
+    const current = {
+      name: '',
+      tags: [],
+      phone: undefined,
+      address: null,
+      data: new Date(),
+    }
+    const newObj = deepClone(current)
+    expect(newObj !== current).toBeTruthy()
+    expect(newObj.data !== current.data).toBeTruthy()
   })
 })
 
