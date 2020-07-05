@@ -39,6 +39,41 @@ $ yarn dev
 <br>
 <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher-demo2.gif?raw=true"/>
 
+```javascript
+export default {
+  directives: { infiniteScroll },
+  setup() {
+    const items = ref([])
+
+    const config = {
+      fetcher: api.addBox,
+      conditions: {
+        offset: 0,
+        limit: 10
+      },
+      afterFetch(data) {
+        if (!data) return
+        items.value = items.value.concat(data)
+      }
+    }
+    
+    const { conditions, loading } = useConditionWatcher(config)
+
+    const loadMore = () => {
+      if (loading.value) return
+      conditions.offset += conditions.limit
+    }
+
+    return {
+      conditions,
+      loading,
+      items,
+      loadMore
+    }
+  }
+}
+```
+
 ## Quick Start
 
 Simple example for `vue-next` and `vue-router-next`
