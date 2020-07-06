@@ -34,7 +34,7 @@ $ yarn dev
 
 ### 👉 Online demo with vue-infinite-scroll
 
-[![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&theme=dark) 
+[![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue)
 
 <br>
 <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher-demo2.gif?raw=true"/>
