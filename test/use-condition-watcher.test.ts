@@ -12,7 +12,7 @@ const tick: Function = async (times: number) => {
 let root: any
 
 beforeEach(() => {
-  root = document.createElement('div') as any
+  root = document.createElement('div') as HTMLDivElement
 })
 
 describe('useConditionWatcher', () => {
