@@ -5,8 +5,6 @@
 ## Introduction
 Vue Composition API for automatic fetch data when condition has been changed
 
-⚠️⚠️⚠️ This project is experimental.
-
 #### Features
   ✔ Auto fetch data when conditions changed.<br>
   ✔ Auto filtter falsy value in conditions.<br>
@@ -30,7 +28,6 @@ $ cd examples/vue2
 $ yarn 
 $ yarn dev
 ````
-
 
 ### 👉 Online demo with vue-infinite-scroll
 
@@ -131,6 +128,8 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
   * `conditions` (⚠️Required) : An object of conditions, also be initial value
   * `defaultParams`: An object of fetcher's default parameters
   * `beforeFetch`: A function you can do before fetch data
+Parameters  
+  * `afterFetch`: A function you can do after fetch data. Parameters: `data`.
 
     ```javascript
 
@@ -153,10 +152,13 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
         // conditions is an object clone copy from config.conditions
         conditions.created_at = dayjs(conditions.created_at, 'YYYY-MM-DD');
         return conditions
+      },
+      afterFetch(data) {
+        console.log(data)
       }
     }
     ```
-  * `afterFetch`: A function you can do after fetch data. Return `data`.
+
 
   
 * `queryOptions`: An object of options to sync query string with conditions
@@ -183,7 +185,30 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
     ```javascript
     useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']})
     ```
-   
+    ##### How to use in vue@2 with @vue/composition-api
+    * Same to use `provide` in current file
+      ```javascript
+      import { useConditionWatcher } from "vue-condition-watcher";
+      import { provide } from "@vue/composition-api";
+      import router from "@/router";
+      import api from "../api";
+
+      export default {
+        setup() {
+          provide("router", router);
+
+          const config = {
+            fetcher: api.users,
+            conditions: {
+              offset: 0,
+              limit: 9
+            }
+          };
+
+          return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
+        }
+      };
+      ```
 
 #### Return Values
 - `reactive` : An object and returns a reactive proxy of conditions
@@ -191,38 +216,3 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
 - `error`: Error thrown by `config.fetcher`  
 - `loading`: Request is loading
 - `refresh`: A function to re-fetch data  
-
-#### How to use in vue@2 with vue-composition-api
-* Same to use `provide("router", router);` in current file
-  ```javascript
-  import { useConditionWatcher } from "vue-condition-watcher";
-  import { provide } from "@vue/composition-api";
-  import router from "@/router";
-  import api from "../api";
-
-  export default {
-    setup() {
-      provide("router", router);
-      const config = {
-        fetcher: api.users,
-        defaultParams: {
-          results: 9
-        },
-        conditions: {
-          gender: [],
-          date: "",
-          offset: 0,
-          limit: 9
-        },
-        beforeFetch(conditions) {
-          return conditions;
-        }
-      };
-
-      return useConditionWatcher(config, {
-        sync: "router",
-        ignore: ["offset", "limit"]
-      });
-    }
-  };
-  ```
