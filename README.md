@@ -124,7 +124,7 @@ const { conditions, data, error, loading, refresh } = useConditionWatcher(config
 #### Parameters
 
 - `config` : An object of config for vue-condition-watcher
-  * `fetcher` (⚠️Required) : A promise returning function to fetch data
+  * `fetcher` (⚠️Required) : Can be any asynchronous function to fetch data
   * `conditions` (⚠️Required) : An object of conditions, also be initial value
   * `defaultParams`: An object of fetcher's default parameters
   * `beforeFetch`: A function you can do before fetch data
