@@ -186,7 +186,19 @@ Parameters
     useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']})
     ```
     ##### How to use in vue@2 with @vue/composition-api
-    * Same to use `provide` in current file
+     * ( Good ) Add `provide` in `main.js`
+        ```javascript
+        new Vue({
+          el: '#app',
+          router,
+          store,
+          provide: {
+            router
+          },
+          render: h => h(App)
+        })
+        ```
+    * Add `provide` in current file
       ```javascript
       import { useConditionWatcher } from "vue-condition-watcher";
       import { provide } from "@vue/composition-api";
