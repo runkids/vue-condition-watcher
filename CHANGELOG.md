@@ -1,3 +1,7 @@
+### [0.1.6](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.6) (2020-08-04)
+### Fix
+  * Can not find modules
+
 ### [0.1.5](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.5) (2020-08-04)
 ### Chore
   * Remove peer dependency
