@@ -1,3 +1,8 @@
+### [0.1.5](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.5) (2020-08-04)
+### Chore
+  * Remove peer dependency
+  * Modify readme
+
 ### [0.1.4](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.4) (2020-07-05)
 ### Feature
   * Add function `afterFetch` and return `data`.

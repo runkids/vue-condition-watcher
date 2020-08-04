@@ -11,18 +11,18 @@ Vue Composition API for automatic fetch data when condition has been changed
   ✔ Auto convert the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.<br>
-  ✔ Support `vue@2 @vue/composition-api`
+  ✔ Support `Vue2 @vue/composition-api`
 
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
 
-[👉 Download vue@next example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
+[👉 Download Vue3 example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
 ```bash
 $ cd examples/vue3
 $ yarn 
 $ yarn dev
 ````
 
-[👉 Download vue@2 @vue/composition-api example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
+[👉 Download Vue2 @vue/composition-api example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
 ```bash
 $ cd examples/vue2
 $ yarn 
