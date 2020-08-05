@@ -27,13 +27,10 @@
 
 <script>
 import { useConditionWatcher } from 'vue-condition-watcher'
-import { provide } from '@vue/composition-api'
-import router from '@/router'
 import api from '../api'
 
 export default {
   setup() {
-    provide('router', router)
     const config = {
       fetcher: api.users,
       defaultParams: {
