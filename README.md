@@ -19,14 +19,14 @@ Vue Composition API for automatic fetch data when condition has been changed
 ```bash
 $ cd examples/vue3
 $ yarn 
-$ yarn dev
+$ yarn serve
 ````
 
 [👉 Download Vue2 @vue/composition-api example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
 ```bash
 $ cd examples/vue2
 $ yarn 
-$ yarn dev
+$ yarn serve
 ````
 
 ### 👉 Online demo with vue-infinite-scroll
