@@ -1,3 +1,9 @@
+### [0.1.8](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.8) (2021-02-17)
+
+### Fix
+
+* Utils bug
+
 ### [0.1.7](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.7) (2021-02-17)
 
 ### Fix
