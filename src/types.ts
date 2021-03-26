@@ -9,6 +9,7 @@ export type ProvideKeyName<T> = InjectionKey<T> | string
 
 export interface QueryOptions<T> {
   sync?: ProvideKeyName<T>
+  navigation?: 'push' | 'replace'
   ignore?: string[]
 }
 

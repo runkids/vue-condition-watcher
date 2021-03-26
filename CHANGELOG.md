@@ -1,3 +1,9 @@
+### [0.1.9](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.9) (2021-03-26)
+
+### Feature
+
+* Add query option property navigation
+
 ### [0.1.8](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.8) (2021-02-17)
 
 ### Fix

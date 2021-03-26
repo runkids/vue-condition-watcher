@@ -11,7 +11,7 @@
     "@vue/composition-api": "^1.0.0-rc.3",
     "core-js": "^3.6.5",
     "vue": "^2.6.12",
-    "vue-condition-watcher": "^0.1.8",
+    "vue-condition-watcher": "^0.1.9",
     "vue-infinite-scroll": "^2.0.2",
     "vue-router": "^3.3.4"
   },

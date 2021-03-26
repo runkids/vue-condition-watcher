@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { useConditionWatcher } from 'vue-condition-watcher'
+import { useConditionWatcher } from '../../../src/index'
 import api from '../api'
 
 export default {
