@@ -206,44 +206,44 @@ Parameters
 
 ##### How to use in vue@2 with @vue/composition-api
 
-    - ( Good ) Add `provide` in `main.js`
+- ( Good ) Add `provide` in `main.js`
 
-        ```javascript
-        new Vue({
-          el: '#app',
-          router,
-          store,
-          provide: {
-            router
-          },
-          render: h => h(App)
-        })
-        ```
+  ```javascript
+  new Vue({
+    el: '#app',
+    router,
+    store,
+    provide: {
+      router
+    },
+    render: h => h(App)
+  })
+  ```
 
-    - Add `provide` in current file
+- Add `provide` in current file
 
-      ```javascript
-      import { useConditionWatcher } from "vue-condition-watcher";
-      import { provide } from "@vue/composition-api";
-      import router from "@/router";
-      import api from "../api";
+  ```javascript
+  import { useConditionWatcher } from "vue-condition-watcher";
+  import { provide } from "@vue/composition-api";
+  import router from "@/router";
+  import api from "../api";
 
-      export default {
-        setup() {
-          provide("router", router);
+  export default {
+    setup() {
+      provide("router", router);
 
-          const config = {
-            fetcher: api.users,
-            conditions: {
-              offset: 0,
-              limit: 9
-            }
-          };
-
-          return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
+      const config = {
+        fetcher: api.users,
+        conditions: {
+          offset: 0,
+          limit: 9
         }
       };
-      ```
+
+      return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
+    }
+  };
+  ```
 
 #### Return Values
 
