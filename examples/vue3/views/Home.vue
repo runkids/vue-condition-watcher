@@ -46,7 +46,7 @@ export default {
       }
     }
 
-    return useConditionWatcher(config, { sync: 'router', ignore: ['offset', 'limit'] })
+    return useConditionWatcher(config, { sync: 'router', ignore: ['offset', 'limit'], navigation: 'replace' })
   }
 }
 </script>

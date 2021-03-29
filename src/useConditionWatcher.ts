@@ -97,8 +97,10 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
       watch(query, async () => {
         const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
         const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
-        const navigation = queryOptions.navigation === 'replace' ? router.replace : router.push
-        await navigation(path + '?' + queryString).catch((e) => e)
+        const location = path + '?' + queryString
+        const navigation = () =>
+          queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
+        await navigation().catch((e) => e)
       })
 
       onMounted(() => {

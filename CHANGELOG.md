@@ -1,3 +1,9 @@
+### [0.1.10](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.10) (2021-03-29)
+
+### Fix
+
+* No sync query use vue2 vue-router
+
 ### [0.1.9](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.9) (2021-03-26)
 
 ### Feature
