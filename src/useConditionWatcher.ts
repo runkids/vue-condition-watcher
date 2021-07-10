@@ -32,9 +32,12 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   }
 
   const fetch = (conditions: ConditionsType): void => {
-    const { loading: fetchLoading, result: fetchResult, error: fetchError, use: fetchData } = useFetchData(() =>
-      config.fetcher(conditions)
-    )
+    const {
+      loading: fetchLoading,
+      result: fetchResult,
+      error: fetchError,
+      use: fetchData,
+    } = useFetchData(() => config.fetcher(conditions))
 
     refresh.value = fetchData
     loading.value = true
