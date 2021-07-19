@@ -4,4 +4,5 @@ module.exports = {
   coverageReporters: ['text'],
   preset: 'ts-jest',
   testRegex: '/test/.*\\.test\\.ts$',
+  testEnvironment: "jsdom",
 };

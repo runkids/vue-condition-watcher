@@ -4,7 +4,6 @@ const users = params =>
   }).then(res => res.json())
 
 const addBox = params => {
-  console.log(params.offset)
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(

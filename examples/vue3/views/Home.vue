@@ -25,6 +25,7 @@
 
 <script>
 import { useConditionWatcher } from '../../../src/index'
+// import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 export default {

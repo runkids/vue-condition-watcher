@@ -11,6 +11,8 @@ import {
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 
+export type FunctionArgs = (args: [any, any, boolean]) => void
+
 export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
   config: T,
   queryOptions?: E
@@ -21,7 +23,9 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   const loading = ref(false)
   const data = ref(null)
   const error = ref(null)
-  const refresh = ref(() => {})
+  const refresh = ref(() => {
+    // default empty function
+  })
   const query = ref({})
   const completeInitialConditions = ref(false)
 
@@ -44,13 +48,13 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
 
     fetchData()
 
-    watch([fetchResult, fetchError, fetchLoading], (values) => {
+    watch([fetchResult, fetchError, fetchLoading], ([...values]: [any, any, boolean]): void => {
       if (typeof config.afterFetch === 'function') {
         config.afterFetch(values[0])
       }
       data.value = values[0]
       error.value = values[1]
-      loading.value = values[2] as boolean
+      loading.value = values[2]
     })
   }
 

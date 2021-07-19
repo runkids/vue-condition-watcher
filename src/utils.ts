@@ -2,7 +2,7 @@ import { ConditionsType } from './types'
 
 declare global {
   interface ObjectConstructor {
-    fromEntries(xs: [string | number | symbol, any][]): object
+    fromEntries(xs: [string | number | symbol, any][]): Record<string, unknown>
   }
 }
 
@@ -74,11 +74,11 @@ export function syncQuery2Conditions(conditions: ConditionsType, query: Conditio
   })
 }
 
-export function isEquivalentString(a, b, ignore) {
+export function isEquivalentString(a: ConditionsType, b: ConditionsType, ignore: string[]) {
   return stringifyQuery(a, ignore) === stringifyQuery(b, ignore)
 }
 
-export function isEquivalent(x, y) {
+export function isEquivalent(x: any, y: any) {
   if (x === null || x === undefined || y === null || y === undefined) {
     return x === y
   }
@@ -117,7 +117,7 @@ export function isEquivalent(x, y) {
   )
 }
 
-export function deepClone(obj) {
+export function deepClone(obj): any {
   if (obj === null) return null
   let clone = Object.assign({}, obj)
   Object.keys(clone).forEach((key) => {

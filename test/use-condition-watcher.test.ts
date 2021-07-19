@@ -2,24 +2,27 @@ import { useConditionWatcher } from '../src'
 import { isRef, isReactive, createApp, nextTick } from 'vue'
 
 jest.useFakeTimers()
-const timeout: Function = (milliseconds: number) => jest.advanceTimersByTime(milliseconds)
-const tick: Function = async (times: number) => {
+const timeout = (milliseconds: number) => jest.advanceTimersByTime(milliseconds)
+const tick = async (times: number) => {
   for (let _ in [...Array(times).keys()]) {
     await nextTick()
   }
 }
 
-let root: any
-
-beforeEach(() => {
-  root = document.createElement('div') as HTMLDivElement
-})
-
 describe('useConditionWatcher', () => {
+  const root = document.createElement('div')
   const consoleWarnSpy = jest.spyOn(console, 'warn')
 
   beforeEach(() => {
     consoleWarnSpy.mockClear()
+  })
+
+  /**
+   * @jest-environment jsdom
+   */
+
+  test('use jsdom in this test file', () => {
+    expect(root).not.toBeNull()
   })
 
   it(`Check return value's type`, async () => {

@@ -1,6 +1,6 @@
 import { reactive, toRefs } from 'vue-demi'
 
-export function useFetchData<T>(fetcher: () => Promise<T>) {
+export function useFetchData<T>(fetcher: () => Promise<T>): any {
   const state = reactive({
     loading: false,
     error: null,

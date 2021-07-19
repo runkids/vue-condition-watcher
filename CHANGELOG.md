@@ -1,3 +1,9 @@
+### [0.1.11](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.11) (2021-07-19)
+
+### Fix
+
+* Use stable version for vue-demi
+
 ### [0.1.10](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.10) (2021-03-29)
 
 ### Fix
