@@ -9,7 +9,7 @@ Vue Composition API for automatic fetch data when condition has been changed
 #### Features
 
   ✔ Auto fetch data when conditions changed.<br>
-  ✔ Auto filtter falsy value in conditions.<br>
+  ✔ Auto filter falsy value in conditions.<br>
   ✔ Auto convert the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.<br>
