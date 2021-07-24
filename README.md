@@ -146,11 +146,9 @@ Parameters
 
     const config = {
       fetcher: params => axios.get('url', { params }),
-
       defaultParams: {
         type: 'member'
       },
-
       conditions: {
         offset: 0,
         limit: 10,
@@ -158,7 +156,6 @@ Parameters
         tags: [],
         created_at: new Date()
       },
-
       beforeFetch: conditions => {
         // conditions is an object clone copy from config.conditions
         conditions.created_at = dayjs(conditions.created_at, 'YYYY-MM-DD');
@@ -247,7 +244,7 @@ Parameters
 
 #### Return Values
 
-- `reactive` : An object and returns a reactive proxy of conditions
+- `conditions` : An object and returns a reactive proxy of conditions
 - `data`: Data resolved by `config.fetcher`
 - `error`: Error thrown by `config.fetcher`  
 - `loading`: Request is loading
