@@ -242,6 +242,34 @@ Parameters
   };
   ```
 
+##### How to use in Nuxt with @nuxtjs/composition-api
+
+- Add `provide` in current file
+
+  ```javascript
+  import { useConditionWatcher } from "vue-condition-watcher";
+  import { defineComponent, useRoute, provide, useContext } from "@nuxtjs/composition-api";
+  import api from "~/api";
+
+  export default defineComponent({
+    setup() {
+      const route = useRoute();
+      const { app } = useContext();
+      provide('router', app.router);
+
+      const config = {
+        fetcher: api.users,
+        conditions: {
+          offset: 0,
+          limit: 9
+        }
+      };
+
+      return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
+    }
+  });
+  ```
+
 #### Return Values
 
 - `conditions` : An object and returns a reactive proxy of conditions
