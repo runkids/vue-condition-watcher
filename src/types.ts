@@ -8,7 +8,7 @@ export type FetcherType = (params: ConditionsType) => Promise<any>
 export type ProvideKeyName<T> = InjectionKey<T> | string
 
 export interface QueryOptions<T> {
-  sync?: ProvideKeyName<T>
+  sync?: ProvideKeyName<T> | 'router'
   navigation?: 'push' | 'replace'
   ignore?: string[]
 }

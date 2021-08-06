@@ -11,8 +11,6 @@ import {
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 
-export type FunctionArgs = (args: [any, any, boolean]) => void
-
 export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
   config: T,
   queryOptions?: E
