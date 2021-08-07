@@ -10,7 +10,6 @@ export const router = createRouter({
     {
       path: '/',
       components: { default: Home },
-      props: to => ({ waited: to.meta.waitedFor }),
-    }
-  ]
+    },
+  ],
 })

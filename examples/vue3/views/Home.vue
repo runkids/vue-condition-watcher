@@ -23,31 +23,38 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent} from 'vue'
 import { useConditionWatcher } from '../../../src/index'
 // import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
-export default {
-  setup(props){
-    const config = {
-      fetcher: api.users,
-      defaultParams: {
-        results: 9,
-      },
-      conditions: {
-        gender: [],
-        date: '',
-        offset: 0,
-        limit: 9
-      },
-      beforeFetch(conditions){
-        console.log(conditions)
-        return conditions
-      }
-    }
+export default defineComponent({
+  setup(){
 
-    return useConditionWatcher(config, { sync: 'router', ignore: ['offset', 'limit'], navigation: 'replace' })
+    return useConditionWatcher(
+      {
+        fetcher: api.users,
+        defaultParams: {
+          results: 9,
+        },
+        conditions: {
+          gender: [],
+          date: '',
+          offset: 0,
+          limit: 9
+        },
+        beforeFetch(conditions){
+          console.log(conditions)
+          return conditions
+        }
+      }, 
+      { 
+        sync: 'router', 
+        ignore: ['offset', 'limit'], 
+        navigation: 'replace' 
+      }
+    )
   }
-}
+})
 </script>
