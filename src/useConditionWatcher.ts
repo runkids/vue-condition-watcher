@@ -1,5 +1,5 @@
 import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
-import { ConditionsType, Config, QueryOptions, ResultInterface } from './types'
+import { ConditionsType, Config, QueryOptions, Result, Conditions } from './types'
 import {
   filterNoneValueObject,
   createParams,
@@ -11,13 +11,13 @@ import {
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 
-export default function useConditionWatcher<T extends Config, E extends QueryOptions<E>>(
-  config: T,
-  queryOptions?: E
-): ResultInterface {
+export default function useConditionWatcher<O extends { [key: string]: any }, K extends keyof O>(
+  config: Config<O>,
+  queryOptions?: QueryOptions<K>
+): Result<O> {
   let router = null
   const backupIntiConditions = deepClone(config.conditions)
-  const _conditions = reactive(config.conditions)
+  const _conditions = reactive(config.conditions as O)
   const loading = ref(false)
   const data = ref(null)
   const error = ref(null)
@@ -57,9 +57,9 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
   }
 
   const conditionChangeHandler = (conditions) => {
-    const conditions2Object: ConditionsType = conditions
+    const conditions2Object: Conditions<O> = conditions
     let customConditions: ConditionsType = {}
-    const deepCopyCondition: ConditionsType = deepClone(conditions2Object)
+    const deepCopyCondition: Conditions<O> = deepClone(conditions2Object)
 
     if (typeof config.beforeFetch === 'function') {
       customConditions = config.beforeFetch(deepCopyCondition)
@@ -101,7 +101,7 @@ export default function useConditionWatcher<T extends Config, E extends QueryOpt
       // watch query changed to push
       watch(query, async () => {
         const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
-        const queryString = stringifyQuery(query.value, queryOptions.ignore || [])
+        const queryString = stringifyQuery(query.value, queryOptions.ignore)
         const location = path + '?' + queryString
         const navigation = () =>
           queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)

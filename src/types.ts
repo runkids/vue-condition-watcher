@@ -1,28 +1,31 @@
-import { Ref, InjectionKey } from 'vue-demi'
+import { Ref, InjectionKey, UnwrapRef } from 'vue-demi'
+
+type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
+
+export type Conditions<T> = {
+  [K in keyof T]: T[K]
+}
 
 export type ConditionsType = {
-  [propName: string]: any
+  [key: string]: any
 }
 
-export type FetcherType = (params: ConditionsType) => Promise<any>
-export type ProvideKeyName<T> = InjectionKey<T> | string
-
-export interface QueryOptions<T> {
-  sync?: ProvideKeyName<T> | 'router'
-  navigation?: 'push' | 'replace'
-  ignore?: string[]
-}
-
-export interface Config {
-  fetcher: FetcherType
-  conditions: ConditionsType
+export interface Config<O> {
+  fetcher: (params: ConditionsType) => Promise<any>
+  conditions: Readonly<Conditions<O>>
   defaultParams?: ConditionsType
   beforeFetch?: (conditions: ConditionsType) => ConditionsType
   afterFetch?: (data: any) => void
 }
 
-export interface ResultInterface {
-  conditions: { [x: string]: any }
+export interface QueryOptions<K> {
+  sync?: InjectionKey<any> | string
+  navigation?: 'push' | 'replace'
+  ignore?: Array<K>
+}
+
+export interface Result<O> {
+  conditions: UnwrapNestedRefs<Conditions<O>>
   loading: Ref<boolean | false>
   data: Ref<any | null>
   refresh: Ref<() => void>
