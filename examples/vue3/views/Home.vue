@@ -32,7 +32,7 @@ import api from '../api'
 export default defineComponent({
   setup(){
 
-    return useConditionWatcher(
+     const { conditions, loading, data, refresh } = useConditionWatcher(
       {
         fetcher: api.users,
         defaultParams: {
@@ -55,6 +55,13 @@ export default defineComponent({
         navigation: 'replace' 
       }
     )
+
+    return {
+      loading,
+      data,
+      refresh,
+      conditions
+    }
   }
 })
 </script>

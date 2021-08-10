@@ -38,6 +38,22 @@
 		"@typescript-eslint/no-var-requires": 0,
 		"@typescript-eslint/no-explicit-any": 0,
 		"@typescript-eslint/no-unused-vars": 0,
-		"@typescript-eslint/explicit-module-boundary-types": 0
+		"@typescript-eslint/explicit-module-boundary-types": 0,
+		"@typescript-eslint/ban-types": [
+			"error",
+			{
+				"types": {
+					"String": true,
+					"Boolean": true,
+					"Number": true,
+					"Symbol": true,
+					"{}": true,
+					"Object": true,
+					"object": false,
+					"Function": true
+				},
+				"extendDefaults": true
+			}
+		]
 	}
 }

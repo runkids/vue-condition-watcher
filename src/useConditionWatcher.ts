@@ -1,5 +1,5 @@
 import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
-import { ConditionsType, Config, QueryOptions, Result, Conditions } from './types'
+import { Config, QueryOptions, Result, Conditions, UnwrapNestedRefs } from './types'
 import {
   filterNoneValueObject,
   createParams,
@@ -11,13 +11,13 @@ import {
 import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 
-export default function useConditionWatcher<O extends { [key: string]: any }, K extends keyof O>(
+export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O>,
   queryOptions?: QueryOptions<K>
 ): Result<O> {
   let router = null
   const backupIntiConditions = deepClone(config.conditions)
-  const _conditions = reactive(config.conditions as O)
+  const _conditions = reactive<O>(config.conditions)
   const loading = ref(false)
   const data = ref(null)
   const error = ref(null)
@@ -33,7 +33,7 @@ export default function useConditionWatcher<O extends { [key: string]: any }, K 
     completeInitialConditions.value = true
   }
 
-  const fetch = (conditions: ConditionsType): void => {
+  const fetch = (conditions: object): void => {
     const {
       loading: fetchLoading,
       result: fetchResult,
@@ -58,7 +58,7 @@ export default function useConditionWatcher<O extends { [key: string]: any }, K 
 
   const conditionChangeHandler = (conditions) => {
     const conditions2Object: Conditions<O> = conditions
-    let customConditions: ConditionsType = {}
+    let customConditions: object = {}
     const deepCopyCondition: Conditions<O> = deepClone(conditions2Object)
 
     if (typeof config.beforeFetch === 'function') {
@@ -78,7 +78,7 @@ export default function useConditionWatcher<O extends { [key: string]: any }, K 
      */
 
     query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
-    const finalConditions: ConditionsType = createParams(query.value, config.defaultParams)
+    const finalConditions: object = createParams(query.value, config.defaultParams)
 
     if (!completeInitialConditions.value) return
     fetch(finalConditions)
@@ -125,7 +125,7 @@ export default function useConditionWatcher<O extends { [key: string]: any }, K 
   }
 
   return {
-    conditions: _conditions,
+    conditions: _conditions as UnwrapNestedRefs<O>,
     loading,
     data,
     refresh,

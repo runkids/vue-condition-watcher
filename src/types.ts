@@ -1,6 +1,6 @@
 import { Ref, InjectionKey, UnwrapRef } from 'vue-demi'
 
-type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
+export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
 
 export type Conditions<T> = {
   [K in keyof T]: T[K]
@@ -11,10 +11,10 @@ export type ConditionsType = {
 }
 
 export interface Config<O> {
-  fetcher: (params: ConditionsType) => Promise<any>
-  conditions: Readonly<Conditions<O>>
-  defaultParams?: ConditionsType
-  beforeFetch?: (conditions: ConditionsType) => ConditionsType
+  fetcher: (params: object) => Promise<any>
+  conditions: Readonly<O>
+  defaultParams?: object
+  beforeFetch?: (conditions: O & object) => object
   afterFetch?: (data: any) => void
 }
 
@@ -25,7 +25,7 @@ export interface QueryOptions<K> {
 }
 
 export interface Result<O> {
-  conditions: UnwrapNestedRefs<Conditions<O>>
+  conditions: UnwrapNestedRefs<O>
   loading: Ref<boolean | false>
   data: Ref<any | null>
   refresh: Ref<() => void>
