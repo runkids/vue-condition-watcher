@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "vue": "^3.2.1",
-    "vue-condition-watcher": "^0.1.11",
+    "vue-condition-watcher": "^0.1.12",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {

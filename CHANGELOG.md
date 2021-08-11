@@ -1,3 +1,13 @@
+### [0.1.12](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.12) (2021-08-11)
+
+### Chore
+
+* Refactor types
+
+### Other
+
+* Requires Node.js 12.0.0 or higher
+
 ### [0.1.11](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.11) (2021-07-19)
 
 ### Fix
