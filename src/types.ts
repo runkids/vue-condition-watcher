@@ -12,7 +12,7 @@ export type ConditionsType = {
 
 export interface Config<O> {
   fetcher: (params: object) => Promise<any>
-  conditions: Readonly<O>
+  conditions: O
   defaultParams?: object
   beforeFetch?: (conditions: O & object) => object
   afterFetch?: (data: any) => void
