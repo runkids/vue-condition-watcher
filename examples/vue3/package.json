@@ -6,14 +6,14 @@
     "build": "vite build"
   },
   "dependencies": {
-    "vue": "^3.2.1",
-    "vue-condition-watcher": "^0.1.12",
+    "vue": "^3.2.26",
+    "vue-condition-watcher": "1.0.0",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.2.4",
-    "@vue/compiler-sfc": "^3.2.1",
+    "@vitejs/plugin-vue": "^2.0.1",
+    "@vue/compiler-sfc": "^3.2.26",
     "typescript": "^4.3.5",
-    "vite": "^2.4.1"
+    "vite": "^2.7.10"
   }
 }

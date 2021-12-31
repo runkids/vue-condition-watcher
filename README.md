@@ -13,7 +13,7 @@ Vue Composition API for automatic fetch data when condition has been changed
   ✔ Auto filter falsy value in conditions.<br>
   ✔ Auto convert the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
-  ✔ Sync the state with the query string and initialize off of that and that back/forward/refresh work.<br>
+  ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
@@ -45,21 +45,21 @@ yarn serve
 export default {
   directives: { infiniteScroll },
   setup() {
-    const items = ref([])
-
     const config = {
       fetcher: api.addBox,
+      initialData: []
       conditions: {
         offset: 0,
         limit: 10
       },
       afterFetch(data) {
         if (!data) return
-        items.value = items.value.concat(data)
+        data = data.concat(data)
+        return data
       }
     }
     
-    const { conditions, loading } = useConditionWatcher(config)
+    const { conditions, loading, data:items } = useConditionWatcher(config)
 
     const loadMore = () => {
       if (loading.value) return
@@ -85,7 +85,7 @@ createApp({
   template: `
     <div class="filter">
       <input v-model="conditions.name">
-      <button @click="refresh">Refresh</button>
+      <button @click="execute">Refetch</button>
     </div>
     <div class="container" v-if="!loading">
       {{ data }}
@@ -127,21 +127,138 @@ CDN
 https://unpkg.com/vue-condition-watcher/dist/index.js
 ```
 
-### API
+### Basic Usage
 
 ```js
-const { conditions, data, error, loading, refresh } = useConditionWatcher(config, queryOptions)
+const { conditions, data, error, loading, execute } = useConditionWatcher(config, queryOptions)
 ```
 
-#### Parameters
+### Execute Request
+
+`conditions` is reactive proxy, easy execute request when `conditions` value changed
+
+```js
+const { conditions } = useConditionWatcher({
+  fetcher,
+  conditions: {
+    page: 0
+  },
+  defaultParams: {
+    opt_expand: 'date'
+  }
+})
+
+conditions.page = 1 // fetch data with payload { page: 1, opt_expand: 'date' }
+
+conditions.page = 2 // fetch data with payload { page: 2, opt_expand: 'date' }
+```
+
+Just call `execute` function to send a request if you need.
+
+```js
+const { conditions, execute: refetch } = useConditionWatcher({
+  fetcher,
+  conditions: {
+    page: 0
+  },
+   defaultParams: {
+    opt_expand: 'date'
+  }
+})
+
+refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
+```
+
+### Prevent Request
+Setting the `immediate` to false will prevent the request until the `execute`
+function called.
+
+```js
+const { execute } = useConditionWatcher({
+  fetcher,
+  conditions,
+  immediate: false,
+})
+
+execute()
+```
+
+### Intercepting Request
+The `beforeFetch` can modify conditions before send a request and you can call `cancel` function to stop request
+```js
+useConditionWatcher({
+  fetcher,
+  conditions: {
+    date: ['2022/01/01', '2022/01/02']
+  },
+  initialData: [],
+  async beforeFetch(conditions, cancel) {
+    // await something
+    await doSomething ()
+
+    // conditions is an object clone copy from config.conditions
+    const {date, ...baseConditions} = conditions
+    const [after, before] = date
+    baseConditions.created_at_after = after
+    baseConditions.created_at_before = before
+
+    return baseConditions
+  }
+})
+```
+The `afterFetch` can intercept the response before data updated
+
+```js
+const { data } = useConditionWatcher({
+  fetcher,
+  conditions,
+  async afterFetch(response) {
+    //response.data = {id: 1, name: 'runkids'}
+    if(response.data === null) {
+      return []
+    }
+    const finalResponse = await otherAPIById(response.data.id)
+
+    return finalResponse // [{message: 'Hello', sender: 'runkids'}]
+  }
+})
+
+console.log(data) //[{message: 'Hello', sender: 'runkids'}]
+```
+
+The `onFetchError` can intercept the response before data and error updated
+
+```js
+const { data, error } = useConditionWatcher({
+  fetcher,
+  conditions,
+  async onFetchError({data, error}) {
+    if(error.code === 401) {
+      await doSomething()
+    }
+
+    return {
+      data: [],
+      error: 'Error Message'
+    }
+  }
+})
+
+console.log(data) //[]
+console.log(error) //'Error Message'
+```
+
+
+#### More Configs
 
 - `config` : An object of config for vue-condition-watcher
   - `fetcher` (⚠️Required) : Can be any asynchronous function to fetch data
   - `conditions` (⚠️Required) : An object of conditions, also be initial value
-  - `defaultParams`: An object of fetcher's default parameters
-  - `beforeFetch`: A function you can do before fetch data
-Parameters  
-  - `afterFetch`: A function you can do after fetch data. Parameters: `data`.
+  - `defaultParams`: An object of fetcher's default
+  parameters
+  - `initialData`: `data` default value is null, and you can setting `data` default value by use this config
+  - `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is true.
+function called
 
     ```javascript
 
@@ -150,26 +267,18 @@ Parameters
       defaultParams: {
         type: 'member'
       },
+      immediate: true,
+      initialData: []
       conditions: {
         offset: 0,
         limit: 10,
         username: '',
-        tags: [],
-        created_at: new Date()
       },
-      beforeFetch: conditions => {
-        // conditions is an object clone copy from config.conditions
-        conditions.created_at = dayjs(conditions.created_at, 'YYYY-MM-DD');
-        return conditions
-      },
-      afterFetch(data) {
-        console.log(data)
-      }
     }
     ```
 
 - `queryOptions`: An object of options to sync query string with conditions
-  - ⚠️ `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/4.0.0-alpha.12) first.
+  - ⚠️ `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/next) first.
   - `sync`: key of provide name ( String | Symbol )
     - main.js: register router
 
@@ -271,10 +380,10 @@ Parameters
   });
   ```
 
-#### Return Values
+#### UseConditionsWatcher Return Values
 
 - `conditions` : An object and returns a reactive proxy of conditions
 - `data`: Data resolved by `config.fetcher`
 - `error`: Error thrown by `config.fetcher`  
-- `loading`: Request is loading
-- `refresh`: A function to re-fetch data  
+- `loading`: Request is fetching
+- `execute`: The function to fetch data  

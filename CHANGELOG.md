@@ -1,3 +1,16 @@
+### [1.0.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.0.0) (2022-01-01)
+
+### Changed
+ * Deprecate `refresh`
+ * You can use async & await function now in `beforeFetch`, `afterFetch`.
+ * `afterFetch` should be return an data.
+
+### Add
+  * Config: `initialData`
+  * Config: `immediate`
+  * Config: `onFetchError`
+  * Return Value: `execute`
+
 ### [0.1.12](https://github.com/runkids/vue-condition-watcher/releases/tag/0.1.12) (2021-08-11)
 
 ### Chore

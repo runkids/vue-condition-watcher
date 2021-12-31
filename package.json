@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "0.1.12",
+  "version": "1.0.0",
   "description": "Vue Composition API for automatic fetch data when condition has been changed",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
@@ -56,7 +56,7 @@
     "node": ">=12"
   },
   "dependencies": {
-    "vue-demi": "^0.11.2"
+    "vue-demi": "^0.12.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",
@@ -73,7 +73,7 @@
     "prettier": "^2.0.5",
     "ts-jest": "27.0.3",
     "typescript": "^4.3.5",
-    "vue": "^3.2.1",
+    "vue": "^3.2.26",
     "vue-router": "^4.0.10"
   }
 }

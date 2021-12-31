@@ -3,12 +3,12 @@
     <div class="link" @click="$router.push('/infinite')">Demo Infinite Scrolling</div>
     <br />
     <div class="filters">
-      <input type="checkbox" id="male" value="male" v-model="conditions.gender" />
+      <input type="checkbox" id="male" value="male" v-model="conditions.gender" :disabled="loading"/>
       <label for="male">Male</label>
-      <input type="checkbox" id="female" value="female" v-model="conditions.gender" />
+      <input type="checkbox" id="female" value="female" v-model="conditions.gender" :disabled="loading"/>
       <label for="female">Female</label>
-      <input class="date-picker" type="date" v-model="conditions.date" />
-      <button class="btn" @click="refresh">Refresh</button>
+      <input class="date-picker" type="date" v-model="conditions.date" :disabled="loading"/>
+      <button class="btn" @click="refresh">Refetch</button>
     </div>
 
     <div class="container" v-if="!loading && data">
@@ -33,6 +33,7 @@ export default {
   setup() {
     const config = {
       fetcher: api.users,
+      initialData: {},
       defaultParams: {
         results: 9
       },

@@ -21,20 +21,21 @@ import api from '../api'
 export default {
   directives: { infiniteScroll },
   setup() {
-    const items = ref([])
-
     const config = {
       fetcher: api.addBox,
+      initialData: [],
       conditions: {
         offset: 0,
         limit: 10
       },
       afterFetch(data) {
         if (!data) return
-        items.value = items.value.concat(data)
+        data = data.concat(data)
+        return data
       }
     }
-    const { conditions, loading } = useConditionWatcher(config)
+    
+    const { conditions, loading, data:items } = useConditionWatcher(config)
 
     const loadMore = () => {
       if (loading.value) return

@@ -1,5 +1,5 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
-import { Config, QueryOptions, Result, Conditions, UnwrapNestedRefs } from './types'
+import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue'
+import { Config, QueryOptions, UseConditionWatcherReturn, Conditions, UnwrapNestedRefs } from './types'
 import {
   filterNoneValueObject,
   createParams,
@@ -7,63 +7,82 @@ import {
   syncQuery2Conditions,
   isEquivalent,
   deepClone,
+  containsProp,
 } from './utils'
-import { useFetchData } from './useFetchData'
 import { useParseQuery } from './useParseQuery'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O>,
   queryOptions?: QueryOptions<K>
-): Result<O> {
+): UseConditionWatcherReturn<O> {
+  function isFetchConfig(obj: object): obj is Config<O> {
+    return containsProp(
+      obj,
+      'fetcher',
+      'conditions',
+      'defaultParams',
+      'initialData',
+      'immediate',
+      'beforeFetch',
+      'afterFetch',
+      'onFetchError'
+    )
+  }
+
+  let watcherConfig: Config<O> = {
+    fetcher: config.fetcher,
+    conditions: config.conditions,
+    immediate: true,
+    initialData: null,
+  }
+
+  if (isFetchConfig(config)) {
+    watcherConfig = { ...watcherConfig, ...config }
+  }
+
   let router = null
-  const backupIntiConditions = deepClone(config.conditions)
-  const _conditions = reactive<O>(config.conditions)
-  const loading = ref(false)
-  const data = ref(null)
+  let completeInitialConditions = false
+
+  const backupIntiConditions = deepClone(watcherConfig.conditions)
+  const _conditions = reactive<O>(backupIntiConditions)
+
+  const isFinished = ref(false)
+  const isFetching = ref(false)
+
+  const data = ref(watcherConfig.initialData || null)
   const error = ref(null)
-  const refresh = ref(() => {
-    // default empty function
-  })
   const query = ref({})
-  const completeInitialConditions = ref(false)
+
+  const loading = (isLoading: boolean) => {
+    isFetching.value = isLoading
+    isFinished.value = !isLoading
+  }
 
   const syncConditionsByQuery = () => {
     const { query: initQuery } = useParseQuery()
     syncQuery2Conditions(_conditions, Object.keys(initQuery).length ? initQuery : backupIntiConditions)
-    completeInitialConditions.value = true
+    completeInitialConditions = false
   }
 
-  const fetch = (conditions: object): void => {
-    const {
-      loading: fetchLoading,
-      result: fetchResult,
-      error: fetchError,
-      use: fetchData,
-    } = useFetchData(() => config.fetcher(conditions))
-
-    refresh.value = fetchData
-    loading.value = true
-
-    fetchData()
-
-    watch([fetchResult, fetchError, fetchLoading], ([...values]: [any, any, boolean]): void => {
-      if (typeof config.afterFetch === 'function') {
-        config.afterFetch(values[0])
-      }
-      data.value = values[0]
-      error.value = values[1]
-      loading.value = values[2]
-    })
-  }
-
-  const conditionChangeHandler = (conditions) => {
+  const conditionChangeHandler = async (conditions) => {
+    if (isFetching.value) return
+    loading(true)
+    error.value = null
     const conditions2Object: Conditions<O> = conditions
     let customConditions: object = {}
     const deepCopyCondition: Conditions<O> = deepClone(conditions2Object)
 
-    if (typeof config.beforeFetch === 'function') {
-      customConditions = config.beforeFetch(deepCopyCondition)
+    if (typeof watcherConfig.beforeFetch === 'function') {
+      let isCanceled = false
+      customConditions = await watcherConfig.beforeFetch(deepCopyCondition, () => {
+        isCanceled = true
+      })
+      if (isCanceled) {
+        loading(false)
+        return Promise.resolve(null)
+      }
       if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
+        loading(false)
         throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
       }
     }
@@ -78,16 +97,46 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
      */
 
     query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
-    const finalConditions: object = createParams(query.value, config.defaultParams)
+    const finalConditions: object = createParams(query.value, watcherConfig.defaultParams)
 
-    if (!completeInitialConditions.value) return
-    fetch(finalConditions)
+    let responseData: any = null
+
+    return new Promise((resolve, reject) => {
+      config
+        .fetcher(finalConditions)
+        .then(async (fetchResponse) => {
+          responseData = fetchResponse
+          if (typeof watcherConfig.afterFetch === 'function') {
+            responseData = await watcherConfig.afterFetch(fetchResponse)
+          }
+          data.value = responseData
+          return resolve(fetchResponse)
+        })
+        .catch(async (fetchError) => {
+          if (typeof watcherConfig.onFetchError === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-extra-semi
+            ;({ data: responseData, error: fetchError } = await watcherConfig.onFetchError({
+              data: null,
+              error: fetchError,
+            }))
+            data.value = responseData || watcherConfig.initialData
+            error.value = fetchError
+          }
+          return reject(fetchError)
+        })
+        .finally(() => {
+          loading(false)
+        })
+    })
   }
 
   watch(
     () => ({ ..._conditions }),
     (nc, oc) => {
-      if (completeInitialConditions.value && isEquivalent(nc, oc)) return
+      if (!completeInitialConditions) {
+        completeInitialConditions = true
+      }
+      if (isEquivalent(nc, oc)) return
       conditionChangeHandler(nc)
     }
   )
@@ -97,16 +146,19 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     if (router) {
       // initial conditions by window.location.search. just do once.
       syncConditionsByQuery()
-      conditionChangeHandler({ ..._conditions })
       // watch query changed to push
-      watch(query, async () => {
-        const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
-        const queryString = stringifyQuery(query.value, queryOptions.ignore)
-        const location = path + '?' + queryString
-        const navigation = () =>
-          queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
-        await navigation().catch((e) => e)
-      })
+      watch(
+        query,
+        async () => {
+          const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
+          const queryString = stringifyQuery(query.value, queryOptions.ignore)
+          const location = path + '?' + queryString
+          const navigation = () =>
+            queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
+          await navigation().catch((e) => e)
+        },
+        { deep: true }
+      )
 
       onMounted(() => {
         window.addEventListener('popstate', syncConditionsByQuery)
@@ -119,16 +171,19 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
         `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
       )
     }
-  } else {
-    completeInitialConditions.value = true
-    conditionChangeHandler({ ..._conditions })
+  }
+
+  if (watcherConfig.immediate === true) {
+    setTimeout(() => {
+      conditionChangeHandler({ ..._conditions })
+    }, 0)
   }
 
   return {
     conditions: _conditions as UnwrapNestedRefs<O>,
-    loading,
+    loading: isFetching,
     data,
-    refresh,
     error,
+    execute: () => conditionChangeHandler({ ..._conditions }),
   }
 }
