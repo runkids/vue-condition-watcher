@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { ref } from '@vue/composition-api'
 import { useConditionWatcher } from 'vue-condition-watcher'
 import infiniteScroll from 'vue-infinite-scroll'
 import api from '../api'
