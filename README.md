@@ -45,21 +45,21 @@ yarn serve
 export default {
   directives: { infiniteScroll },
   setup() {
+    const items = ref([])
+
     const config = {
       fetcher: api.addBox,
-      initialData: []
       conditions: {
         offset: 0,
         limit: 10
       },
       afterFetch(data) {
-        if (!data) return
-        data = data.concat(data)
+        if (!data) return []
+        items.value = items.value.concat(data)
         return data
       }
     }
-    
-    const { conditions, loading, data:items } = useConditionWatcher(config)
+    const { conditions, loading } = useConditionWatcher(config)
 
     const loadMore = () => {
       if (loading.value) return
@@ -257,8 +257,7 @@ console.log(error) //'Error Message'
   - `defaultParams`: An object of fetcher's default
   parameters
   - `initialData`: `data` default value is null, and you can setting `data` default value by use this config
-  - `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is true.
-function called
+  - `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
 
     ```javascript
 

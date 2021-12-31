@@ -8,7 +8,7 @@
       <input type="checkbox" id="female" value="female" v-model="conditions.gender" :disabled="loading"/>
       <label for="female">Female</label>
       <input class="date-picker" type="date" v-model="conditions.date" :disabled="loading"/>
-      <button class="btn" @click="refresh">Refetch</button>
+      <button class="btn" @click="execute">Refetch</button>
     </div>
 
     <div class="container" v-if="!loading && data">

@@ -19,10 +19,10 @@ export interface OnFetchErrorContext<T = any, E = any> {
 
 export interface Config<O> {
   fetcher: (params: object) => Promise<any>
-  immediate?: boolean
-  initialData?: any
   conditions: O
   defaultParams?: object
+  immediate?: boolean
+  initialData?: any
   beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
   afterFetch?: (data: any) => any
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>

@@ -32,15 +32,16 @@ export default defineComponent({
     const { conditions, loading, data, execute } = useConditionWatcher(
       {
         fetcher: api.users,
-        initialData: {},
-        defaultParams: {
-          results: 9,
-        },
         conditions: {
           gender: [],
           date: '',
           offset: 0,
           limit: 9
+        },
+        initialData: {},
+        immediate: true,
+        defaultParams: {
+          results: 9,
         },
       }, 
       { 
@@ -49,6 +50,8 @@ export default defineComponent({
         navigation: 'replace' 
       }
     )
+
+    // execute()
 
     return {
       loading,

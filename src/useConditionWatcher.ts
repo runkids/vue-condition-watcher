@@ -1,4 +1,4 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
 import { Config, QueryOptions, UseConditionWatcherReturn, Conditions, UnwrapNestedRefs } from './types'
 import {
   filterNoneValueObject,
