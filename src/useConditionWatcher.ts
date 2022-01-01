@@ -9,6 +9,7 @@ import {
   deepClone,
   containsProp,
 } from './utils'
+import Queue from './queue'
 import { useParseQuery } from './useParseQuery'
 import { useSubscribe } from './useSubscribe'
 
@@ -144,7 +145,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     })
   }
 
-  const execute = () => conditionChangeHandler({ ..._conditions })
+  const execute = () => Queue.enqueue(() => conditionChangeHandler({ ..._conditions }))
 
   if (router) {
     // initial conditions by window.location.search. just do once.
@@ -180,7 +181,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     (nc, oc) => {
       if (isEquivalent(nc, oc)) return
       conditionEvent.trigger([deepClone(nc), deepClone(oc)])
-      conditionChangeHandler(nc)
+      Queue.enqueue(() => conditionChangeHandler(nc))
     }
   )
 

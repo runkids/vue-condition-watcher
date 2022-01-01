@@ -1,3 +1,7 @@
+### [1.1.2](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.1) (2022-01-01)
+### Fix
+  * Keep requests first in - first out
+
 ### [1.1.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.1) (2022-01-01)
 ### Fix
   * Build files bug
