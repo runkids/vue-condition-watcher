@@ -9,7 +9,7 @@ import {
   deepClone,
   containsProp,
 } from './utils'
-import Queue from './queue'
+import { usePromiseQueue } from './usePromiseQueue'
 import { useParseQuery } from './useParseQuery'
 import { useSubscribe } from './useSubscribe'
 
@@ -53,6 +53,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const data = ref(watcherConfig.initialData || null)
   const error = ref(null)
   const query = ref({})
+  const { enqueue } = usePromiseQueue()
 
   const conditionEvent = useSubscribe<any>()
 
@@ -145,7 +146,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     })
   }
 
-  const execute = () => Queue.enqueue(() => conditionChangeHandler({ ..._conditions }))
+  const execute = () => enqueue(() => conditionChangeHandler({ ..._conditions }))
 
   if (router) {
     // initial conditions by window.location.search. just do once.
@@ -181,7 +182,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     (nc, oc) => {
       if (isEquivalent(nc, oc)) return
       conditionEvent.trigger([deepClone(nc), deepClone(oc)])
-      Queue.enqueue(() => conditionChangeHandler(nc))
+      enqueue(() => conditionChangeHandler(nc))
     }
   )
 

@@ -1,3 +1,7 @@
+### [1.1.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.3) (2022-01-02)
+### Fix
+  * Refactor Queue class to hook function
+
 ### [1.1.2](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.2) (2022-01-02)
 ### Fix
   * Keep requests first in - first out
