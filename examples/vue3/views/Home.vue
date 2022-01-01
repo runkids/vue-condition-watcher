@@ -6,6 +6,7 @@
     <label for="female">Female</label>
     <input class="date-picker" type="date" v-model="conditions.date" :disabled="loading">
     <button class="btn" @click="execute">Refetch</button>
+    <button class="btn" @click="resetConditions">Reset</button>
   </div>
 
   <div class="container" v-if="!loading">
@@ -29,7 +30,7 @@ import api from '../api'
 
 export default defineComponent({
   setup(){
-    const { conditions, loading, data, execute } = useConditionWatcher(
+    const { conditions, loading, data, execute, resetConditions, onConditionsChange } = useConditionWatcher(
       {
         fetcher: api.users,
         conditions: {
@@ -39,7 +40,7 @@ export default defineComponent({
           limit: 9
         },
         initialData: {},
-        immediate: true,
+        immediate: false,
         defaultParams: {
           results: 9,
         },
@@ -51,13 +52,17 @@ export default defineComponent({
       }
     )
 
-    // execute()
+    onConditionsChange(([newConditions, oldConditions])=> {
+      console.log('newConditions=',newConditions)
+      console.log('oldConditions=',oldConditions)
+    })
 
     return {
       loading,
       data,
       conditions,
       execute,
+      resetConditions
     }
   }
 })

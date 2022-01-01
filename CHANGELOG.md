@@ -1,3 +1,13 @@
+### [1.1.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.0) (2022-01-01)
+### Fix
+  * `immediate` not working in sync router mode 
+### Add
+  * Return Value: `resetConditions`
+  * Return Value: `onConditionsChange`
+### [1.0.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.0.1) (2022-01-01)
+
+### Fix
+* Build files bug
 ### [1.0.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.0.0) (2022-01-01)
 
 ### Changed

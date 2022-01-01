@@ -40,4 +40,6 @@ export interface UseConditionWatcherReturn<O> {
   data: Ref<any | null>
   error: Ref<any | null>
   execute: () => Promise<any>
+  resetConditions: VoidFunction
+  onConditionsChange: (fn: ([newConditions, oldConditions]) => void) => void
 }

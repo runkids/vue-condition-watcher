@@ -130,7 +130,7 @@ https://unpkg.com/vue-condition-watcher/dist/index.js
 ### Basic Usage
 
 ```js
-const { conditions, data, error, loading, execute } = useConditionWatcher(config, queryOptions)
+const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config, queryOptions)
 ```
 
 ### Execute Request
@@ -167,6 +167,25 @@ const { conditions, execute: refetch } = useConditionWatcher({
 })
 
 refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
+```
+### Handle Conditions Changed
+
+`onConditionsChange` can help you handle conditions changed.
+
+```js
+const { conditions, onConditionsChange } = useConditionWatcher({
+  fetcher,
+  conditions: {
+    page: 0
+  },
+})
+
+conditions.page = 1
+
+onConditionsChange(([newConditions, oldConditions])=> {
+  console.log(newConditions) // { page: 1}
+  console.log(oldConditions) // { page: 0}
+})
 ```
 
 ### Prevent Request
@@ -385,4 +404,6 @@ console.log(error) //'Error Message'
 - `data`: Data resolved by `config.fetcher`
 - `error`: Error thrown by `config.fetcher`  
 - `loading`: Request is fetching
-- `execute`: The function to fetch data  
+- `execute`: The function to fetch data
+- `resetConditions`: Reset conditions to initial value
+- `onConditionsChange`: Handle conditions changed
