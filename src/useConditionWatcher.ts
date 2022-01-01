@@ -1,4 +1,4 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
+import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue'
 import { Config, QueryOptions, UseConditionWatcherReturn, Conditions, UnwrapNestedRefs } from './types'
 import {
   filterNoneValueObject,
@@ -10,6 +10,7 @@ import {
   containsProp,
 } from './utils'
 import { useParseQuery } from './useParseQuery'
+import { useSubscribe } from './useSubscribe'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O>,
@@ -41,10 +42,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   }
 
   let router = null
-  let completeInitialConditions = false
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
-  const _conditions = reactive<O>(backupIntiConditions)
+  const _conditions = reactive<O>(watcherConfig.conditions)
 
   const isFinished = ref(false)
   const isFetching = ref(false)
@@ -53,7 +53,22 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const error = ref(null)
   const query = ref({})
 
-  const loading = (isLoading: boolean) => {
+  const conditionEvent = useSubscribe<any>()
+
+  if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
+    router = inject(queryOptions.sync)
+    if (!router) {
+      throw new ReferenceError(
+        `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
+      )
+    }
+  }
+
+  const resetConditions = (): void => {
+    Object.assign(_conditions, backupIntiConditions)
+  }
+
+  const loading = (isLoading: boolean): void => {
     isFetching.value = isLoading
     isFinished.value = !isLoading
   }
@@ -61,7 +76,6 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const syncConditionsByQuery = () => {
     const { query: initQuery } = useParseQuery()
     syncQuery2Conditions(_conditions, Object.keys(initQuery).length ? initQuery : backupIntiConditions)
-    completeInitialConditions = false
   }
 
   const conditionChangeHandler = async (conditions) => {
@@ -130,60 +144,53 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     })
   }
 
-  watch(
-    () => ({ ..._conditions }),
-    (nc, oc) => {
-      if (!completeInitialConditions) {
-        completeInitialConditions = true
-      }
-      if (isEquivalent(nc, oc)) return
-      conditionChangeHandler(nc)
-    }
-  )
+  const execute = () => conditionChangeHandler({ ..._conditions })
 
-  if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
-    router = inject(queryOptions.sync)
-    if (router) {
-      // initial conditions by window.location.search. just do once.
-      syncConditionsByQuery()
-      // watch query changed to push
-      watch(
-        query,
-        async () => {
-          const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
-          const queryString = stringifyQuery(query.value, queryOptions.ignore)
-          const location = path + '?' + queryString
-          const navigation = () =>
-            queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
-          await navigation().catch((e) => e)
-        },
-        { deep: true }
-      )
+  if (router) {
+    // initial conditions by window.location.search. just do once.
+    syncConditionsByQuery()
+    // watch query changed to push
+    watch(
+      query,
+      async () => {
+        const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
+        const queryString = stringifyQuery(query.value, queryOptions.ignore)
+        const location = path + '?' + queryString
+        const navigation = () =>
+          queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
+        await navigation().catch((e) => e)
+      },
+      { deep: true }
+    )
 
-      onMounted(() => {
-        window.addEventListener('popstate', syncConditionsByQuery)
-      })
-      onUnmounted(() => {
-        window.removeEventListener('popstate', syncConditionsByQuery)
-      })
-    } else {
-      throw new ReferenceError(
-        `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
-      )
-    }
+    onMounted(() => {
+      window.addEventListener('popstate', syncConditionsByQuery)
+    })
+    onUnmounted(() => {
+      window.removeEventListener('popstate', syncConditionsByQuery)
+    })
   }
 
   if (watcherConfig.immediate === true) {
-    setTimeout(() => {
-      conditionChangeHandler({ ..._conditions })
-    }, 0)
+    setTimeout(execute, 0)
   }
+
+  watch(
+    () => ({ ..._conditions }),
+    (nc, oc) => {
+      if (isEquivalent(nc, oc)) return
+      conditionEvent.trigger([deepClone(nc), deepClone(oc)])
+      conditionChangeHandler(nc)
+    }
+  )
 
   return {
     conditions: _conditions as UnwrapNestedRefs<O>,
     loading: isFetching,
     data,
     error,
-    execute: () => conditionChangeHandler({ ..._conditions }),
+    execute,
+    resetConditions,
+    onConditionsChange: conditionEvent.on,
   }
 }

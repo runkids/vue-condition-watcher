@@ -9,6 +9,7 @@
       <label for="female">Female</label>
       <input class="date-picker" type="date" v-model="conditions.date" :disabled="loading"/>
       <button class="btn" @click="execute">Refetch</button>
+      <button class="btn" @click="resetConditions">Reset</button>
     </div>
 
     <div class="container" v-if="!loading && data">

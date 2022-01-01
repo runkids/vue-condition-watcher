@@ -197,4 +197,31 @@ describe('useConditionWatcher', () => {
       expect(vm.$el.textContent).toBe('male,female')
     })
   })
+
+  it(`Initial values of conditions by config`, () => {
+    const vm = createApp({
+      template: `<div>{{conditions.count}}</div>`,
+      setup() {
+        const { conditions, resetConditions } = useConditionWatcher({
+          fetcher: (params) => new Promise((resolve) => resolve(params)),
+          conditions: {
+            count: 0,
+          },
+        })
+
+        conditions.count = 10
+
+        resetConditions()
+
+        return {
+          conditions,
+        }
+      },
+    }).mount(root)
+
+    doAsync(async () => {
+      await tick(1)
+      expect(vm.$el.textContent).toBe('0')
+    })
+  })
 })
