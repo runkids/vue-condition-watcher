@@ -1,3 +1,15 @@
+### [1.2.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.0) (2022-01-02)
+### Add
+  * Add fetch events `onFetchSuccess`, `onFetchError`, `onFetchFinally`
+### Changed
+  * `onConditionsChange` return type changed.
+  ```js
+    //Before is array
+    onConditionsChange(([newCond, oldCond]) => {})
+    //After is arguments
+    onConditionsChange((newCond, oldCond) => {})
+  ```
+
 ### [1.1.4](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.4) (2022-01-02)
 ### Changed
   * Change return value `data`, `error`, `loading` to readonly
