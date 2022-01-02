@@ -1,3 +1,8 @@
+### [1.1.4](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.4) (2022-01-02)
+### Changed
+  * Change return value `data`, `error`, `loading` to readonly
+  * Change `data` type: `ref` to `shallowRef`
+
 ### [1.1.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.1.3) (2022-01-02)
 ### Fix
   * Refactor Queue class to hook function

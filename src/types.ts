@@ -36,9 +36,9 @@ export interface QueryOptions<K> {
 
 export interface UseConditionWatcherReturn<O> {
   conditions: UnwrapNestedRefs<O>
-  loading: Ref<boolean | false>
-  data: Ref<any | null>
-  error: Ref<any | null>
+  readonly loading: Ref<boolean | false>
+  readonly data: Ref<any | null>
+  readonly error: Ref<any | null>
   execute: () => Promise<any>
   resetConditions: VoidFunction
   onConditionsChange: (fn: ([newConditions, oldConditions]) => void) => void

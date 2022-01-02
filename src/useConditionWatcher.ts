@@ -1,4 +1,4 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted } from 'vue-demi'
+import { reactive, ref, watch, inject, onMounted, onUnmounted, readonly, shallowRef } from 'vue-demi'
 import { Config, QueryOptions, UseConditionWatcherReturn, Conditions, UnwrapNestedRefs } from './types'
 import {
   filterNoneValueObject,
@@ -50,12 +50,12 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const isFinished = ref(false)
   const isFetching = ref(false)
 
-  const data = ref(watcherConfig.initialData || null)
+  const data = shallowRef(watcherConfig.initialData || null)
   const error = ref(null)
   const query = ref({})
-  const { enqueue } = usePromiseQueue()
 
-  const conditionEvent = useSubscribe<any>()
+  const { enqueue } = usePromiseQueue()
+  const conditionEvent = useSubscribe<[O, O]>()
 
   if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
     router = inject(queryOptions.sync)
@@ -125,6 +125,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
           if (typeof watcherConfig.afterFetch === 'function') {
             responseData = await watcherConfig.afterFetch(fetchResponse)
           }
+          if (responseData === undefined) {
+            console.warn(`[vue-condition-watcher]: "afterFetch" return value is ${responseData}. Please check it.`)
+          }
           data.value = responseData
           return resolve(fetchResponse)
         })
@@ -181,16 +184,16 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     () => ({ ..._conditions }),
     (nc, oc) => {
       if (isEquivalent(nc, oc)) return
-      conditionEvent.trigger([deepClone(nc), deepClone(oc)])
+      conditionEvent.trigger([deepClone(nc), deepClone(oc)] as [O, O])
       enqueue(() => conditionChangeHandler(nc))
     }
   )
 
   return {
     conditions: _conditions as UnwrapNestedRefs<O>,
-    loading: isFetching,
-    data,
-    error,
+    loading: readonly(isFetching),
+    data: readonly(data),
+    error: readonly(error),
     execute,
     resetConditions,
     onConditionsChange: conditionEvent.on,
