@@ -134,9 +134,9 @@ https://unpkg.com/vue-condition-watcher/dist/index.js
 const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config, queryOptions)
 ```
 
-### Execute Request
+### Execute Fetch
 
-`conditions` is reactive proxy, easy execute request when `conditions` value changed
+`conditions` is reactive proxy, easy execute fetch when `conditions` value changed
 
 ```js
 const { conditions } = useConditionWatcher({
@@ -288,8 +288,6 @@ const { data, error } = useConditionWatcher({
 console.log(data) //[]
 console.log(error) //'Error Message'
 ```
-
-
 #### More Configs
 
 - `config` : An object of config for vue-condition-watcher
@@ -420,7 +418,7 @@ console.log(error) //'Error Message'
   });
   ```
 
-#### UseConditionsWatcher Return Values
+### Return Values
 
 - `conditions` : An object and returns a reactive proxy of conditions
 - `data`: Data resolved by `config.fetcher`
@@ -432,3 +430,93 @@ console.log(error) //'Error Message'
 - `onFetchSuccess`: Will fire on fetch request success
 - `onFetchError`: Will fire on fetch request error
 - `onFetchFinally`: Will fire on fetch finished
+
+## Lifecycle
+<img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-condition-watcher_lifecycle.jpeg?raw=true"/>
+
+* ##### `onConditionsChange`
+  Fire new conditions value and old conditions value.
+  ```js
+  onConditionsChange((cond, preCond)=> {
+    console.log(cond)
+    console.log(preCond)
+  })
+  ```
+* ##### `beforeFetch`
+  You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
+  ```js
+  const { conditions } = useConditionWatcher({
+    fetcher,
+    conditions,
+    beforeFetch
+  })
+
+  async function beforeFetch((cond, cancel){
+    if(!cond.token) {
+      // stop fetch
+      cancel()
+      // will fire onConditionsChange again
+      conditions.token = await fetchToken()
+    }
+    return cond
+  })
+  ```
+
+* ##### `afterFetch` & `onFetchSuccess`
+  `afterFetch` fire before `onFetchSuccess`<br/>
+  `afterFetch` can modify data before update.
+  ||Type|Modify data before update|
+  |-----|--------|------|
+  |afterFetch| config | ⭕️ |
+  |onFetchSuccess  | event | ❌ |
+  ```html
+    <template> 
+      {{ data?.detail }} <!-- 'xxx' -->
+    </template>
+  ```
+   ```js
+  const { data, onFetchSuccess } = useConditionWatcher({
+    fetcher,
+    conditions,
+    async afterFetch((response){
+      //response = { id: 1 }
+      const detail = await fetchDataById(response.id)
+      return detail // { id: 1, detail: 'xxx' }
+    })
+  })
+
+  onFetchSuccess((response)=> {
+    console.log(response) // { id: 1, detail: 'xxx' }
+  })
+  ```
+
+* ##### `onFetchError(config)` & `onFetchError(event)`
+  `config.onFetchError` fire before `event.onFetchError`<br/>
+  `config.onFetchError` can modify data and error before update.
+  ||Type|Modify data before update|Modify error before update|
+  |-----|--------|------|------|
+  |onFetchError| config | ⭕️ | ⭕️ |
+  |onFetchError  | event | ❌ | ❌ |
+   ```js
+  const { onFetchError } = useConditionWatcher({
+    fetcher,
+    conditions,
+    onFetchError((ctx){
+      return {
+        data: [],
+        error: 'Error message.'
+      }
+    })
+  })
+
+  onFetchError((error)=> {
+    console.log(error) // origin error data
+  })
+  ```
+* ##### `onFetchFinally`
+  Will fire on fetch finished.
+  ```js
+  onFetchFinally(async ()=> {
+    //do something
+  })
+  ```
