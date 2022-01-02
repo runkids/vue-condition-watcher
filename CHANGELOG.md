@@ -1,3 +1,7 @@
+### [1.2.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.1) (2022-01-02)
+### Modify
+  * Modify execute type
+
 ### [1.2.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.0) (2022-01-02)
 ### Add
   * Add fetch events `onFetchSuccess`, `onFetchError`, `onFetchFinally`

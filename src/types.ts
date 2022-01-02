@@ -38,7 +38,7 @@ export interface UseConditionWatcherReturn<O> {
   readonly loading: Ref<boolean | false>
   readonly data: Ref<any | null>
   readonly error: Ref<any | null>
-  execute: (throwOnFailed: boolean) => Promise<any>
+  execute: (throwOnFailed?: boolean) => Promise<any>
   resetConditions: VoidFunction
   onConditionsChange: (fn: (newConditions, oldConditions) => void) => void
   onFetchSuccess: (fn: (response) => void) => void
