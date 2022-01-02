@@ -11,7 +11,7 @@ Vue Composition API for automatic fetch data when condition has been changed
 
   ✔ Auto fetch data when conditions changed.<br>
   ✔ Auto filter falsy value in conditions.<br>
-  ✔ Auto convert the corresponding type. (string, number, array, date)<br>
+  ✔ Auto converts the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Keep requests first in — first out.<br>
@@ -39,43 +39,6 @@ yarn serve
 
 [![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue)
 
-<br>
-<img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher-demo2.gif?raw=true"/>
-
-```javascript
-export default {
-  directives: { infiniteScroll },
-  setup() {
-    const items = ref([])
-
-    const config = {
-      fetcher: api.addBox,
-      conditions: {
-        offset: 0,
-        limit: 10
-      },
-      afterFetch(data) {
-        if (!data) return []
-        items.value = items.value.concat(data)
-        return data
-      }
-    }
-    const { conditions, loading } = useConditionWatcher(config)
-
-    const loadMore = () => {
-      if (loading.value) return
-      conditions.offset += conditions.limit
-    }
-
-    return {
-      conditions,
-      loading,
-      items,
-      loadMore
-    }
-  }
-}
-```
 
 ## Quick Start
 
@@ -169,6 +132,38 @@ const { conditions, execute: refetch } = useConditionWatcher({
 
 refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
 ```
+
+Update conditions one time.
+```js
+const { conditions, resetConditions } = useConditionWatcher({
+  fetcher,
+  immediate: false,
+  conditions: {
+    page: 0,
+    name: '',
+    date: []
+  },
+})
+
+// initial conditions then fire onConditionsChange event
+Object.assign(conditions, {
+  name: 'runkids',
+  date: ['2022-01-01', '2022-01-02']
+})
+
+// Reset conditions
+function reset () {
+  Object.assign(conditions, {
+    page: 0,
+    name: '',
+    date: []
+  })
+
+  // Or you can just use `resetConditions` function to initial value.
+  resetConditions()
+}
+```
+
 ### Conditions Change Event
 
 `onConditionsChange` can help you handle conditions changed.
@@ -212,7 +207,7 @@ onFetchFinally(() => {
 
 ### Prevent Request
 Setting the `immediate` to false will prevent the request until the `execute`
-function called.
+function called or conditions changed.
 
 ```js
 const { execute } = useConditionWatcher({
@@ -225,7 +220,7 @@ execute()
 ```
 
 ### Intercepting Request
-The `beforeFetch` can modify conditions before send a request and you can call `cancel` function to stop request
+The `beforeFetch` let you modify conditions before fetch, or you can call `cancel` function to stop fetch.
 ```js
 useConditionWatcher({
   fetcher,
@@ -451,7 +446,7 @@ console.log(error) //'Error Message'
     beforeFetch
   })
 
-  async function beforeFetch((cond, cancel){
+  async function beforeFetch(cond, cancel){
     if(!cond.token) {
       // stop fetch
       cancel()
@@ -478,7 +473,7 @@ console.log(error) //'Error Message'
   const { data, onFetchSuccess } = useConditionWatcher({
     fetcher,
     conditions,
-    async afterFetch((response){
+    async afterFetch(response){
       //response = { id: 1 }
       const detail = await fetchDataById(response.id)
       return detail // { id: 1, detail: 'xxx' }
@@ -501,7 +496,7 @@ console.log(error) //'Error Message'
   const { onFetchError } = useConditionWatcher({
     fetcher,
     conditions,
-    onFetchError((ctx){
+    onFetchError(ctx){
       return {
         data: [],
         error: 'Error message.'
