@@ -25,14 +25,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-// import { useConditionWatcher } from '../../../src/index'
-import { useConditionWatcher } from 'vue-condition-watcher'
+import { useConditionWatcher } from '../../../src/index'
+// import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 export default defineComponent({
   setup(){
     const cancelTrigger = ref(false)
-    const { conditions, loading, data, execute, resetConditions, onConditionsChange } = useConditionWatcher(
+    const { conditions, loading, data, execute, resetConditions, onConditionsChange, onFetchSuccess, onFetchError } = useConditionWatcher(
       {
         fetcher: api.users,
         conditions: {
@@ -61,11 +61,19 @@ export default defineComponent({
       }
     )
 
-    onConditionsChange(([newConditions, oldConditions])=> {
-      if (newConditions.offset !== 0 && newConditions.offset === oldConditions.offset) {
+    onConditionsChange((newCond, oldCond)=> {
+      if (newCond.offset !== 0 && newCond.offset === oldCond.offset) {
         cancelTrigger.value = true
         conditions.offset = 0
       }
+    })
+
+    onFetchSuccess((res) => {
+      console.log(res)
+    })
+
+    onFetchError((error) => {
+      console.log(error)
     })
 
     return {
@@ -73,7 +81,7 @@ export default defineComponent({
       data,
       conditions,
       execute,
-      resetConditions
+      resetConditions,
     }
   }
 })

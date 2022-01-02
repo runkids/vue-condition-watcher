@@ -169,9 +169,10 @@ const { conditions, execute: refetch } = useConditionWatcher({
 
 refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
 ```
-### Handle Conditions Changed
+### Conditions Change Event
 
 `onConditionsChange` can help you handle conditions changed.
+Will return new value and old value.
 
 ```js
 const { conditions, onConditionsChange } = useConditionWatcher({
@@ -183,9 +184,29 @@ const { conditions, onConditionsChange } = useConditionWatcher({
 
 conditions.page = 1
 
-onConditionsChange(([newConditions, oldConditions])=> {
-  console.log(newConditions) // { page: 1}
-  console.log(oldConditions) // { page: 0}
+onConditionsChange((conditions, preConditions)=> {
+  console.log(conditions) // { page: 1}
+  console.log(preConditions) // { page: 0}
+})
+```
+
+### Fetch Event
+
+The `onFetchResponse`, `onFetchError` and `onFetchFinally` will fire on fetch request.
+
+```ts
+const { onFetchResponse, onFetchError, onFetchFinally } = useConditionWatcher(config)
+
+onFetchResponse((response) => {
+  console.log(response)
+})
+
+onFetchError((error) => {
+  console.error(error)
+})
+
+onFetchFinally(() => {
+  //todo
 })
 ```
 
@@ -407,4 +428,7 @@ console.log(error) //'Error Message'
 - `loading`: Request is fetching
 - `execute`: The function to fetch data
 - `resetConditions`: Reset conditions to initial value
-- `onConditionsChange`: Handle conditions changed
+- `onConditionsChange`: Will fire on conditions changed
+- `onFetchSuccess`: Will fire on fetch request success
+- `onFetchError`: Will fire on fetch request error
+- `onFetchFinally`: Will fire on fetch finished

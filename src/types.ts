@@ -1,6 +1,6 @@
 import { Ref, InjectionKey, UnwrapRef } from 'vue-demi'
 
-type Fn = () => void
+export type Fn = () => void
 
 export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
 
@@ -16,7 +16,6 @@ export interface OnFetchErrorContext<T = any, E = any> {
   error: E
   data: T | null
 }
-
 export interface Config<O> {
   fetcher: (params: object) => Promise<any>
   conditions: O
@@ -39,7 +38,10 @@ export interface UseConditionWatcherReturn<O> {
   readonly loading: Ref<boolean | false>
   readonly data: Ref<any | null>
   readonly error: Ref<any | null>
-  execute: () => Promise<any>
+  execute: (throwOnFailed: boolean) => Promise<any>
   resetConditions: VoidFunction
-  onConditionsChange: (fn: ([newConditions, oldConditions]) => void) => void
+  onConditionsChange: (fn: (newConditions, oldConditions) => void) => void
+  onFetchSuccess: (fn: (response) => void) => void
+  onFetchError: (fn: (error) => void) => void
+  onFetchFinally: (fn: (error) => void) => void
 }

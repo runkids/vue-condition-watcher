@@ -1,11 +1,13 @@
-export function useSubscribe<T = any>() {
-  const fns: Array<(param: T) => void> = []
-  const on = (fn: (param: T) => void) => {
+// These function inspired from VueUse's `createEventHook`
+
+export function useSubscribe() {
+  const fns: Array<(...args) => void> = []
+  const on = (fn: (...args) => void) => {
     fns.push(fn)
   }
 
-  const trigger = (param: T) => {
-    fns.forEach((fn) => fn(param))
+  const trigger = (...args) => {
+    fns.forEach((fn) => fn(...args))
   }
 
   return {
