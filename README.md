@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Vue composition API for automatic fetch data and easily control conditions
+Vue composition API for automatic data fetching and easily control conditions
 > requires Node.js 12.0.0 or higher.
 
 #### Features
@@ -39,40 +39,9 @@ yarn serve
 
 [![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue)
 
+## Getting Started
 
-## Quick Start
-
-Simple example for `vue-next` and `vue-router-next`
-
-```javascript
-createApp({
-  template: `
-    <div class="filter">
-      <input v-model="conditions.name">
-      <button @click="execute">Refetch</button>
-    </div>
-    <div class="container" v-if="!loading">
-      {{ data }}
-    </div>
-    <div class="loading" v-else>Loading...</div>
-  `,
-  setup() {
-    const config = {
-      fetcher: params => axios.get('/user/', {params}),
-      conditions: {
-        name: ''
-      },
-    }
-    return useConditionWatcher(config, {sync: 'router'})
-  },
-})
-.provide('router', router)
-.use(router)
-.mount(document.createElement('div'))
-```
-
-## Usage
-
+### Installation
 In your project
 
 ```bash
@@ -90,6 +59,49 @@ CDN
 ```javascript
 https://unpkg.com/vue-condition-watcher/dist/index.js
 ```
+### Quick Start
+
+This is a simple example for `vue-next` and `vue-router-next`
+
+First you need to create a fetcher function, use the native `fetch` or libs like Axios. Then import `useConditionWatcher` and start using it.
+
+```javascript
+createApp({
+  template: `
+    <div class="filter">
+      <input v-model="conditions.name">
+      <button @click="execute">Refetch</button>
+    </div>
+    <div class="container">
+      {{ !loading ? data : 'Loading...' }}
+    </div>
+    <div v-if="error">{{ error }}</div>
+  `,
+  setup() {
+    const fetcher = params => axios.get('/user/', {params})
+    const { conditions, data, loading, error } = useConditionWatcher(
+      {
+        fetcher,
+        conditions: {
+          name: ''
+        },
+      }, 
+      {
+        sync: 'router'
+      }
+    )
+    return { conditions, data, loading, error }
+  },
+})
+.provide('router', router)
+.use(router)
+.mount(document.createElement('div'))
+```
+You can use the value of `data`, `error`, and `loading` to determine the current state of the request.
+
+When the `conditions.name` value changes, will fire the `lifecycle` to fetching data again.
+
+Set `router` instance at `provider`, and use query option of sync `sync: 'router'`. Will store the conditions within the URL hash every time conditions change.
 
 ### Basic Usage
 
