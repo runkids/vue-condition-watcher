@@ -9,9 +9,9 @@ Vue composition API for automatic data fetching and easily control conditions
 
 #### Features
 
-  ✔ Auto fetch data when conditions changed.<br>
-  ✔ Auto filter falsy value in conditions.<br>
-  ✔ Auto converts the corresponding type. (string, number, array, date)<br>
+  ✔ Automatic fetch data when conditions changed.<br>
+  ✔ Automatic filter falsy value in conditions before fetch.<br>
+  ✔ Automatic converts the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Keep requests first in — first out.<br>
@@ -145,7 +145,7 @@ const { conditions, execute: refetch } = useConditionWatcher({
 refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
 ```
 
-Update conditions one time.
+Force update conditions in time.
 ```js
 const { conditions, resetConditions } = useConditionWatcher({
   fetcher,
@@ -527,3 +527,73 @@ console.log(error) //'Error Message'
     //do something
   })
   ```
+
+## Make It Reusable
+You might need to reuse the data in many places. It is incredibly easy to create reusable hooks of `vue-condition-watcher` :
+```js
+function useUserExpensesHistory (id) {
+  const { conditions, data, error, loading } = useConditionWatcher({
+    fetcher: params => api.user(id, { params }),
+    defaultParams: {
+      optExpand: 'amount,place'
+    },
+    conditions: {
+      daterange: []
+    }
+    immediate: false,
+    initialData: [],
+    beforeFetch(cond, cancel) {
+      if(!id) {
+        cancel()
+      }
+      const { daterange, ...baseCond } = cond
+      if(daterange.length) {
+        [baseCond.created_at_after, baseCond.created_at_before] = [
+          daterange[0],
+          daterange[1]
+        ]
+      }
+      return baseCond
+    }
+  })
+
+  return {
+    histories: data,
+    isFetching: loading,
+    isError: error,
+    daterange: conditions.daterange
+  }
+}
+```
+
+And use it in your components:
+```html
+<template>
+  <el-date-picker
+    v-model="daterange"
+    :disabled="isFetching"
+    type="daterange"
+    range-separator="To"
+    start-placeholder="Start date"
+    end-placeholder="End date"
+  />
+  <div v-for="history in histories" :key="history.id">
+    {{ `${history.created_at}: ${history.amount}` }}
+  </div>
+</template>
+```
+```js
+<script setup>
+  const { 
+    daterange, 
+    histories, 
+    isFetching, 
+    isError 
+  } = useUserExpensesHistory(route.params.id)
+
+  onMounted(() => {
+    //start first time data fetching after initial date range
+    daterange = [new Date(), new Date()]
+  })
+</script>
+```
