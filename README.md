@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Vue Composition API for automatic fetch data when condition has been changed
+Vue composition API for automatic fetch data and easily control conditions
 > requires Node.js 12.0.0 or higher.
 
 #### Features
