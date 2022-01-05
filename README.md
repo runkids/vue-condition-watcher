@@ -17,7 +17,7 @@ Vue composition API for automatic data fetching and easily control conditions
   ✔ Keep requests first in — first out.<br>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
-  <img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-conditions-watcher.gif?raw=true"/>
+  <img src=".github/vue-conditions-watcher.gif"/>
 
 [👉 Download Vue3 example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
 
@@ -439,7 +439,7 @@ console.log(error) //'Error Message'
 - `onFetchFinally`: Will fire on fetch finished
 
 ## Lifecycle
-<img src="https://github.com/runkids/vue-condition-watcher/blob/master/examples/vue-condition-watcher_lifecycle.jpeg?raw=true"/>
+<img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
 
 * ##### `onConditionsChange`
   Fire new conditions value and old conditions value.
