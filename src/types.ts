@@ -1,8 +1,6 @@
-import { Ref, InjectionKey, UnwrapRef } from 'vue-demi'
+import { Ref, InjectionKey, UnwrapNestedRefs } from 'vue-demi'
 
 export type Fn = () => void
-
-export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
 
 export type Conditions<T> = {
   [K in keyof T]: T[K]
@@ -11,6 +9,13 @@ export type Conditions<T> = {
 export type ConditionsType = {
   [key: string]: any
 }
+
+export type OnConditionsChangeReturnValue<C> = Partial<UnwrapNestedRefs<C>> & ConditionsType
+
+export type OnConditionsChangeContext<O> = (
+  newConditions: OnConditionsChangeReturnValue<O>,
+  oldConditions: OnConditionsChangeReturnValue<O>
+) => void
 
 export interface OnFetchErrorContext<T = any, E = any> {
   error: E
@@ -40,8 +45,8 @@ export interface UseConditionWatcherReturn<O> {
   readonly error: Ref<any | null>
   execute: (throwOnFailed?: boolean) => Promise<any>
   resetConditions: VoidFunction
-  onConditionsChange: (fn: (newConditions, oldConditions) => void) => void
-  onFetchSuccess: (fn: (response) => void) => void
-  onFetchError: (fn: (error) => void) => void
-  onFetchFinally: (fn: (error) => void) => void
+  onConditionsChange: (fn: OnConditionsChangeContext<O>) => void
+  onFetchSuccess: (fn: (response: any) => void) => void
+  onFetchError: (fn: (error: any) => void) => void
+  onFetchFinally: (fn: (error: any) => void) => void
 }

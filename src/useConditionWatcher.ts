@@ -1,5 +1,5 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted, readonly, shallowRef } from 'vue-demi'
-import { Config, QueryOptions, UseConditionWatcherReturn, Conditions, UnwrapNestedRefs } from './types'
+import { reactive, ref, watch, inject, onMounted, onUnmounted, readonly, shallowRef, UnwrapNestedRefs } from 'vue-demi'
+import { Config, QueryOptions, UseConditionWatcherReturn, Conditions } from './types'
 import {
   filterNoneValueObject,
   createParams,

@@ -4,7 +4,7 @@
   "description": "Vue Composition API for automatic fetch data when condition has been changed",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/type.d.ts",
   "files": [
     "dist/**",
     "esm/**"
