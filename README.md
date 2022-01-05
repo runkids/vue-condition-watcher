@@ -427,10 +427,10 @@ console.log(error) //'Error Message'
 
 ### Return Values
 
-- `conditions` : An object and returns a reactive proxy of conditions
-- `data`: Data resolved by `config.fetcher`
-- `error`: Error thrown by `config.fetcher`  
-- `loading`: Request is fetching
+- `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
+- `data`( `👁‍🗨 readonly & ⚠️ shallowRef` ) : Data resolved by `config.fetcher`
+- `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
+- `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
 - `execute`: The function to fetch data
 - `resetConditions`: Reset conditions to initial value
 - `onConditionsChange`: Will fire on conditions changed
@@ -535,7 +535,7 @@ function useUserExpensesHistory (id) {
   const { conditions, data, error, loading } = useConditionWatcher({
     fetcher: params => api.user(id, { params }),
     defaultParams: {
-      optExpand: 'amount,place'
+      opt_expand: 'amount,place'
     },
     conditions: {
       daterange: []

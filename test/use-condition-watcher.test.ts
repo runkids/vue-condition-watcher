@@ -1,5 +1,5 @@
 import { useConditionWatcher } from '../src'
-import { isRef, isReactive, createApp, nextTick } from 'vue'
+import { isRef, isReactive, isReadonly, createApp, nextTick } from 'vue'
 
 jest.useFakeTimers()
 const timeout = (milliseconds: number) => jest.advanceTimersByTime(milliseconds)
@@ -47,6 +47,21 @@ describe('useConditionWatcher', () => {
     expect(isRef(loading)).toBeTruthy()
     expect(typeof loading.value === 'boolean').toBeTruthy()
     expect(typeof execute === 'function').toBeTruthy()
+  })
+
+  it(`Check data, error, loading is readonly`, () => {
+    const config = {
+      fetcher: (params) => new Promise((resolve) => resolve(params)),
+      conditions: {
+        gender: ['male'],
+        results: 9,
+      },
+    }
+    const { data, error, loading } = useConditionWatcher(config)
+
+    expect(isReadonly(data)).toBeTruthy()
+    expect(isReadonly(error)).toBeTruthy()
+    expect(isReadonly(loading)).toBeTruthy()
   })
 
   it(`Condition should be change`, () => {
