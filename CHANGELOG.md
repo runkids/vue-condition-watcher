@@ -1,3 +1,7 @@
+### [1.2.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.3) (2022-01-06)
+### Fix
+  * types entry
+
 ### [1.2.2](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.2) (2022-01-06)
 ### Fix
   * Type generation
