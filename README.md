@@ -746,3 +746,9 @@ And use it in your components:
 ```
 
 When conditions.daterange or conditions.limit change, will reset offset to 0 and only fetch data again after reset offset.
+
+## TDOD List
+
+- [ ] Cache
+- [ ] Prefetching
+- [ ] Automatic Revalidation
