@@ -27,11 +27,14 @@
 </template>
 
 <script>
+import { getCurrentInstance } from '@vue/composition-api'
 import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 export default {
   setup() {
+    const { proxy } = getCurrentInstance()
+    
     const config = {
       fetcher: api.users,
       initialData: {},
@@ -44,15 +47,16 @@ export default {
         offset: 0,
         limit: 9
       },
+      history: {
+        sync: proxy.$router,
+        ignore: ['offset', 'limit']
+      },
       beforeFetch(conditions) {
         return conditions
       }
     }
 
-    return useConditionWatcher(config, {
-      sync: 'router',
-      ignore: ['offset', 'limit']
-    })
+    return useConditionWatcher(config)
   }
 }
 </script>

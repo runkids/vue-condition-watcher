@@ -26,8 +26,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import {  useRouter } from 'vue-router'
-import { useConditionWatcher } from '../../../src/index'
-// import { useConditionWatcher } from 'vue-condition-watcher'
+// import { useConditionWatcher } from '../../../src/index'
+import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 export default defineComponent({
