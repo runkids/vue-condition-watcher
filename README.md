@@ -15,6 +15,7 @@ Vue composition API for automatic data fetching and easily control conditions
   ✔ Store the conditions within the URL hash every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Keep requests first in — first out.<br>
+  ✔ Dependent request before update data. <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src=".github/vue-conditions-watcher.gif"/>
@@ -42,6 +43,7 @@ yarn serve
 ## Getting Started
 
 ### Installation
+
 In your project
 
 ```bash
@@ -59,6 +61,7 @@ CDN
 ```javascript
 https://unpkg.com/vue-condition-watcher/dist/index.js
 ```
+
 ### Quick Start
 
 This is a simple example for `vue-next` and `vue-router-next`
@@ -97,6 +100,7 @@ createApp({
 .use(router)
 .mount(document.createElement('div'))
 ```
+
 You can use the value of `data`, `error`, and `loading` to determine the current state of the request.
 
 When the `conditions.name` value changes, will fire the `lifecycle` to fetching data again.
@@ -146,6 +150,7 @@ refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
 ```
 
 Force update conditions in time.
+
 ```js
 const { conditions, resetConditions } = useConditionWatcher({
   fetcher,
@@ -218,6 +223,7 @@ onFetchFinally(() => {
 ```
 
 ### Prevent Request
+
 Setting the `immediate` to false will prevent the request until the `execute`
 function called or conditions changed.
 
@@ -232,7 +238,9 @@ execute()
 ```
 
 ### Intercepting Request
+
 The `beforeFetch` let you modify conditions before fetch, or you can call `cancel` function to stop fetch.
+
 ```js
 useConditionWatcher({
   fetcher,
@@ -254,7 +262,8 @@ useConditionWatcher({
   }
 })
 ```
-The `afterFetch` can intercept the response before data updated
+
+The `afterFetch` can intercept the response before data updated, **also your can requestss depend on each other 🎭**
 
 ```js
 const { data } = useConditionWatcher({
@@ -265,6 +274,7 @@ const { data } = useConditionWatcher({
     if(response.data === null) {
       return []
     }
+    // requests depend on each other
     const finalResponse = await otherAPIById(response.data.id)
 
     return finalResponse // [{message: 'Hello', sender: 'runkids'}]
@@ -295,6 +305,7 @@ const { data, error } = useConditionWatcher({
 console.log(data) //[]
 console.log(error) //'Error Message'
 ```
+
 #### More Configs
 
 - `config` : An object of config for vue-condition-watcher
@@ -439,18 +450,24 @@ console.log(error) //'Error Message'
 - `onFetchFinally`: Will fire on fetch finished
 
 ## Lifecycle
+
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
 
-* ##### `onConditionsChange`
+- ##### `onConditionsChange`
+
   Fire new conditions value and old conditions value.
+
   ```js
   onConditionsChange((cond, preCond)=> {
     console.log(cond)
     console.log(preCond)
   })
   ```
-* ##### `beforeFetch`
+
+- ##### `beforeFetch`
+
   You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
+
   ```js
   const { conditions } = useConditionWatcher({
     fetcher,
@@ -469,18 +486,21 @@ console.log(error) //'Error Message'
   })
   ```
 
-* ##### `afterFetch` & `onFetchSuccess`
+- ##### `afterFetch` & `onFetchSuccess`
+
   `afterFetch` fire before `onFetchSuccess`<br/>
   `afterFetch` can modify data before update.
-  ||Type|Modify data before update|
-  |-----|--------|------|
-  |afterFetch| config | ⭕️ |
-  |onFetchSuccess  | event | ❌ |
+  ||Type|Modify data before update| Dependent request |
+  |-----|--------|------|------|
+  |afterFetch| config | ⭕️ | ⭕️ |
+  |onFetchSuccess  | event | ❌ | ❌ |
+
   ```html
     <template> 
       {{ data?.detail }} <!-- 'xxx' -->
     </template>
   ```
+
    ```js
   const { data, onFetchSuccess } = useConditionWatcher({
     fetcher,
@@ -497,13 +517,15 @@ console.log(error) //'Error Message'
   })
   ```
 
-* ##### `onFetchError(config)` & `onFetchError(event)`
+- ##### `onFetchError(config)` & `onFetchError(event)`
+
   `config.onFetchError` fire before `event.onFetchError`<br/>
   `config.onFetchError` can modify data and error before update.
   ||Type|Modify data before update|Modify error before update|
   |-----|--------|------|------|
   |onFetchError| config | ⭕️ | ⭕️ |
   |onFetchError  | event | ❌ | ❌ |
+
    ```js
   const { onFetchError } = useConditionWatcher({
     fetcher,
@@ -520,8 +542,11 @@ console.log(error) //'Error Message'
     console.log(error) // origin error data
   })
   ```
-* ##### `onFetchFinally`
+
+- ##### `onFetchFinally`
+
   Will fire on fetch finished.
+
   ```js
   onFetchFinally(async ()=> {
     //do something
@@ -529,7 +554,9 @@ console.log(error) //'Error Message'
   ```
 
 ## Make It Reusable
+
 You might need to reuse the data in many places. It is incredibly easy to create reusable hooks of `vue-condition-watcher` :
+
 ```js
 function useUserExpensesHistory (id) {
   const { conditions, data, error, loading } = useConditionWatcher({
@@ -567,21 +594,7 @@ function useUserExpensesHistory (id) {
 ```
 
 And use it in your components:
-```html
-<template>
-  <el-date-picker
-    v-model="daterange"
-    :disabled="isFetching"
-    type="daterange"
-    range-separator="To"
-    start-placeholder="Start date"
-    end-placeholder="End date"
-  />
-  <div v-for="history in histories" :key="history.id">
-    {{ `${history.created_at}: ${history.amount}` }}
-  </div>
-</template>
-```
+
 ```js
 <script setup>
   const { 
@@ -596,4 +609,20 @@ And use it in your components:
     daterange = [new Date(), new Date()]
   })
 </script>
+```
+
+```html
+<template>
+  <el-date-picker
+    v-model="daterange"
+    :disabled="isFetching"
+    type="daterange"
+    range-separator="To"
+    start-placeholder="Start date"
+    end-placeholder="End date"
+  />
+  <div v-for="history in histories" :key="history.id">
+    {{ `${history.created_at}: ${history.amount}` }}
+  </div>
+</template>
 ```
