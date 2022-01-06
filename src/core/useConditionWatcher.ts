@@ -1,48 +1,54 @@
-import { reactive, ref, watch, inject, onMounted, onUnmounted, readonly, shallowRef, UnwrapNestedRefs } from 'vue-demi'
-import { Config, QueryOptions, UseConditionWatcherReturn, Conditions } from './types'
+import { reactive, ref, watch, readonly, UnwrapNestedRefs } from 'vue-demi'
+import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
+import { usePromiseQueue } from './hooks/usePromiseQueue'
+import { useHistory } from './hooks/useHistory'
+import { createEvents } from './utils/createEvents'
 import {
   filterNoneValueObject,
   createParams,
-  stringifyQuery,
   syncQuery2Conditions,
   isEquivalent,
   deepClone,
   containsProp,
-} from './utils'
-import { usePromiseQueue } from './usePromiseQueue'
-import { useParseQuery } from './useParseQuery'
-import { useSubscribe } from './useSubscribe'
+} from './utils/common'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
-  config: Config<O>,
-  queryOptions?: QueryOptions<K>
+  config: Config<O, K>
 ): UseConditionWatcherReturn<O> {
-  function isFetchConfig(obj: object): obj is Config<O> {
+  function isFetchConfig(obj: object): obj is Config<O, K> {
     return containsProp(
       obj,
       'fetcher',
       'conditions',
       'defaultParams',
       'initialData',
+      'manual',
       'immediate',
+      'history',
       'beforeFetch',
       'afterFetch',
       'onFetchError'
     )
   }
 
-  let watcherConfig: Config<O> = {
+  function isHistoryOption() {
+    if (!config.history || !config.history.sync) return false
+    return containsProp(config.history, 'navigation', 'ignore', 'sync')
+  }
+
+  // default config
+  let watcherConfig: Config<O, K> = {
     fetcher: config.fetcher,
     conditions: config.conditions,
     immediate: true,
+    manual: false,
     initialData: null,
   }
 
+  // update config
   if (isFetchConfig(config)) {
     watcherConfig = { ...watcherConfig, ...config }
   }
-
-  let router = null
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
   const _conditions = reactive<O>(watcherConfig.conditions)
@@ -50,24 +56,12 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const isFinished = ref(false)
   const isFetching = ref(false)
 
-  const data = shallowRef(watcherConfig.initialData || null)
+  const data = ref(watcherConfig.initialData || null)
   const error = ref(null)
   const query = ref({})
 
   const { enqueue } = usePromiseQueue()
-  const conditionEvent = useSubscribe()
-  const responseEvent = useSubscribe()
-  const errorEvent = useSubscribe()
-  const finallyEvent = useSubscribe()
-
-  if (queryOptions && typeof queryOptions.sync === 'string' && queryOptions.sync.length) {
-    router = inject(queryOptions.sync)
-    if (!router) {
-      throw new ReferenceError(
-        `[vue-condition-watcher] Could not found vue-router instance. Please check key: ${queryOptions.sync} is right!`
-      )
-    }
-  }
+  const { conditionEvent, responseEvent, errorEvent, finallyEvent } = createEvents()
 
   const resetConditions = (): void => {
     Object.assign(_conditions, backupIntiConditions)
@@ -78,12 +72,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     isFinished.value = !isLoading
   }
 
-  const syncConditionsByQuery = () => {
-    const { query: initQuery } = useParseQuery()
-    syncQuery2Conditions(_conditions, Object.keys(initQuery).length ? initQuery : backupIntiConditions)
-  }
-
-  const conditionChangeHandler = async (conditions, throwOnFailed = false) => {
+  const conditionsChangeHandler = async (conditions, throwOnFailed = false) => {
     const checkThrowOnFailed = typeof throwOnFailed === 'boolean' ? throwOnFailed : false
     if (isFetching.value) return
     loading(true)
@@ -159,34 +148,29 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     })
   }
 
-  const execute = (throwOnFailed = false) => enqueue(() => conditionChangeHandler({ ..._conditions }, throwOnFailed))
+  const execute = (throwOnFailed = false) => enqueue(() => conditionsChangeHandler({ ..._conditions }, throwOnFailed))
 
-  if (router) {
-    // initial conditions by window.location.search. just do once.
-    syncConditionsByQuery()
-    // watch query changed to push
-    watch(
-      query,
-      async () => {
-        const path: string = router.currentRoute.value ? router.currentRoute.value.path : router.currentRoute.path
-        const queryString = stringifyQuery(query.value, queryOptions.ignore)
-        const location = path + '?' + queryString
-        const navigation = () =>
-          queryOptions.navigation === 'replace' ? router.replace(location) : router.push(location)
-        await navigation().catch((e) => e)
+  // - mutate: Modify `data` directly
+  // - `data` is read only by default, recommend modify `data` at `afterFetch`
+  // - When you need to modify `data`, you can use mutate() to directly modify data
+  const mutate = <Mutate>((newData) => (data.value = newData))
+
+  // - History mode base on vue-router
+  if (isHistoryOption()) {
+    const historyOption = {
+      sync: config.history.sync,
+      ignore: config.history.ignore || [],
+      navigation: config.history.navigation || 'push',
+      listener(parsedQuery) {
+        const queryObject = Object.keys(parsedQuery).length ? parsedQuery : backupIntiConditions
+        syncQuery2Conditions(_conditions, queryObject)
       },
-      { deep: true }
-    )
-
-    onMounted(() => {
-      window.addEventListener('popstate', syncConditionsByQuery)
-    })
-    onUnmounted(() => {
-      window.removeEventListener('popstate', syncConditionsByQuery)
-    })
+    }
+    useHistory(query, historyOption)
   }
 
-  if (watcherConfig.immediate === true) {
+  // - Automatic data fetching by default
+  if (!watcherConfig.manual && watcherConfig.immediate) {
     setTimeout(execute, 0)
   }
 
@@ -195,7 +179,8 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     (nc, oc) => {
       if (isEquivalent(nc, oc)) return
       conditionEvent.trigger(deepClone(nc), deepClone(oc))
-      enqueue(() => conditionChangeHandler(nc))
+      // Automatic data fetching until manual to be false
+      !watcherConfig.manual && enqueue(() => conditionsChangeHandler(nc))
     }
   )
 
@@ -205,6 +190,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     data: readonly(data),
     error: readonly(error),
     execute,
+    mutate,
     resetConditions,
     onConditionsChange: conditionEvent.on,
     onFetchSuccess: responseEvent.on,

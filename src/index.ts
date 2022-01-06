@@ -1,12 +1,11 @@
-export { default as useConditionWatcher } from './useConditionWatcher'
+export { default as useConditionWatcher } from './core/useConditionWatcher'
 
 export type {
   Fn,
   Conditions,
   OnFetchErrorContext,
   Config,
-  QueryOptions,
   OnConditionsChangeReturnValue,
   OnConditionsChangeContext,
   UseConditionWatcherReturn,
-} from './types'
+} from './core/types'

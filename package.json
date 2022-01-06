@@ -32,7 +32,9 @@
     "vue-hooks",
     "composition-api",
     "vue-composable",
-    "composable"
+    "composable",
+    "fetch",
+    "fetch-data"
   ],
   "author": "Willy Hong",
   "license": "MIT",

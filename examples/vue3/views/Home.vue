@@ -25,16 +25,35 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-// import { useConditionWatcher } from '../../../src/index'
-import { useConditionWatcher } from 'vue-condition-watcher'
+import {  useRouter } from 'vue-router'
+import { useConditionWatcher } from '../../../src/index'
+// import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 export default defineComponent({
   setup(){
+    const router = useRouter()
+
     const cancelTrigger = ref(false)
-    const { conditions, loading, data, execute, resetConditions, onConditionsChange, onFetchSuccess, onFetchError } = useConditionWatcher(
+    
+    const { 
+      conditions, 
+      loading, 
+      data, 
+      execute,
+      mutate,
+      resetConditions, 
+      onConditionsChange, 
+      onFetchSuccess, 
+      onFetchError 
+    } = useConditionWatcher(
       {
         fetcher: api.users,
+        defaultParams: {
+          results: 9,
+        },
+        manual: false,
+        immediate: true,
         conditions: {
           gender: [],
           date: '',
@@ -42,24 +61,21 @@ export default defineComponent({
           limit: 9
         },
         initialData: {},
-        immediate: true,
-        defaultParams: {
-          results: 9,
+        history: {
+          sync: router,
+          ignore: ['limit', 'offset'],
         },
-        beforeFetch(cond, cancel) {
-          if (cancelTrigger.value) {
-            cancel()
-            cancelTrigger.value = false
-          }
-          return cond
-        }
+        beforeFetch
       }, 
-      { 
-        sync: 'router', 
-        ignore: ['offset', 'limit'], 
-        navigation: 'replace' 
-      }
     )
+
+    function beforeFetch(cond, cancel) {
+      if (cancelTrigger.value) {
+        cancel()
+        cancelTrigger.value = false
+      }
+      return cond
+    }
 
     onConditionsChange((newCond, oldCond)=> {
       if (newCond.offset !== 0 && newCond.offset === oldCond.offset) {
@@ -70,6 +86,8 @@ export default defineComponent({
 
     onFetchSuccess((res) => {
       console.log(res)
+      data.value = []
+      mutate([])
     })
 
     onFetchError((error) => {

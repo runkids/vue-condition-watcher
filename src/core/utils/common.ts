@@ -1,4 +1,4 @@
-import { ConditionsType } from './types'
+import { ConditionsType } from '../types'
 
 declare global {
   interface ObjectConstructor {
@@ -135,6 +135,11 @@ export function deepClone(obj): any {
     : clone
 }
 
-export function containsProp(obj: object, ...props: string[]) {
+export function containsProp(obj: any, ...props: string[]) {
+  if (!isObject(obj)) return false
   return props.some((k) => k in obj)
+}
+
+export function isObject(obj: any): boolean {
+  return typeof obj !== 'boolean' && typeof obj === 'object' && !Array.isArray(obj) && obj !== null
 }

@@ -5,7 +5,7 @@ import {
   syncQuery2Conditions,
   isEquivalent,
   deepClone,
-} from '../src/utils'
+} from '../src/core/utils/common'
 
 describe('utils: isEquivalent', () => {
   it(`Check Object Equality`, () => {

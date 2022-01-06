@@ -1,4 +1,4 @@
-import { Ref, InjectionKey, UnwrapNestedRefs } from 'vue-demi'
+import { Ref, UnwrapNestedRefs } from 'vue-demi'
 
 export type Fn = () => void
 
@@ -21,19 +21,30 @@ export interface OnFetchErrorContext<T = any, E = any> {
   error: E
   data: T | null
 }
-export interface Config<O> {
+
+type MutateData = (newData: any) => void
+type MutateFunction = (arg: (oldData: any) => any) => void
+export interface Mutate extends MutateData, MutateFunction {}
+
+export interface Config<O, K> {
   fetcher: (params: object) => Promise<any>
-  conditions: O
+  conditions?: O
   defaultParams?: object
   immediate?: boolean
+  manual?: boolean
   initialData?: any
+  history?: HistoryOptions<K>
   beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
   afterFetch?: (data: any) => any
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
 
-export interface QueryOptions<K> {
-  sync?: InjectionKey<any> | string
+export interface HistoryOptions<K> {
+  sync: {
+    currentRoute: any
+    replace: (string) => any
+    push: (string) => any
+  }
   navigation?: 'push' | 'replace'
   ignore?: Array<K>
 }
@@ -44,6 +55,7 @@ export interface UseConditionWatcherReturn<O> {
   readonly data: Ref<any | null>
   readonly error: Ref<any | null>
   execute: (throwOnFailed?: boolean) => Promise<any>
+  mutate: Mutate
   resetConditions: VoidFunction
   onConditionsChange: (fn: OnConditionsChangeContext<O>) => void
   onFetchSuccess: (fn: (response: any) => void) => void
