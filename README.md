@@ -542,6 +542,7 @@ function usePagination () {
   let cancelFlag = false // check this to cancel fetch
 
   const { startLoading, stopLoading } = useLoading()
+  const router = useRouter()
   
   const { conditions, data, execute, resetConditions, onConditionsChange, onFetchFinally } = useConditionWatcher(
     {
@@ -554,7 +555,7 @@ function usePagination () {
       immediate: true,
       initialData: [],
       history: {
-        sync: 'router',
+        sync: router,
         // You can ignore the key of URL query string, prevent users from entering unreasonable numbers by themselves.
         // The URL will look like ?offset=0 not show `limit`
         ignore: ['limit'] 
