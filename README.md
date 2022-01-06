@@ -16,6 +16,7 @@ Vue composition API for automatic data fetching and easily control conditions
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Keep requests first in — first out.<br>
   ✔ Dependent request before update data. <br/>
+  ✔ Easily manage paged data and customized your pagination hook. <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src=".github/vue-conditions-watcher.gif"/>
@@ -617,12 +618,131 @@ And use it in your components:
     v-model="daterange"
     :disabled="isFetching"
     type="daterange"
-    range-separator="To"
-    start-placeholder="Start date"
-    end-placeholder="End date"
   />
   <div v-for="history in histories" :key="history.id">
     {{ `${history.created_at}: ${history.amount}` }}
   </div>
 </template>
 ```
+
+Congratulations! 🥳 You have learned how to use composition-api with `vue-condition-watcher`.
+
+Now we can manage the paging information use `vue-condition-watcher` .
+
+## Pagination
+
+Here is an example use Django the limit and offset functions and Element UI.
+
+Create `usePagination`
+
+```js
+function usePagination () {
+  let cancelFlag = false // check this to cancel fetch
+
+  const { startLoading, stopLoading } = useLoading()
+  
+  const { conditions, data, execute, resetConditions, onConditionsChange, onFetchFinally } = useConditionWatcher(
+    {
+      fetcher: api.list,
+      conditions: {
+        daterange: [],
+        limit: 20,
+        offset: 0
+      }
+      immediate: true,
+      initialData: [],
+      beforeFetch
+    }, 
+    {
+      sync: 'router',
+      // You can ignore the key of URL hash, prevent users from entering unreasonable numbers by themselves.
+      // The URL will look like ?offset=0 not show `limit`
+      ignore: ['limit'] 
+    }
+  )
+
+  // use on pagination component
+  const currentPage = computed({
+    get: () => conditions.offset / conditions.limit + 1,
+    set: (page) => {
+      conditions.offset = (page - 1) * conditions.limit
+    }
+  })
+
+  // onConditionsChange -> beforeFetch -> onFetchFinally
+  onConditionsChange((newCond, oldCond) => {
+    // When conditions changed, reset offset to 0 and then will fire beforeEach again.
+    if (newCond.offset !== 0 && newCond.offset === oldCond.offset) {
+      cancelFlag = true
+      conditions.offset = 0
+    }
+  })
+
+  async function beforeFetch(cond, cancel) {
+    if (cancelFlag) {
+      // cancel fetch when cancelFlag be true
+      cancel()
+      cancelFlag = false // reset cancelFlag 
+      return cond
+    }
+    // start loading
+    await nextTick()
+    startLoading()
+    const { daterange, ...baseCond } = cond
+    if(daterange.length) {
+      [baseCond.created_at_after, baseCond.created_at_before] = [
+        daterange[0],
+        daterange[1]
+      ]
+    }
+    return baseCond
+  }
+
+  onFetchFinally(async () => {
+    await nextTick()
+    // stop loading
+    stopLoading()
+    window.scrollTo(0, 0)
+  })
+
+  return {
+    data,
+    conditions,
+    currentPage,
+    resetConditions,
+    refetch: execute
+  }
+}
+```
+
+And use it in your components:
+
+```js
+<script setup>
+  const { data, conditions, currentPage, resetConditions, refetch } = usePagination()
+</script>
+```
+
+```html
+<template>
+  <el-button @click="refetch">Refetch Data</el-button>
+  <el-button @click="resetConditions">Reset Offset</el-button>
+
+  <el-date-picker
+    v-model="conditions.daterange"
+    type="daterange"
+  />
+
+  <div v-for="info in data" :key="info.id">
+    {{ info }}
+  </div>
+
+  <el-pagination
+    v-model:currentPage="currentPage"
+    v-model:page-size="conditions.limit"
+    :total="data.length"
+  />
+</template>
+```
+
+When conditions.daterange or conditions.limit change, will reset offset to 0 and only fetch data again after reset offset.
