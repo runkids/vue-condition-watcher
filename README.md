@@ -14,7 +14,7 @@ Vue composition API for automatic data fetching and easily control conditions
   ✔ Automatic fetch data when conditions changed.<br>
   ✔ Automatic filter falsy value in conditions before fetch.<br>
   ✔ Automatic converts the corresponding type. (string, number, array, date)<br>
-  ✔ Store the conditions within the URL hash every time a condition is changed<br>
+  ✔ Store the conditions within the URL query string every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
   ✔ Keep requests first in — first out.<br>
   ✔ Dependent request before update data. <br/>
@@ -85,21 +85,22 @@ createApp({
   `,
   setup() {
     const fetcher = params => axios.get('/user/', {params})
+    const router = useRouter()
+
     const { conditions, data, loading, error } = useConditionWatcher(
       {
         fetcher,
         conditions: {
           name: ''
         },
-      }, 
-      {
-        sync: 'router'
+        history: {
+          sync: router
+        }
       }
     )
     return { conditions, data, loading, error }
   },
 })
-.provide('router', router)
 .use(router)
 .mount(document.createElement('div'))
 ```
@@ -108,12 +109,12 @@ You can use the value of `data`, `error`, and `loading` to determine the current
 
 When the `conditions.name` value changes, will fire the `lifecycle` to fetching data again.
 
-Set `router` instance at `provider`, and use query option of sync `sync: 'router'`. Will store the conditions within the URL hash every time conditions change.
+Use `config.history` of sync to `sync: router`. Will store the conditions within the URL query string every time conditions change.
 
 ### Basic Usage
 
 ```js
-const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config, queryOptions)
+const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config)
 ```
 
 ### Execute Fetch
@@ -240,6 +241,20 @@ const { execute } = useConditionWatcher({
 execute()
 ```
 
+### Manually Trigger Request
+
+By default, `vue-condition-watcher` will automatically trigger fetch data. You can pass `manual` to disable the default fetch and then use `execute()` to trigger fetch data.
+
+```js
+const { execute } = useConditionWatcher({
+  fetcher,
+  conditions,
+  manual: true,
+})
+
+execute()
+```
+
 ### Intercepting Request
 
 The `beforeFetch` let you modify conditions before fetch, or you can call `cancel` function to stop fetch.
@@ -278,6 +293,7 @@ const { data } = useConditionWatcher({
       return []
     }
     // requests depend on each other
+    // the loading is still be true until fire `onFetchFinally`
     const finalResponse = await otherAPIById(response.data.id)
 
     return finalResponse // [{message: 'Hello', sender: 'runkids'}]
@@ -309,143 +325,27 @@ console.log(data) //[]
 console.log(error) //'Error Message'
 ```
 
-#### More Configs
-
-- `config` : An object of config for vue-condition-watcher
-  - `fetcher` (⚠️Required) : Can be any asynchronous function to fetch data
-  - `conditions` (⚠️Required) : An object of conditions, also be initial value
-  - `defaultParams`: An object of fetcher's default
-  parameters
-  - `initialData`: `data` default value is null, and you can setting `data` default value by use this config
-  - `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
-
-    ```javascript
-
-    const config = {
-      fetcher: params => axios.get('url', { params }),
-      defaultParams: {
-        type: 'member'
-      },
-      immediate: true,
-      initialData: []
-      conditions: {
-        offset: 0,
-        limit: 10,
-        username: '',
-      },
-    }
-    ```
-
-- `queryOptions`: An object of options to sync query string with conditions
-  - ⚠️ `queryOptions` work base on vue-router, you need install [vue-router](https://www.npmjs.com/package/vue-router/v/next) first.
-  - `sync`: key of provide name ( String | Symbol )
-    - main.js: register router
-
-    ```javascript
-      import {createApp} from 'vue'
-      import App from './App.vue'
-      import { router } from './router'
-
-      const app = createApp(App)
-        .provide('router', router) // it's should be required
-        .use(router)
-        .mount('#app')
-    ```
-
-    - then
-
-    ```javascript
-    useConditionWatcher(config, {sync: 'router'})
-    ```
-
-  - `ignore`: you can ignore key name from conditions, will not push with query.
-
-    ```javascript
-    useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']})
-    ```
-
-  - `navigation`: use vue router navigation method push or replace, default value is push.
-
-    ```javascript
-      useConditionWatcher(config, {sync: 'router', navigation: 'replace'})
-    ```
-
-##### How to use in vue@2 with @vue/composition-api
-
-- ( Good ) Add `provide` in `main.js`
-
-  ```javascript
-  new Vue({
-    el: '#app',
-    router,
-    store,
-    provide: {
-      router
-    },
-    render: h => h(App)
-  })
-  ```
-
-- Add `provide` in current file
-
-  ```javascript
-  import { useConditionWatcher } from "vue-condition-watcher";
-  import { provide } from "@vue/composition-api";
-  import router from "@/router";
-  import api from "../api";
-
-  export default {
-    setup() {
-      provide("router", router);
-
-      const config = {
-        fetcher: api.users,
-        conditions: {
-          offset: 0,
-          limit: 9
-        }
-      };
-
-      return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
-    }
-  };
-  ```
-
-##### How to use in Nuxt with @nuxtjs/composition-api
-
-- Add `provide` in current file
-
-  ```javascript
-  import { useConditionWatcher } from "vue-condition-watcher";
-  import { defineComponent, useRoute, provide, useContext } from "@nuxtjs/composition-api";
-  import api from "~/api";
-
-  export default defineComponent({
-    setup() {
-      const route = useRoute();
-      const { app } = useContext();
-      provide('router', app.router);
-
-      const config = {
-        fetcher: api.users,
-        conditions: {
-          offset: 0,
-          limit: 9
-        }
-      };
-
-      return useConditionWatcher(config, {sync: 'router', ignore: ['offset', 'limit']});
-    }
-  });
-  ```
+### Configs
+- `fetcher` (⚠️Required) : A promise returning function to fetch your data 
+- `conditions` (⚠️Required) : An object of conditions, also to be initial value
+- `defaultParams`: An object of fetcher's default
+parameters
+- `initialData`: `data` default value is null, and you can setting `data` default value by use this config
+- `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
+- `manual`: You can use `manual` to disabled automatically fetch data
+- `history`: Sync conditions value to URL query string
+- `beforeFetch`: You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
+- `afterFetch`: You can modify data before update. also can use `mutate` modify too. But still recommend modify `data` at `afterFetch`.
+- `onFetchError`: Handle error, and you can modify data and error before update here.
 
 ### Return Values
 
 - `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
-- `data`( `👁‍🗨 readonly & ⚠️ shallowRef` ) : Data resolved by `config.fetcher`
+- `data`( `👁‍🗨 readonly & ⚠️ ref` ) : Data resolved by `config.fetcher`
 - `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
 - `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
-- `execute`: The function to fetch data
+- `execute`: The function to trigger the request
+- `mutate`: You can use mutate() to directly modify `data` **( By default, data is readonly )**
 - `resetConditions`: Reset conditions to initial value
 - `onConditionsChange`: Will fire on conditions changed
 - `onFetchSuccess`: Will fire on fetch request success
@@ -653,14 +553,14 @@ function usePagination () {
       }
       immediate: true,
       initialData: [],
+      history: {
+        sync: 'router',
+        // You can ignore the key of URL query string, prevent users from entering unreasonable numbers by themselves.
+        // The URL will look like ?offset=0 not show `limit`
+        ignore: ['limit'] 
+      },
       beforeFetch
     }, 
-    {
-      sync: 'router',
-      // You can ignore the key of URL hash, prevent users from entering unreasonable numbers by themselves.
-      // The URL will look like ?offset=0 not show `limit`
-      ignore: ['limit'] 
-    }
   )
 
   // use on pagination component
@@ -754,3 +654,4 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 - [ ] Cache
 - [ ] Prefetching
 - [ ] Automatic Revalidation
+- [ ] Pulling

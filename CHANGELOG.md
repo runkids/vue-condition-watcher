@@ -1,3 +1,48 @@
+### [1.3.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.3.0) (2022-01-07)
+### Features:
+------------------
+* **Add Configs**:
+1. `manual`: you can manual fetching data now,  just use `execute` to fetch data.
+2. `history`: the history mode you can sync conditions with URL, base on vue-router (V3 & V4 support)
+
+* **Add Return Values**:
+1. `mutate`: use `mutate` to directly modify data
+
+## BREAKING CHANGES:
+------------------
+* **Modify**:
+1. Changed `data` from `shallowRef` to `ref`.
+
+* **Deprecated**:
+1. `queryOptions` are now removed, replace `queryOptions` with `config.history`. The `sync` no need inject router now just use `router`
+    ```js
+      const router = useRouter()
+
+      // Before
+      Provider(router)
+      useConditionWatcher(
+        {
+          fetcher,
+          conditions,
+        }, 
+        {
+          sync: 'router'
+        }
+      )
+
+      // After
+      useConditionWatcher(
+        {
+          fetcher,
+          conditions,
+          history: {
+            sync: router
+          }
+        }, 
+      )
+    ```
+
+
 ### [1.2.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.3) (2022-01-06)
 ### Fix
   * types entry
