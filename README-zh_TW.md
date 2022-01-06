@@ -1,4 +1,4 @@
-English | [繁體中文](./README-zh_TW.md)
+[English](./README.md) | 繁體中文
 
 # vue-condition-watcher 🕶
 
@@ -747,7 +747,7 @@ And use it in your components:
 </template>
 ```
 
-When daterange or limit changed, will reset offset to 0 and only fetch data again after reset offset.
+When conditions.daterange or conditions.limit change, will reset offset to 0 and only fetch data again after reset offset.
 
 ## TDOD List
 
