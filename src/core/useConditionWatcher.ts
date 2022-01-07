@@ -1,16 +1,10 @@
-import { reactive, ref, watch, readonly, UnwrapNestedRefs } from 'vue-demi'
+import { reactive, ref, watch, readonly, UnwrapNestedRefs, onUnmounted, watchEffect, unref, isRef } from 'vue-demi'
 import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
 import { usePromiseQueue } from './hooks/usePromiseQueue'
 import { useHistory } from './hooks/useHistory'
 import { createEvents } from './utils/createEvents'
-import {
-  filterNoneValueObject,
-  createParams,
-  syncQuery2Conditions,
-  isEquivalent,
-  deepClone,
-  containsProp,
-} from './utils/common'
+import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
+import { containsProp, isServer, rAF } from './utils/helper'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O, K>
@@ -25,6 +19,10 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
       'manual',
       'immediate',
       'history',
+      'pollingInterval',
+      'pollingWhenHidden',
+      'pollingWhenOffline',
+      'revalidateOnFocus',
       'beforeFetch',
       'afterFetch',
       'onFetchError'
@@ -43,6 +41,10 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     immediate: true,
     manual: false,
     initialData: null,
+    pollingInterval: isRef(config.pollingInterval) ? config.pollingInterval : ref(config.pollingInterval || 0),
+    pollingWhenHidden: false,
+    pollingWhenOffline: false,
+    revalidateOnFocus: false,
   }
 
   // update config
@@ -55,13 +57,29 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
 
   const isFinished = ref(false)
   const isFetching = ref(false)
+  const isOnline = ref(true)
+  const isActive = ref(true)
 
   const data = ref(watcherConfig.initialData || null)
   const error = ref(null)
   const query = ref({})
 
+  const pollingTimer = ref()
+
   const { enqueue } = usePromiseQueue()
-  const { conditionEvent, responseEvent, errorEvent, finallyEvent } = createEvents()
+  // - create fetch event & condition event & web event
+  const {
+    conditionEvent,
+    responseEvent,
+    errorEvent,
+    finallyEvent,
+    reconnectEvent,
+    focusEvent,
+    visibilityEvent,
+    stopFocusEvent,
+    stopReconnectEvent,
+    stopVisibilityEvent,
+  } = createEvents()
 
   const resetConditions = (): void => {
     Object.assign(_conditions, backupIntiConditions)
@@ -104,7 +122,6 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
      * example. {name: '', items: [], age: 0, tags: null}
      * return result will be {age: 0}
      */
-
     query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
     const finalConditions: object = createParams(query.value, watcherConfig.defaultParams)
 
@@ -144,11 +161,60 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
         .finally(() => {
           loading(false)
           finallyEvent.trigger()
+          // - Start polling with out setting to manual
+          if (watcherConfig.manual) return
+          polling()
         })
     })
   }
 
-  const execute = (throwOnFailed = false) => enqueue(() => conditionsChangeHandler({ ..._conditions }, throwOnFailed))
+  const revalidate = (throwOnFailed = false) =>
+    enqueue(() => conditionsChangeHandler({ ..._conditions }, throwOnFailed))
+
+  function execute(throwOnFailed = false) {
+    if (!data || isServer) {
+      revalidate(throwOnFailed)
+    } else {
+      // Delay the revalidate if we have data to return so we won't block
+      rAF(() => revalidate(throwOnFailed))
+    }
+  }
+
+  function polling() {
+    if (pollingTimer.value) return
+
+    watchEffect((onCleanup) => {
+      if (unref(watcherConfig.pollingInterval)) {
+        pollingTimer.value = (() => {
+          let timerId = null
+          function next() {
+            const interval = unref(watcherConfig.pollingInterval)
+            if (interval && timerId !== -1) {
+              timerId = setTimeout(nun, interval)
+            }
+          }
+          function nun() {
+            // Only run when the page is visible, online and not errored.
+            if (
+              !error.value &&
+              (watcherConfig.pollingWhenHidden || isActive.value) &&
+              (watcherConfig.pollingWhenOffline || isOnline.value)
+            ) {
+              revalidate().then(next)
+            } else {
+              next()
+            }
+          }
+          next()
+          return () => timerId && clearTimeout(timerId)
+        })()
+      }
+
+      onCleanup(() => {
+        pollingTimer.value && pollingTimer.value()
+      })
+    })
+  }
 
   // - mutate: Modify `data` directly
   // - `data` is read only by default, recommend modify `data` at `afterFetch`
@@ -171,18 +237,47 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
 
   // - Automatic data fetching by default
   if (!watcherConfig.manual && watcherConfig.immediate) {
-    setTimeout(execute, 0)
+    execute()
   }
 
   watch(
     () => ({ ..._conditions }),
     (nc, oc) => {
+      // - Deep check object if be true do nothing
       if (isEquivalent(nc, oc)) return
       conditionEvent.trigger(deepClone(nc), deepClone(oc))
-      // Automatic data fetching until manual to be false
+      // - Automatic data fetching until manual to be false
       !watcherConfig.manual && enqueue(() => conditionsChangeHandler(nc))
     }
   )
+
+  reconnectEvent.on((status: boolean) => {
+    isOnline.value = status
+  })
+
+  visibilityEvent.on((status: boolean) => {
+    isActive.value = status
+  })
+
+  const stopSubscribeFocus = focusEvent.on(() => {
+    if (!isActive.value) return
+    execute()
+    if (isHistoryOption()) {
+      //todo sync query
+    }
+  })
+
+  if (!watcherConfig.revalidateOnFocus) {
+    stopFocusEvent()
+    stopSubscribeFocus.off()
+  }
+
+  onUnmounted(() => {
+    pollingTimer.value && pollingTimer.value()
+    stopFocusEvent()
+    stopReconnectEvent()
+    stopVisibilityEvent()
+  })
 
   return {
     conditions: _conditions as UnwrapNestedRefs<O>,

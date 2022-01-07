@@ -12,6 +12,10 @@
   align-items: center;
 }
 
+.interval-btns {
+  margin: 10px 0;
+}
+
 .filters .btn {
   cursor: pointer;
   margin-left: 0.5rem;

@@ -134,12 +134,3 @@ export function deepClone(obj): any {
     ? Array.from(obj)
     : clone
 }
-
-export function containsProp(obj: any, ...props: string[]) {
-  if (!isObject(obj)) return false
-  return props.some((k) => k in obj)
-}
-
-export function isObject(obj: any): boolean {
-  return typeof obj !== 'boolean' && typeof obj === 'object' && !Array.isArray(obj) && obj !== null
-}

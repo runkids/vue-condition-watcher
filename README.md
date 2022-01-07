@@ -6,7 +6,7 @@ English | [繁體中文](./README-zh_TW.md)
 
 ## Introduction
 
-Vue composition API for automatic data fetching and easily control conditions
+Vue composition API for automatic data fetching. Easily control and sync to URL query string by conditions
 > requires Node.js 12.0.0 or higher.
 
 #### Features
@@ -16,9 +16,13 @@ Vue composition API for automatic data fetching and easily control conditions
   ✔ Automatic converts the corresponding type. (string, number, array, date)<br>
   ✔ Store the conditions within the URL query string every time a condition is changed<br>
   ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
-  ✔ Keep requests first in — first out.<br>
+  ✔ Avoiding the race condition.<br>
   ✔ Dependent request before update data. <br/>
   ✔ Easily manage paged data and customized your pagination hook. <br/>
+  ✔ Revalidation on focus & network recovery <br/>
+  ✔ Polling <br/>
+  ✔ Local mutation <br/>
+  ✔ TypeScript support <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src=".github/vue-conditions-watcher.gif"/>
@@ -326,7 +330,8 @@ console.log(error) //'Error Message'
 ```
 
 ### Configs
-- `fetcher` (⚠️Required) : A promise returning function to fetch your data 
+
+- `fetcher` (⚠️Required) : A promise returning function to fetch your data
 - `conditions` (⚠️Required) : An object of conditions, also to be initial value
 - `defaultParams`: An object of fetcher's default
 parameters
@@ -655,4 +660,3 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 - [ ] Cache
 - [ ] Prefetching
 - [ ] Automatic Revalidation
-- [ ] Pulling

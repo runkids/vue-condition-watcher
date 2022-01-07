@@ -1,13 +1,13 @@
 import { Ref, UnwrapNestedRefs } from 'vue-demi'
 
+export type ConditionsType = {
+  [key: string]: any
+}
+
 export type Fn = () => void
 
 export type Conditions<T> = {
   [K in keyof T]: T[K]
-}
-
-export type ConditionsType = {
-  [key: string]: any
 }
 
 export type OnConditionsChangeReturnValue<C> = Partial<UnwrapNestedRefs<C>> & ConditionsType
@@ -26,19 +26,6 @@ type MutateData = (newData: any) => void
 type MutateFunction = (arg: (oldData: any) => any) => void
 export interface Mutate extends MutateData, MutateFunction {}
 
-export interface Config<O, K> {
-  fetcher: (params: object) => Promise<any>
-  conditions?: O
-  defaultParams?: object
-  immediate?: boolean
-  manual?: boolean
-  initialData?: any
-  history?: HistoryOptions<K>
-  beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
-  afterFetch?: (data: any) => any
-  onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
-}
-
 export interface HistoryOptions<K> {
   sync: {
     currentRoute: any
@@ -49,12 +36,29 @@ export interface HistoryOptions<K> {
   ignore?: Array<K>
 }
 
+export interface Config<O, K> {
+  fetcher: (params: object) => Promise<any>
+  conditions?: O
+  defaultParams?: object
+  immediate?: boolean
+  manual?: boolean
+  initialData?: any
+  history?: HistoryOptions<K>
+  pollingInterval?: number | Ref<number>
+  pollingWhenHidden?: boolean
+  pollingWhenOffline?: boolean
+  revalidateOnFocus?: boolean
+  beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
+  afterFetch?: (data: any) => any
+  onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
+}
+
 export interface UseConditionWatcherReturn<O> {
   conditions: UnwrapNestedRefs<O>
   readonly loading: Ref<boolean | false>
   readonly data: Ref<any | null>
   readonly error: Ref<any | null>
-  execute: (throwOnFailed?: boolean) => Promise<any>
+  execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
   resetConditions: VoidFunction
   onConditionsChange: (fn: OnConditionsChangeContext<O>) => void

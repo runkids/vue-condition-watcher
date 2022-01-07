@@ -1,29 +1,14 @@
 <template>
   <div class="filters">
-    <input type="checkbox" id="male" value="male" v-model="conditions.gender" :disabled="loading">
-    <label for="male">Male</label>
-    <input type="checkbox" id="female" value="female" v-model="conditions.gender" :disabled="loading">
-    <label for="female">Female</label>
-    <input class="date-picker" type="date" v-model="conditions.date" :disabled="loading">
     <button class="btn" @click="execute">Refetch</button>
-    <button class="btn" @click="resetConditions">Reset Condition</button>
-    <button class="btn" @click="conditions.offset += conditions.limit">Add Offset</button>
-  </div>
-
-  <div class="filters interval-btns">
-    <button class="btn" @click="pollingInterval = 0">Interval 0s</button>
-    <button class="btn" @click="pollingInterval = 1000">Interval 1s</button>
-    <button class="btn" @click="pollingInterval = 10000">Interval 10s</button>
   </div>
 
   <div class="container" v-if="!loading">
-    <div class="card" v-for="item in data.results" :key="item.id.value">
+    <div class="card" v-for="item in data" :key="item.id.value">
       <div>
-        <img :src="item.picture.thumbnail"/>
+        <img :src="item.thumbnailUrl"/>
       </div>
-      <h4>{{`${item.name.first} ${item.name.last}`}}</h4>
-      <div>{{item.email}}</div>
-      <div>{{item.phone}}</div>
+      <h4>{{ item.title }}</h4>
     </div>
   </div>
   <div class="loading" v-else>Loading...</div>
@@ -31,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import {  useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useConditionWatcher } from '../../../src/index'
 // import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
@@ -41,7 +26,6 @@ export default defineComponent({
     const router = useRouter()
 
     const cancelTrigger = ref(false)
-    const pollingInterval = ref(0)
     
     const { 
       conditions, 
@@ -54,7 +38,10 @@ export default defineComponent({
       onFetchError 
     } = useConditionWatcher(
       {
-        fetcher: api.users,
+        fetcher: api.photos,
+        defaultParams: {
+          results: 9,
+        },
         manual: false,
         immediate: true,
         conditions: {
@@ -63,9 +50,6 @@ export default defineComponent({
           offset: 0,
           limit: 9
         },
-        pollingInterval: pollingInterval,
-        pollingWhenHidden: true,
-        pollingWhenOffline: true,
         initialData: {},
         history: {
           sync: router,
@@ -102,7 +86,6 @@ export default defineComponent({
       loading,
       data,
       conditions,
-      pollingInterval,
       execute,
       resetConditions,
     }
