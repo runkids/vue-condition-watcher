@@ -263,7 +263,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     if (!isActive.value) return
     execute()
     if (isHistoryOption()) {
-      //todo sync query
+      //todo sync query.value
     }
   })
 
