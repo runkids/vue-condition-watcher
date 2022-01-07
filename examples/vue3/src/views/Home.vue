@@ -114,30 +114,35 @@ onFetchFinally(() => {
       <el-button type="primary" @click="execute" size="small">Refresh</el-button>
       <el-button type="primary" @click="resetConditions" size="small">Reset Conditions</el-button>
     </el-col>
-    <el-col :span="6"><div class="grid-content bg-purple"></div></el-col>
   </el-row>
 
   <h4 style="margin: 20px 0; display: flex; justify-content: space-between;">
     <div>
-      <div>
-        Conditions: {{ conditions }}
-      </div>
-      <div>
-        Payload: {{ payload }}
-      </div>
+      <el-alert :title="`FullPath: ${$route.fullPath}`" :closable="false"/><br/>
+      <el-alert :title="`Conditions: ${JSON.stringify(conditions)}`" :closable="false"/><br/>
+      <el-alert :title="`Payload: ${payload}`" :closable="false"/>
     </div>
     <div>
+      <div>
+        pollingWhenHidden: <span class="status">true</span>
+      </div>
+      <div>
+        pollingWhenOffline: <span class="status">true</span>
+      </div>
+      <div>
+        revalidateOnFocus: <span class="status">true</span>
+      </div>
       <div>
         Results Size: {{ data.length }}
       </div>
       <div>
-        Count of data fetching : {{ fetchCounts }}
+        Count of data fetching : <span style="color: #E6A23C;">{{ fetchCounts }}</span>
       </div>
     </div>
   </h4>
 
-  <el-scrollbar max-height="70vh" ref="scrollbarRef">
-    <el-table :data="data" height="70vh" style="width: 100%" v-loading="loading">
+  <el-scrollbar max-height="60vh" ref="scrollbarRef">
+    <el-table :data="data" height="60vh" style="width: 100%" v-loading="loading">
       <el-table-column label="Index" v-slot="{ $index }">
         {{ $index + 1}}
       </el-table-column>

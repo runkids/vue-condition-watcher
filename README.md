@@ -9,7 +9,7 @@ English | [繁體中文](./README-zh_TW.md)
 Vue composition API for automatic data fetching. Easily control and sync to URL query string by conditions
 > requires Node.js 12.0.0 or higher.
 
-#### Features
+## Features
 
   ✔ Automatic fetch data when conditions changed.<br>
   ✔ Automatic filter falsy value in conditions before fetch.<br>
