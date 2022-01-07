@@ -1,0 +1,158 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import type { ElScrollbar } from 'element-plus'
+import { useConditionWatcher } from '../../../../src/index'
+// import { useConditionWatcher } from 'vue-condition-watcher'
+import api from '../api'
+
+const router = useRouter()
+const payload = ref('')
+const fetchCounts = ref(0)
+const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
+
+const cancelTrigger = ref(false)
+const pollingInterval= ref(0)
+
+const { 
+  conditions, 
+  loading, 
+  data, 
+  execute,
+  resetConditions, 
+  onFetchFinally,
+  onConditionsChange, 
+  onFetchSuccess, 
+  onFetchError 
+} = useConditionWatcher(
+  {
+    fetcher: (params) => {
+      payload.value = JSON.stringify(params)
+      return api.users(params)
+    },
+    conditions: {
+      gender: ['male'],
+      page: 1
+    },
+    defaultParams: {
+      results: 100,
+    },
+    manual: false,
+    immediate: true,
+    pollingInterval: pollingInterval,
+    pollingWhenHidden: true,
+    pollingWhenOffline: true,
+    revalidateOnFocus: true,
+    initialData: [],
+    history: {
+      sync: router,
+    },
+    beforeFetch,
+    afterFetch
+  }, 
+)
+
+function beforeFetch(cond, cancel) {
+  if (cancelTrigger.value) {
+    cancel()
+    cancelTrigger.value = false
+  }
+  return cond
+}
+
+function afterFetch (data) {
+  return data.results
+}
+
+onConditionsChange((newCond, oldCond)=> {
+  if (newCond.page !== 1 && newCond.page === oldCond.page) {
+    cancelTrigger.value = true
+    conditions.page = 1
+  }
+})
+
+onFetchSuccess((res) => {
+  console.log('onFetchSuccess=', res)
+})
+
+onFetchError((error) => {
+  console.log('onFetchError=', error)
+})
+
+onFetchFinally(() => {
+  scrollbarRef.value.setScrollTop(0)
+  fetchCounts.value+=1
+})
+</script>
+
+<template>
+  <el-row>
+    <el-col :span="4">
+      <el-checkbox-group v-model="conditions.gender" :disabled="loading" size="small">
+        <el-checkbox label="male" border>
+          Male
+        </el-checkbox>
+        <el-checkbox label="female" border>
+          Female
+        </el-checkbox>
+      </el-checkbox-group>
+    </el-col>
+    <el-col :span="8">
+      <el-radio-group v-model="pollingInterval" :disabled="loading" size="small">
+        <el-radio :label="0" border>
+          Stop Interval
+        </el-radio>
+        <el-radio :label="3000" border>
+          Set Interval 3s
+        </el-radio>
+        <el-radio :label="10000" border>
+          Set Interval 10s
+        </el-radio>
+      </el-radio-group>
+    </el-col>
+    <el-col :span="4">
+      <el-button type="primary" @click="execute" size="small">Refresh</el-button>
+      <el-button type="primary" @click="resetConditions" size="small">Reset Conditions</el-button>
+    </el-col>
+    <el-col :span="6"><div class="grid-content bg-purple"></div></el-col>
+  </el-row>
+
+  <h4 style="margin: 20px 0; display: flex; justify-content: space-between;">
+    <div>
+      <div>
+        Conditions: {{ conditions }}
+      </div>
+      <div>
+        Payload: {{ payload }}
+      </div>
+    </div>
+    <div>
+      <div>
+        Results Size: {{ data.length }}
+      </div>
+      <div>
+        Count of data fetching : {{ fetchCounts }}
+      </div>
+    </div>
+  </h4>
+
+  <el-scrollbar max-height="70vh" ref="scrollbarRef">
+    <el-table :data="data" height="70vh" style="width: 100%" v-loading="loading">
+      <el-table-column label="Index" v-slot="{ $index }">
+        {{ $index + 1}}
+      </el-table-column>
+      <el-table-column label="Photo" v-slot="{ row }">
+        <el-image :src="row.picture.thumbnail" />
+      </el-table-column>
+      <el-table-column label="Name" v-slot="{ row }">
+        {{`${row.name.first} ${row.name.last}`}}
+      </el-table-column>
+      <el-table-column prop="gender" label="Gender" />
+      <el-table-column prop="email" label="Email" />
+      <el-table-column prop="phone" label="Phone" />
+    </el-table>
+  </el-scrollbar>
+  <div class="footer">
+    <el-pagination background layout="prev, pager, next" :total="100" v-model:current-page="conditions.page"/>
+  </div>
+</template>

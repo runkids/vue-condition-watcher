@@ -660,3 +660,12 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 - [ ] Cache
 - [ ] Prefetching
 - [ ] Automatic Revalidation
+
+## Thanks
+
+This project is heavily inspired by the following awesome projects.
+
+- [vercel/swr](https://github.com/vercel/swr)
+## 📄 License
+
+[MIT License](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE) © 2020-PRESENT [Runkids](https://github.com/runkids)
