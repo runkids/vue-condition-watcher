@@ -1,4 +1,4 @@
-### [1.4.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.3.0) (Prepare)
+### [1.4.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.0) (2022-01-09)
 ### Changed
   * Change `data` type: `ref` to `shallowRef`
   * `mutate` now support callback function
@@ -8,6 +8,22 @@
         return currentData
       })
     ```
+  * `resetConditions` can receiver object to update conditions
+    ```js
+      const config = {
+        conditions: {
+          a: '1',
+          b: '2'
+        }
+      }
+      // to default conditions value
+      resetConditions() // { a: '1', b: '2' }
+
+      // update by key value
+      resetConditions({
+        b: '3'
+      }) // { a: '1', b: '3' }
+    ```
 ### Features:
 
 * **Add new configs for Polling feature**:
@@ -16,6 +32,8 @@
 3. pollingWhenOffline: default is false
 * **Add new configs for Revalidate on Focu feature**:
 4. revalidateOnFocus: default is false
+* **Add new configs for Cache & Preload**
+5. cacheProvider: `() => new Map()`
 
 ---------------------------------
 ### [1.3.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.3.0) (2022-01-07)

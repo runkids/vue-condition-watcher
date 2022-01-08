@@ -57,7 +57,7 @@ export interface Config<O, K> {
   pollingWhenHidden?: boolean
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
-  cacheProvider?: () => Cache<any> | Cache<any>
+  cacheProvider?: () => Cache<any>
   beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
   afterFetch?: (data: any) => any
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>

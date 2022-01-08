@@ -39,6 +39,8 @@
 - [變異資料](#變異資料)
 - [Conditions 改變事件](#conditions-改變事件)
 - [請求事件](#請求事件)
+- [輪詢](#輪詢)
+- [緩存](#緩存)
 - [生命週期](#生命週期)
 - [分頁處理](#分頁處理)
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
@@ -146,6 +148,11 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
 - `immediate`: 如果不想一開始自動請求資料，可以將此參數設定為 `false`，直到 `conditions` 改變或是執行 `execute` 才會執行請求。
 - `manual`: 改為手動執行 `execute` 以觸發請求，就算 `conditions` 改變也不會自動請求。
 - `history`: 基於 vue-router (v3 & v4)，啟用同步 `conditions` 到 URL 的 Query String。當網頁重新整理後會同步 Query String 至 `conditions`
+- `pollingInterval`: 啟用輪詢，以毫秒為單位可以是 `number` 或是 `ref(number)`
+- `pollingWhenHidden`: 每當離開聚焦畫面繼續輪詢，預設是關閉的
+- `pollingWhenOffline`: 每當網路斷線繼續輪詢，預設是關閉的
+- `revalidateOnFocus`: 重新聚焦畫面後，重新請求一次，預設是關閉的
+- `cacheProvider`: `vue-condition-watch` 背後會緩存資料，可傳入此參數自訂 `cacheProvider`
 - `beforeFetch`: 你可以在請求前最後修改 `conditions`，也可以在此階段終止請求。
 - `afterFetch`: 你可以在 `data` 更新前調整 `data` 的結果
 - `onFetchError`: 當請求發生錯誤觸發，可以在`data` 和 `error` 更新前調整 `error`& `data`
@@ -223,20 +230,14 @@ const { conditions, resetConditions } = useConditionWatcher({
 })
 
 // 初始化 conditions 將會觸發 `onConditionsChange` 事件
-Object.assign(conditions, {
+resetConditions({
   name: 'runkids',
   date: ['2022-01-01', '2022-01-02']
 })
 
 // 重置 conditions
 function reset () {
-  Object.assign(conditions, {
-    page: 0,
-    name: '',
-    date: []
-  })
-
-  // 或是你可以直接用 `resetConditions` function 來重置初始值.
+  // 直接用 `resetConditions` function 來重置初始值.
   resetConditions()
 }
 ```
@@ -438,6 +439,101 @@ onFetchError((error) => {
 
 onFetchFinally(() => {
   //todo
+})
+```
+
+
+## 輪詢
+
+你可以透過設定 `pollingInterval` 啟用輪詢功能（當為 0 時會關閉此功能）
+
+```js
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: 1000
+})
+```
+你還可以使用 `ref` 動態響應輪詢週期。
+
+```js
+const pollingInterval = ref(0)
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: pollingInterval
+})
+
+function startPolling () {
+  pollingInterval.value = 1000
+}
+
+onMounted(startPolling)
+```
+
+`vue-condition-watcher` 預設會在你離開畫面聚焦或是網路斷線時停用輪詢，直到畫面重新聚焦或是網路連線上了才會啟用輪詢。
+
+你可以透過設定關閉預設行為：
+
+- `pollingWhenHidden=true`  離開聚焦後繼續輪詢
+- `pollingWhenOffline=true` 網路斷線還是會繼續輪詢
+
+你也可以啟用聚焦畫面後重打請求，確保資料是最新狀態。
+
+- `revalidateOnFocus=true`
+
+```js
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: 1000,
+  pollingWhenHidden: true, // pollingWhenHidden default is false
+  pollingWhenOffline: true, // pollingWhenOffline default is false
+  revalidateOnFocus: true // revalidateOnFocus default is false
+})
+```
+## 緩存
+
+`vue-condition-watcher` 預設會在當前組件緩存你的第一次數據。接著後面的請求會先使用緩存數據，背後默默請求新資料，等待最新回傳結果並比對緩存資料是否相同，達到類似預加載的效果。
+
+你也可以設定 `cacheProvider` 全局共用或是緩存資料在 `localStorage`，搭配輪詢可以達到分頁同步資料的效果。
+###### Global Based
+```js
+// App.vue
+<script lang="ts">
+const cache = new Map()
+
+export default {
+  name: 'App',
+  provide: {
+    cacheProvider: () => cache
+  }
+}
+
+//Other.vue
+useConditionWatcher({
+  fetcher,
+  conditions,
+  cacheProvider: inject('cacheProvider')
+})
+</script>
+```
+###### [LocalStorage Based](https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache)
+```js
+function localStorageProvider() {
+  const map = new Map(JSON.parse(localStorage.getItem('your-cache-key') || '[]'))
+  window.addEventListener('beforeunload', () => {
+    const appCache = JSON.stringify(Array.from(map.entries()))
+    localStorage.setItem('your-cache-key', appCache)
+  })
+  return map
+}
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  cacheProvider: localStorageProvider
 })
 ```
 ## 生命週期

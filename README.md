@@ -39,6 +39,8 @@ Vue composition API for automatic data fetching. With `conditions` as the core. 
 - [Mutations data](#mutations-data)
 - [Conditions Change Event](#conditions-change-event)
 - [Fetch Event](#fetch-event)
+- [Polling](#polling)
+- [Cache](#cache)
 - [Lifecycle](#lifecycle)
 - [Pagination](#pagination)
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
@@ -148,6 +150,11 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
 - `immediate`: If you don't want to automatically fetch data in the first time, you can set this parameter to `false`, and the request will not be executed until `conditions` is changed or `execute` is executed.
 - `manual`: Instead manually execute `execute` function to trigger the request, even if `conditions` changes, it will not be automatically requested.
 - `history`: Based on vue-router (v3 & v4), enables synchronization of `conditions` to URL's Query String. Synchronize Query String to `conditions` when the page is refreshed
+- `pollingInterval`: Enable polling, can be `number` or `ref(number)` in milliseconds
+- `pollingWhenHidden`: Continue polling whenever you leave the focused screen, the default is `false`.
+- `pollingWhenOffline`: continue polling whenever the network is disconnected, the default is `false`.
+- `revalidateOnFocus`: After re-focusing the screen, re-request once, the default is `false`.
+- `cacheProvider`: `vue-condition-watch` will cache data behind, you can pass this parameter to customize `cacheProvider`
 - `beforeFetch`: You can last modify the `conditions` before the request, or you can terminate the request at this stage.
 - `afterFetch`: you can adjust the result of `data` before `data` is updated
 - `onFetchError`: Triggered when an error occurs in the request, you can adjust `error` & `data` before `data` and `error` are updated
@@ -225,20 +232,14 @@ const { conditions, resetConditions } = useConditionWatcher({
 })
 
 // initial conditions then fire onConditionsChange event
-Object.assign(conditions, {
+resetConditions({
   name: 'runkids',
   date: ['2022-01-01', '2022-01-02']
 })
 
 // Reset conditions
 function reset () {
-  Object.assign(conditions, {
-    page: 0,
-    name: '',
-    date: []
-  })
-
-  // Or you can just use `resetConditions` function to initial value.
+  // You can just use `resetConditions` function to initial value.
   resetConditions()
 }
 ```
@@ -429,6 +430,97 @@ onFetchError((error) => {
 
 onFetchFinally(() => {
   //todo
+})
+```
+
+## Polling
+You can use `pollingInterval` to automatically refetch data. Just enable it by setting `pollingInterval` value.
+
+```js
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: 1000
+})
+```
+And also you can use `ref`, it's will be reactivity.
+
+```js
+const pollingInterval = ref(0)
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: pollingInterval
+})
+
+function startPolling () {
+  pollingInterval.value = 1000
+}
+
+onMounted(startPolling)
+```
+The `vue-condition-watcher` default will disable polling when you leave the screen in focus or when the network is disconnected.
+
+You can turn off the default behavior by setting:
+
+- `pollingWhenHidden=true` to continue polling after leaving focus
+- `pollingWhenOffline=true` will continue polling if the network is disconnected
+
+You can also retry the request after enabling the focus screen to make sure the data is up to date.
+
+- `revalidateOnFocus=true`
+
+```js
+useConditionWatcher({
+  fetcher,
+  conditions,
+  pollingInterval: 1000,
+  pollingWhenHidden: true, // pollingWhenHidden default is false
+  pollingWhenOffline: true, // pollingWhenOffline default is false
+  revalidateOnFocus: true // revalidateOnFocus default is false
+})
+```
+## Cache
+The `vue-condition-watcher` preset will cache your first data in the current component. Then the following requests will use the cached data first, silently request new data behind, wait for the latest return result and compare whether the cached data is the same to achieve a similar preloading effect.
+
+You can also set `cacheProvider` by function to share globally or cache data in `localStorage`, and with polling, it can achieve the effect of paging and synchronizing data.
+###### Global Based
+```js
+// App.vue
+<script lang="ts">
+const cache = new Map()
+
+export default {
+  name: 'App',
+  provide: {
+    cacheProvider: () => cache
+  }
+}
+
+//Other.vue
+useConditionWatcher({
+  fetcher,
+  conditions,
+  cacheProvider: inject('cacheProvider')
+})
+</script>
+```
+###### [LocalStorage Based](https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache)
+```js
+function localStorageProvider() {
+  const map = new Map(JSON.parse(localStorage.getItem('your-cache-key') || '[]'))
+  window.addEventListener('beforeunload', () => {
+    const appCache = JSON.stringify(Array.from(map.entries()))
+    localStorage.setItem('your-cache-key', appCache)
+  })
+  return map
+}
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  cacheProvider: localStorageProvider
 })
 ```
 ## Lifecycle
@@ -731,9 +823,6 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 
 ## TDOD List
 
-- [ ] Cache
-- [ ] Prefetching
-- [ ] Automatic Revalidation
 - [ ] Error Retry
 - [ ] Nuxt SSR SSG Support
 
