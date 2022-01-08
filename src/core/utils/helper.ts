@@ -7,7 +7,7 @@ const STR_UNDEFINED = 'undefined'
 
 export const hasWindow = () => typeof window != STR_UNDEFINED
 export const hasDocument = () => typeof document != STR_UNDEFINED
-export const isDocumentVisibility = () => hasDocument() && window?.document?.visibilityState === 'visible'
+export const isDocumentVisibility = () => hasDocument() && document.visibilityState === 'visible'
 export const hasRequestAnimationFrame = () => hasWindow() && typeof window['requestAnimationFrame'] != STR_UNDEFINED
 export const isNil = (val: unknown) => val === null || val === undefined
 export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'

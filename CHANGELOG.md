@@ -1,3 +1,25 @@
+### [1.4.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.0) (2022-01-09)
+  * Fix bug for vue2
+  ```
+    error  in ./node_modules/vue-condition-watcher/esm/core/utils/helper.js
+    Module parse failed: Unexpected token (9:66)
+    You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+    | export const hasWindow = () => typeof window != STR_UNDEFINED;
+    | export const hasDocument = () => typeof document != STR_UNDEFINED;
+    > export const isDocumentVisibility = () => hasDocument() && window?.document?.visibilityState === 'visible';
+    | export const hasRequestAnimationFrame = () => hasWindow() && typeof window['requestAnimationFrame'] != STR_UNDEFINED;
+    | export const isNil = (val) => val === null || val === undefined;
+
+    @ ./node_modules/vue-condition-watcher/esm/core/useConditionWatcher.js 6:0-96 10:15-27 15:15-27 49:35-43 140:12-23 140:39-47 144:12-15
+    @ ./node_modules/vue-condition-watcher/esm/index.js
+    @ ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/views/InfiniteScrolling.vue?vue&type=script&lang=js&
+    @ ./src/views/InfiniteScrolling.vue?vue&type=script&lang=js&
+    @ ./src/views/InfiniteScrolling.vue
+    @ ./src/router/index.js
+    @ ./src/main.js
+    @ multi (webpack)-dev-server/client?http://192.168.68.114:8081&sockPath=/sockjs-node (webpack)/hot/dev-server.js ./src/main.js
+  ```
+
 ### [1.4.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.0) (2022-01-09)
 ### Changed
   * Change `data` type: `ref` to `shallowRef`

@@ -2,8 +2,8 @@
 import { ref, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ElScrollbar } from 'element-plus'
-import { useConditionWatcher } from '../../../../src/index'
-// import { useConditionWatcher } from 'vue-condition-watcher'
+// import { useConditionWatcher } from '../../../../src/index'
+import { useConditionWatcher } from 'vue-condition-watcher'
 import api from '../api'
 
 const router = useRouter()
