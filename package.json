@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Vue composition API for automatic data fetching. With conditions as the core. Easily control and sync to URL query string by conditions",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
