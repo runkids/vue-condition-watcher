@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ElScrollbar } from 'element-plus'
 import { useConditionWatcher } from '../../../../src/index'
@@ -18,6 +18,7 @@ const {
   conditions, 
   loading, 
   data, 
+  mutate,
   execute,
   resetConditions, 
   onFetchFinally,
@@ -64,6 +65,15 @@ function afterFetch (data) {
   return data.results
 }
 
+function updateFirstRowData () {
+  const updatedData = mutate((currentData) => {
+    const row = currentData[0]
+    row.name.last = 'Runkids'
+    return currentData
+  })
+  console.log(updatedData)
+}
+
 onConditionsChange((newCond, oldCond)=> {
   if (newCond.page !== 1 && newCond.page === oldCond.page) {
     cancelTrigger.value = true
@@ -79,9 +89,10 @@ onFetchError((error) => {
   console.log('onFetchError=', error)
 })
 
-onFetchFinally(() => {
-  scrollbarRef.value.setScrollTop(0)
+onFetchFinally(async () => {
   fetchCounts.value+=1
+  await nextTick()
+  scrollbarRef.value.setScrollTop(0)
 })
 </script>
 
@@ -110,9 +121,10 @@ onFetchFinally(() => {
         </el-radio>
       </el-radio-group>
     </el-col>
-    <el-col :span="4">
+    <el-col :span="6">
       <el-button type="primary" @click="execute" size="small">Refresh</el-button>
       <el-button type="primary" @click="resetConditions" size="small">Reset Conditions</el-button>
+      <el-button type="primary" @click="updateFirstRowData" size="small">Mutate First Row Data</el-button>
     </el-col>
   </el-row>
 

@@ -1,12 +1,12 @@
 English | [繁體中文](./README-zh_TW.md)
 
-# vue-condition-watcher 🕶
+# vue-condition-watcher <img src="https://slackmojis.com/emojis/43271-glasses/download" width="40" />
 
 [![CircleCI](https://circleci.com/gh/runkids/vue-condition-watcher.svg?style=svg)](https://circleci.com/gh/runkids/vue-condition-watcher) [![vue3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/) [![vue3](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://composition-api.vuejs.org/) [![npm](https://img.shields.io/npm/v/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher)  [![npm](https://img.shields.io/npm/dt/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher) [![bundle size](https://badgen.net/bundlephobia/minzip/vue-condition-watcher)](https://bundlephobia.com/result?p=vue-condition-watcher) [![npm](https://img.shields.io/npm/l/vue-condition-watcher.svg)](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE)
 
 ## Introduction
 
-Vue composition API for automatic data fetching. Easily control and sync to URL query string by conditions
+Vue composition API for automatic data fetching. With `conditions` as the core. Easily control and sync to URL query string by `conditions`
 > requires Node.js 12.0.0 or higher.
 
 ## Features
@@ -19,13 +19,32 @@ Vue composition API for automatic data fetching. Easily control and sync to URL 
   ✔ Avoiding the race condition.<br>
   ✔ Dependent request before update data. <br/>
   ✔ Easily manage paged data and customized your pagination hook. <br/>
-  ✔ Revalidation on focus & network recovery <br/>
-  ✔ Polling <br/>
-  ✔ Local mutation <br/>
-  ✔ TypeScript support <br/>
+  ✔ Revalidation on focus & network recovery. <br/>
+  ✔ Polling. <br/>
+  ✔ Mutations to `data` make the user experience better. <br/>
+  ✔ TypeScript support. <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src=".github/vue-conditions-watcher.gif"/>
+
+## Navigation
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configs](#configs)
+- [Return Values](#return-values)
+- [Execute Fetch](#execute-fetch)
+- [Prevent Request](#prevent-request)
+- [Manually Trigger Request](#manually-trigger-request)
+- [Intercepting Request](#intercepting-request)
+- [Mutations to data](#mutations-to-data)
+- [Conditions Change Event](#conditions-change-event)
+- [Fetch Event](#fetch-event)
+- [Lifecycle](#Lifecycle)
+- [Pagination](#Pagination)
+- [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
+
+## Demo
 
 [👉 Download Vue3 example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
 
@@ -121,6 +140,33 @@ Use `config.history` of sync to `sync: router`. Will store the conditions within
 const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config)
 ```
 
+### Configs
+
+- `fetcher`:  (⚠️ Required)  A promise returning function to fetch your data
+- `conditions`:  (⚠️ Required) Object of conditions, also to be initial value
+- `defaultParams`: Object of fetcher's default parameters
+- `initialData`: `data` default value is null, and you can setting `data` default value by use this config
+- `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
+- `manual`: You can use `manual` to disabled automatically fetch data
+- `history`: Sync conditions value to URL query string
+- `beforeFetch`: You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
+- `afterFetch`: You can modify data before update. also can use `mutate` modify too. But still recommend modify `data` at `afterFetch`.
+- `onFetchError`: Handle error, and you can modify data and error before update here.
+
+### Return Values
+
+- `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
+- `data`( `👁‍🗨 readonly & ⚠️ ref` ) : Data resolved by `config.fetcher`
+- `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
+- `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
+- `execute`: The function to trigger the request
+- `mutate`: You can use mutate() to directly modify `data` **( By default, data is readonly )**
+- `resetConditions`: Reset conditions to initial value
+- `onConditionsChange`: Will fire on conditions changed
+- `onFetchSuccess`: Will fire on fetch request success
+- `onFetchError`: Will fire on fetch request error
+- `onFetchFinally`: Will fire on fetch finished
+
 ### Execute Fetch
 
 `conditions` is reactive proxy, easy execute fetch when `conditions` value changed
@@ -188,48 +234,6 @@ function reset () {
   resetConditions()
 }
 ```
-
-### Conditions Change Event
-
-`onConditionsChange` can help you handle conditions changed.
-Will return new value and old value.
-
-```js
-const { conditions, onConditionsChange } = useConditionWatcher({
-  fetcher,
-  conditions: {
-    page: 0
-  },
-})
-
-conditions.page = 1
-
-onConditionsChange((conditions, preConditions)=> {
-  console.log(conditions) // { page: 1}
-  console.log(preConditions) // { page: 0}
-})
-```
-
-### Fetch Event
-
-The `onFetchResponse`, `onFetchError` and `onFetchFinally` will fire on fetch request.
-
-```ts
-const { onFetchResponse, onFetchError, onFetchFinally } = useConditionWatcher(config)
-
-onFetchResponse((response) => {
-  console.log(response)
-})
-
-onFetchError((error) => {
-  console.error(error)
-})
-
-onFetchFinally(() => {
-  //todo
-})
-```
-
 ### Prevent Request
 
 Setting the `immediate` to false will prevent the request until the `execute`
@@ -261,7 +265,11 @@ execute()
 
 ### Intercepting Request
 
-The `beforeFetch` let you modify conditions before fetch, or you can call `cancel` function to stop fetch.
+The `beforeFetch` let you modify conditions before fetch. 
+Receive two params:
+- Object of clone deep conditions.
+- Function called to stop fetch.
+
 
 ```js
 useConditionWatcher({
@@ -270,12 +278,12 @@ useConditionWatcher({
     date: ['2022/01/01', '2022/01/02']
   },
   initialData: [],
-  async beforeFetch(conditions, cancel) {
-    // await something
-    await doSomething ()
+  async beforeFetch(conds, cancel) {
+    // await to check token before fetch
+    await checkToken ()
 
-    // conditions is an object clone copy from config.conditions
-    const {date, ...baseConditions} = conditions
+    // conds is an object clone copy from config.conditions
+    const {date, ...baseConditions} = conds
     const [after, before] = date
     baseConditions.created_at_after = after
     baseConditions.created_at_before = before
@@ -285,7 +293,7 @@ useConditionWatcher({
 })
 ```
 
-The `afterFetch` can intercept the response before data updated, **also your can requestss depend on each other 🎭**
+The `afterFetch` can intercept the response before data updated, **also your can requests depend on each other 🎭**
 
 ```js
 const { data } = useConditionWatcher({
@@ -328,35 +336,94 @@ const { data, error } = useConditionWatcher({
 console.log(data) //[]
 console.log(error) //'Error Message'
 ```
+### Mutations data
+In some cases, mutations to `data` is a good way to make the user experience better, you don't need wait for the remote data.
 
-### Configs
+Use `mutate` function, you can update `data`. While `onFetchSuccess` will replace `data` again.
 
-- `fetcher` (⚠️Required) : A promise returning function to fetch your data
-- `conditions` (⚠️Required) : An object of conditions, also to be initial value
-- `defaultParams`: An object of fetcher's default
-parameters
-- `initialData`: `data` default value is null, and you can setting `data` default value by use this config
-- `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
-- `manual`: You can use `manual` to disabled automatically fetch data
-- `history`: Sync conditions value to URL query string
-- `beforeFetch`: You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
-- `afterFetch`: You can modify data before update. also can use `mutate` modify too. But still recommend modify `data` at `afterFetch`.
-- `onFetchError`: Handle error, and you can modify data and error before update here.
+Two way to use mutate function:
 
-### Return Values
+- First way, force update current data.
+```js
+mutate(newData)
+```
+- Second way, use function will receive deep clone data, and return updated data.
+```js
+const finalData = mutate((currentData) => {
+  currentData[0].name = 'runkids'
+  return currentData
+})
 
-- `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
-- `data`( `👁‍🗨 readonly & ⚠️ ref` ) : Data resolved by `config.fetcher`
-- `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
-- `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
-- `execute`: The function to trigger the request
-- `mutate`: You can use mutate() to directly modify `data` **( By default, data is readonly )**
-- `resetConditions`: Reset conditions to initial value
-- `onConditionsChange`: Will fire on conditions changed
-- `onFetchSuccess`: Will fire on fetch request success
-- `onFetchError`: Will fire on fetch request error
-- `onFetchFinally`: Will fire on fetch finished
+console.log(finalData[0]name === data.value[0].name) //true
+```
+##### 🏄‍♂️ Example for update a part of your data based on the current data
+POST APIs will just return the updated data directly, so we don’t need to fetch list data again.
+```js
+const { conditions, data, mutate } = useConditionWatcher({
+  fetcher: api.userInfo,
+  conditions,
+  initialData: []
+})
 
+async function updateUserName (userId, newName, rowIndex = 0) {
+  console.log(data.value) //before: [{ id: 1, name: 'runkids' }, { id: 2, name: 'vuejs' }]
+
+  const response = await api.updateUer(userId, newName)
+
+  // 🚫 `data.value[0] = response.data`
+  // Not work! Because `data` is read only.
+
+  // Easy to use function will receive deep clone data, and return updated data.
+  mutate(currentData => {
+    currentData[rowIndex] = response.data
+    return currentData
+  })
+
+  console.log(data.value) //after: [{ id: 1, name: 'mutate name' }, { id: 2, name: 'vuejs' }]
+}
+
+
+```
+### Conditions Change Event
+
+`onConditionsChange` can help you handle conditions changed.
+Will return new value and old value.
+
+```js
+const { conditions, onConditionsChange } = useConditionWatcher({
+  fetcher,
+  conditions: {
+    page: 0
+  },
+})
+
+conditions.page = 1
+
+onConditionsChange((conditions, preConditions)=> {
+  console.log(conditions) // { page: 1}
+  console.log(preConditions) // { page: 0}
+})
+```
+
+### Fetch Event
+
+The `onFetchResponse`, `onFetchError` and `onFetchFinally` will fire on fetch request.
+
+```ts
+const { onFetchResponse, onFetchError, onFetchFinally } = useConditionWatcher(config)
+
+onFetchResponse((response) => {
+  console.log(response)
+})
+
+onFetchError((error) => {
+  console.error(error)
+})
+
+onFetchFinally(() => {
+  //todo
+})
+```
 ## Lifecycle
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
@@ -660,6 +727,8 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 - [ ] Cache
 - [ ] Prefetching
 - [ ] Automatic Revalidation
+- [ ] Error Retry
+- [ ] Nuxt SSR SSG Support
 
 ## Thanks
 

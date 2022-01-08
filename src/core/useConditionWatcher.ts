@@ -1,4 +1,15 @@
-import { reactive, ref, watch, readonly, UnwrapNestedRefs, onUnmounted, watchEffect, unref, isRef } from 'vue-demi'
+import {
+  reactive,
+  ref,
+  watch,
+  readonly,
+  UnwrapNestedRefs,
+  onUnmounted,
+  watchEffect,
+  unref,
+  isRef,
+  shallowRef,
+} from 'vue-demi'
 import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
 import { usePromiseQueue } from './hooks/usePromiseQueue'
 import { useHistory } from './hooks/useHistory'
@@ -60,7 +71,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data = ref(watcherConfig.initialData || null)
+  const data = shallowRef(watcherConfig.initialData || null)
   const error = ref(null)
   const query = ref({})
 
@@ -219,7 +230,28 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   // - mutate: Modify `data` directly
   // - `data` is read only by default, recommend modify `data` at `afterFetch`
   // - When you need to modify `data`, you can use mutate() to directly modify data
-  const mutate = <Mutate>((newData) => (data.value = newData))
+  /*
+   *  Two way to use mutate
+   *  - 1.
+   *     mutate(newData)
+   *  - 2.
+   *     mutate((currentData) => {
+   *        currentData[0].name = 'runkids'
+   *        return currentData
+   *     })
+   */
+  const mutate = (...args): Mutate => {
+    const arg = args[0]
+    if (arg === undefined) {
+      return data.value
+    }
+    if (typeof arg === 'function') {
+      data.value = arg(deepClone(data.value))
+    } else {
+      data.value = arg
+    }
+    return data.value
+  }
 
   // - History mode base on vue-router
   if (isHistoryOption()) {
