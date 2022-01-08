@@ -11,17 +11,16 @@ Vue composition API for automatic data fetching. With `conditions` as the core. 
 
 ## Features
 
-  ✔ Automatic fetch data when conditions changed.<br>
-  ✔ Automatic filter falsy value in conditions before fetch.<br>
-  ✔ Automatic converts the corresponding type. (string, number, array, date)<br>
-  ✔ Store the conditions within the URL query string every time a condition is changed<br>
-  ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
-  ✔ Avoiding the race condition.<br>
-  ✔ Dependent request before update data. <br/>
-  ✔ Easily manage paged data and customized your pagination hook. <br/>
-  ✔ Revalidation on focus & network recovery. <br/>
-  ✔ Polling. <br/>
-  ✔ Mutations to `data` make the user experience better. <br/>
+  ✔ Automatically fetch data whenever `conditions` changes<br>
+  ✔ `null` `undefined` `[]` `''` will be automatically filtered out before sending the request<br>
+  ✔ Refreshing the page will automatically initialize `conditions` according to the query string of the URL, and will automatically correspond to the type ( string, number, array, date )<br>
+  ✔ Whenever `conditions` changes, the URL query string will be automatically synchronized, and the previous page and next page will work normally<br>
+  ✔ Avoid `race condition`, ensure requests are first in, first out, and can also avoid repeated requests<br>
+  ✔ Do Dependent Request before updating `data`<br/>
+  ✔ Easily handle paging needs, simply customize your own paging logic<br/>
+  ✔ Automatically re-request data when web page is refocused or network disconnection resumes<br/>
+  ✔ Support polling, the polling period can be adjusted dynamically<br/>
+  ✔ No need to wait for the return result, you can manually change `data` to make the user experience better<br/>
   ✔ TypeScript support. <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
   
@@ -37,11 +36,11 @@ Vue composition API for automatic data fetching. With `conditions` as the core. 
 - [Prevent Request](#prevent-request)
 - [Manually Trigger Request](#manually-trigger-request)
 - [Intercepting Request](#intercepting-request)
-- [Mutations to data](#mutations-to-data)
+- [Mutations data](#mutations-data)
 - [Conditions Change Event](#conditions-change-event)
 - [Fetch Event](#fetch-event)
-- [Lifecycle](#Lifecycle)
-- [Pagination](#Pagination)
+- [Lifecycle](#lifecycle)
+- [Pagination](#pagination)
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
 
 ## Demo
@@ -142,30 +141,39 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
 
 ### Configs
 
-- `fetcher`:  (⚠️ Required)  A promise returning function to fetch your data
-- `conditions`:  (⚠️ Required) Object of conditions, also to be initial value
-- `defaultParams`: Object of fetcher's default parameters
-- `initialData`: `data` default value is null, and you can setting `data` default value by use this config
-- `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
-- `manual`: You can use `manual` to disabled automatically fetch data
-- `history`: Sync conditions value to URL query string
-- `beforeFetch`: You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
-- `afterFetch`: You can modify data before update. also can use `mutate` modify too. But still recommend modify `data` at `afterFetch`.
-- `onFetchError`: Handle error, and you can modify data and error before update here.
+- `fetcher`: (⚠️ Required) promise function for data fetching.
+- `conditions`: (⚠️ Required) `conditions` default value.
+- `defaultParams`: The parameters that will be preset with each request and cannot be modified.
+- `initialData`: `data` returns null by default. If you want to define the initial data, you can use this parameter setting.
+- `immediate`: If you don't want to automatically fetch data in the first time, you can set this parameter to `false`, and the request will not be executed until `conditions` is changed or `execute` is executed.
+- `manual`: Instead manually execute `execute` function to trigger the request, even if `conditions` changes, it will not be automatically requested.
+- `history`: Based on vue-router (v3 & v4), enables synchronization of `conditions` to URL's Query String. Synchronize Query String to `conditions` when the page is refreshed
+- `beforeFetch`: You can last modify the `conditions` before the request, or you can terminate the request at this stage.
+- `afterFetch`: you can adjust the result of `data` before `data` is updated
+- `onFetchError`: Triggered when an error occurs in the request, you can adjust `error` & `data` before `data` and `error` are updated
 
 ### Return Values
 
-- `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
-- `data`( `👁‍🗨 readonly & ⚠️ ref` ) : Data resolved by `config.fetcher`
-- `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
-- `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
-- `execute`: The function to trigger the request
-- `mutate`: You can use mutate() to directly modify `data` **( By default, data is readonly )**
-- `resetConditions`: Reset conditions to initial value
-- `onConditionsChange`: Will fire on conditions changed
-- `onFetchSuccess`: Will fire on fetch request success
-- `onFetchError`: Will fire on fetch request error
-- `onFetchFinally`: Will fire on fetch finished
+- `conditions`:<br/>
+ Type: `reactive`<br/>
+ Reactive objects (conditions based on config) are the main core of `vue-conditions-watcher`. Whenever `conditions` changes, the [lifecycle](#lifecycle) will be triggered.<br/>
+- `data`:<br/>
+Type: `👁‍🗨 readonly & ref`<br/>
+The return result of `config.fetcher`<br/>
+- `error`:<br/>
+Type: `👁‍🗨 readonly & ref`<br/>
+`config.fetcher` error return result<br/>
+- `loading`:<br/>
+Type: `👁‍🗨 readonly & ref`<br/>
+The status of the request being processed<br/>
+- `execute`: Trigger the request again based on the current `conditions` and `defaultParams`.<br/>
+- `mutate`: `data` can be modified using this method<br/>
+**🔒 ( `data` default is only unmodifiable )**<br/>
+- `resetConditions`: Reset `conditions` back to their initial values
+- `onConditionsChange`: Fires when `conditions` changes, returning new and old values
+- `onFetchSuccess`: The request is successfully triggered and the original request result is returned
+- `onFetchError`: Triggered by request failure, returning the original request failure result
+- `onFetchFinally`: Fired when the request ends
 
 ### Execute Fetch
 
@@ -356,8 +364,8 @@ const finalData = mutate((currentData) => {
 
 console.log(finalData[0]name === data.value[0].name) //true
 ```
-##### 🏄‍♂️ Example for update a part of your data based on the current data
-POST APIs will just return the updated data directly, so we don’t need to fetch list data again.
+#### 🏄‍♂️ Example for update a part of your data based on the current data
+POST API will just return the updated data directly, so we don’t need to fetch list data again.
 ```js
 const { conditions, data, mutate } = useConditionWatcher({
   fetcher: api.userInfo,
@@ -381,7 +389,6 @@ async function updateUserName (userId, newName, rowIndex = 0) {
 
   console.log(data.value) //after: [{ id: 1, name: 'mutate name' }, { id: 2, name: 'vuejs' }]
 }
-
 
 ```
 ### Conditions Change Event

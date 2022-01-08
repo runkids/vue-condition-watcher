@@ -1,29 +1,50 @@
 [English](./README.md) | 繁體中文
 
-# vue-condition-watcher 🕶
+# vue-condition-watcher <img src="https://slackmojis.com/emojis/43271-glasses/download" width="40" />
 
 [![CircleCI](https://circleci.com/gh/runkids/vue-condition-watcher.svg?style=svg)](https://circleci.com/gh/runkids/vue-condition-watcher) [![vue3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/) [![vue3](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://composition-api.vuejs.org/) [![npm](https://img.shields.io/npm/v/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher)  [![npm](https://img.shields.io/npm/dt/vue-condition-watcher.svg)](https://www.npmjs.com/package/vue-condition-watcher) [![bundle size](https://badgen.net/bundlephobia/minzip/vue-condition-watcher)](https://bundlephobia.com/result?p=vue-condition-watcher) [![npm](https://img.shields.io/npm/l/vue-condition-watcher.svg)](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE)
 
-## Introduction
+## 介紹
 
-Vue composition API for automatic data fetching and easily control conditions
-> requires Node.js 12.0.0 or higher.
+`vue-condition-watcher` 是 Vue 組合 API，以 `conditions` 為核心，可用在請求資料情境，還能簡單地使用 `conditions` 參數來自動獲取資料
+> Node.js 需大於或等於 12.0.0 版本
 
-#### Features
+## 功能
 
-  ✔ Automatic fetch data when conditions changed.<br>
-  ✔ Automatic filter falsy value in conditions before fetch.<br>
-  ✔ Automatic converts the corresponding type. (string, number, array, date)<br>
-  ✔ Store the conditions within the URL query string every time a condition is changed<br>
-  ✔ Sync the state with the query string and initialize off of that and that back/forward/execute work.<br>
-  ✔ Keep requests first in — first out.<br>
-  ✔ Dependent request before update data. <br/>
-  ✔ Easily manage paged data and customized your pagination hook. <br/>
-  ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
+  ✔ 每當 `conditions` 變動，會自動獲取數據<br>
+  ✔ 送出請求前會自動過濾掉 `null` `undefined` `[]` `''`<br>
+  ✔ 重新整理網頁會自動依照 URL 的 query string 初始化 `conditions`，且會自動對應型別 ( string, number, array, date )<br>
+  ✔ 每當 `conditions` 變動，會自動同步 URL query string，並且讓上一頁下一頁都可以正常運作<br>
+  ✔ 避免 `race condition`，確保請求先進先出，也可以避免重複請求<br>
+  ✔ 在更新 `data` 前，可做到依賴請求 ( Dependent Request )<br/>
+  ✔ 輕鬆處理分頁的需求，簡單客製自己的分頁邏輯<br/>
+  ✔ 當網頁重新聚焦或是網絡斷線恢復自動重新請求資料<br/>
+  ✔ 支援輪詢，可動態調整輪詢週期<br/>
+  ✔ 不需要等待回傳結果，可手動改變 `data` 讓使用者體驗更好<br/>
+  ✔ 支援 TypeScript<br/>
+  ✔ 支援 Vue 2 & 3，感謝 [vue-demi](https://github.com/vueuse/vue-demi)
   
   <img src=".github/vue-conditions-watcher.gif"/>
 
-[👉 Download Vue3 example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (Use [Vite](https://github.com/vuejs/vite))
+## Navigation
+
+- [安裝](#installation)
+- [快速開始](#快速開始)
+- [Configs](#configs)
+- [Return Values](#return-values)
+- [執行請求](#執行請求)
+- [阻止預請求](#阻止預請求)
+- [手動觸發請求](#手動觸發請求)
+- [攔截請求](#攔截請求)
+- [變異資料](#變異資料)
+- [Conditions 改變事件](#conditions-改變事件)
+- [請求事件](#請求事件)
+- [生命週期](#生命週期)
+- [分頁處理](#分頁處理)
+- [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
+
+## Demo
+[👉 (推薦) 這邊下載 Vue3 版本範例](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (使用 [Vite](https://github.com/vuejs/vite))
 
 ```bash
 cd examples/vue3
@@ -31,7 +52,7 @@ yarn
 yarn serve
 ````
 
-[👉 Download Vue2 @vue/composition-api example here](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
+[👉 這邊下載 Vue2 @vue/composition-api 版本範例](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue2)
 
 ```bash
 cd examples/vue2
@@ -39,21 +60,21 @@ yarn
 yarn serve
 ````
 
-### 👉 Online demo with vue-infinite-scroll
+### 👉 無限滾動線上 Demo
 
 [![Edit vue-condition-watcher demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-condition-watcher-demo-0wfgc?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue)
 
-## Getting Started
+## 入門
 
-### Installation
+### 安裝
 
-In your project
+在你的專案執行 yarn
 
 ```bash
 yarn add vue-condition-watcher
 ```
 
-Or with npm
+或是使用 NPM
 
 ```bash
 npm install vue-condition-watcher
@@ -65,11 +86,11 @@ CDN
 https://unpkg.com/vue-condition-watcher/dist/index.js
 ```
 
-### Quick Start
+### 快速開始
 
-This is a simple example for `vue-next` and `vue-router-next`
+這是一個使用 `vue-next` 和 `vue-router-next` 的簡單範例。
 
-First you need to create a fetcher function, use the native `fetch` or libs like Axios. Then import `useConditionWatcher` and start using it.
+首先建立一個 `fetcher` function, 你可以用原生的 `fetch` 或是 `Axios` 這類的套件。接著  import `useConditionWatcher` 並開始使用它。
 
 ```javascript
 createApp({
@@ -105,21 +126,56 @@ createApp({
 .mount(document.createElement('div'))
 ```
 
-You can use the value of `data`, `error`, and `loading` to determine the current state of the request.
+您可以使用 `data`、`error` 和 `loading` 的值來確定請求的當前狀態。
 
-When the `conditions.name` value changes, will fire the `lifecycle` to fetching data again.
+當 `conditions.name` 值改變，將會觸發 [生命週期](#lifecycle) 重新發送請求.
 
-Use `config.history` of sync to `sync: router`. Will store the conditions within the URL query string every time conditions change.
+你可以在 `config.history` 設定 sync 為 `sync: router`。 這將會同步 `conditions` 的變化到 URL 的 query string。
 
-### Basic Usage
+### 基礎用法
 
 ```js
 const { conditions, data, error, loading, execute, resetConditions, onConditionsChange } = useConditionWatcher(config)
 ```
 
-### Execute Fetch
+### Configs
+- `fetcher`: (⚠️ 必要)  請求資料的 promise function。
+- `conditions`: (⚠️ 必要) `conditions` 預設值。
+- `defaultParams`: 每次請求預設會帶上的參數，不可修改。
+- `initialData`: `data` 預設回傳 null，如果想定義初始的資料可以使用這個參數設定。
+- `immediate`: 如果不想一開始自動請求資料，可以將此參數設定為 `false`，直到 `conditions` 改變或是執行 `execute` 才會執行請求。
+- `manual`: 改為手動執行 `execute` 以觸發請求，就算 `conditions` 改變也不會自動請求。
+- `history`: 基於 vue-router (v3 & v4)，啟用同步 `conditions` 到 URL 的 Query String。當網頁重新整理後會同步 Query String 至 `conditions`
+- `beforeFetch`: 你可以在請求前最後修改 `conditions`，也可以在此階段終止請求。
+- `afterFetch`: 你可以在 `data` 更新前調整 `data` 的結果
+- `onFetchError`: 當請求發生錯誤觸發，可以在`data` 和 `error` 更新前調整 `error`& `data`
 
-`conditions` is reactive proxy, easy execute fetch when `conditions` value changed
+### Return Values
+
+- `conditions`:<br/>
+ Type: `reactive`<br/>
+ reactive 型態的物件 (基於 config 的 conditions)，是 `vue-conditions-watcher`主要核心，每當 `conditions` 改變都會觸發[生命週期](#lifecycle)。<br/>
+- `data`:<br/>
+  Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  `config.fetcher` 的回傳結果<br/>
+- `error`:<br/>
+  Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  `config.fetcher` 錯誤返回結果<br/>
+- `loading`:<br/>
+  Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  請求正在處理中的狀態<br/>
+- `execute`: 基於目前的 `conditions` 和 `defaultParams` 再次觸發請求。<br/>
+- `mutate`: 可以使用此方法修改 `data` <br/>
+**🔒 ( `data`預設是唯獨不可修改的 )**<br/>
+- `resetConditions`: 重置 `conditions` 回初始值
+- `onConditionsChange`: 在 `conditions` 發生變化時觸發，回傳新值以及舊值
+- `onFetchSuccess`: 請求成功觸發，回傳原始的請求結果
+- `onFetchError`: 請求失敗觸發，回傳原始的請求失敗結果
+- `onFetchFinally`: 請求結束時觸發
+
+### 執行請求
+
+`conditions` 是響應式的， 每當 `conditions` 變化將自動觸發請求
 
 ```js
 const { conditions } = useConditionWatcher({
@@ -137,7 +193,7 @@ conditions.page = 1 // fetch data with payload { page: 1, opt_expand: 'date' }
 conditions.page = 2 // fetch data with payload { page: 2, opt_expand: 'date' }
 ```
 
-Just call `execute` function to send a request if you need.
+如果有需要你可以執行 `execute` 這個 function 再次發送請求
 
 ```js
 const { conditions, execute: refetch } = useConditionWatcher({
@@ -153,7 +209,7 @@ const { conditions, execute: refetch } = useConditionWatcher({
 refetch() // fetch data with payload { page: 0, opt_expand: 'date' }
 ```
 
-Force update conditions in time.
+一次完整更新 `conditions`，**只會觸發一次請求**
 
 ```js
 const { conditions, resetConditions } = useConditionWatcher({
@@ -166,13 +222,13 @@ const { conditions, resetConditions } = useConditionWatcher({
   },
 })
 
-// initial conditions then fire onConditionsChange event
+// 初始化 conditions 將會觸發 `onConditionsChange` 事件
 Object.assign(conditions, {
   name: 'runkids',
   date: ['2022-01-01', '2022-01-02']
 })
 
-// Reset conditions
+// 重置 conditions
 function reset () {
   Object.assign(conditions, {
     page: 0,
@@ -180,56 +236,14 @@ function reset () {
     date: []
   })
 
-  // Or you can just use `resetConditions` function to initial value.
+  // 或是你可以直接用 `resetConditions` function 來重置初始值.
   resetConditions()
 }
 ```
 
-### Conditions Change Event
+### 阻止預請求
 
-`onConditionsChange` can help you handle conditions changed.
-Will return new value and old value.
-
-```js
-const { conditions, onConditionsChange } = useConditionWatcher({
-  fetcher,
-  conditions: {
-    page: 0
-  },
-})
-
-conditions.page = 1
-
-onConditionsChange((conditions, preConditions)=> {
-  console.log(conditions) // { page: 1}
-  console.log(preConditions) // { page: 0}
-})
-```
-
-### Fetch Event
-
-The `onFetchResponse`, `onFetchError` and `onFetchFinally` will fire on fetch request.
-
-```ts
-const { onFetchResponse, onFetchError, onFetchFinally } = useConditionWatcher(config)
-
-onFetchResponse((response) => {
-  console.log(response)
-})
-
-onFetchError((error) => {
-  console.error(error)
-})
-
-onFetchFinally(() => {
-  //todo
-})
-```
-
-### Prevent Request
-
-Setting the `immediate` to false will prevent the request until the `execute`
-function called or conditions changed.
+`vue-conditions-watcher` 會在一開始先請求一次，如果不想這樣做可以設定 `immediate` 為 `false`，將不會一開始就發送請求直到你呼叫 `execute` function 或是改變 `conditions`
 
 ```js
 const { execute } = useConditionWatcher({
@@ -241,9 +255,9 @@ const { execute } = useConditionWatcher({
 execute()
 ```
 
-### Manually Trigger Request
+### 手動觸發請求
 
-By default, `vue-condition-watcher` will automatically trigger fetch data. You can pass `manual` to disable the default fetch and then use `execute()` to trigger fetch data.
+`vue-condition-watcher` 會自動觸發請求. 但是你可以設定 `manual` 為 `true` 來關閉這個功能。接著可以使用 `execute()` 在你想要的時機觸發請求。
 
 ```js
 const { execute } = useConditionWatcher({
@@ -255,9 +269,13 @@ const { execute } = useConditionWatcher({
 execute()
 ```
 
-### Intercepting Request
+### 攔截請求
 
-The `beforeFetch` let you modify conditions before fetch, or you can call `cancel` function to stop fetch.
+`beforeFetch` 可以讓你在請求之前再次修改 `conditions`。
+* 第一個參數回傳一個深拷貝的 `conditions`，你可以任意的修改它且不會影響原本 `conditions`，你可以在這邊調整要給後端的 API 格式。
+* 第二個參數回傳一個 function，執行它將會終止這次請求。這在某些情況會很有用的。
+* `beforeFetch` 可以處理同步與非同步行為。
+* 必須返回修改後的 `conditions`
 
 ```js
 useConditionWatcher({
@@ -267,21 +285,24 @@ useConditionWatcher({
   },
   initialData: [],
   async beforeFetch(conditions, cancel) {
-    // await something
-    await doSomething ()
+    // 請求之前先檢查 token
+    await checkToken ()
 
-    // conditions is an object clone copy from config.conditions
+    // conditions 是一個深拷貝 `config.conditions` 的物件
     const {date, ...baseConditions} = conditions
     const [after, before] = date
     baseConditions.created_at_after = after
     baseConditions.created_at_before = before
 
+    // 返回修改後的 `conditions`
     return baseConditions
   }
 })
 ```
 
-The `afterFetch` can intercept the response before data updated, **also your can requestss depend on each other 🎭**
+`afterFetch` 可以在更新 `data` 前攔截請求，這時候的 `loading` 狀態還是 `true`。
+* 你可以在這邊做依賴請求 🎭，或是處理其他同步與非同步行為
+* 可以在這邊最後修改 `data`，返回的值將會是 `data` 的值
 
 ```js
 const { data } = useConditionWatcher({
@@ -292,8 +313,8 @@ const { data } = useConditionWatcher({
     if(response.data === null) {
       return []
     }
-    // requests depend on each other
-    // the loading is still be true until fire `onFetchFinally`
+    // 依賴其他請求
+    // `loading` 還是 `true` 直到 `onFetchFinally`
     const finalResponse = await otherAPIById(response.data.id)
 
     return finalResponse // [{message: 'Hello', sender: 'runkids'}]
@@ -303,7 +324,15 @@ const { data } = useConditionWatcher({
 console.log(data) //[{message: 'Hello', sender: 'runkids'}]
 ```
 
-The `onFetchError` can intercept the response before data and error updated
+`onFetchError` 可以攔截錯誤，可以在 `data` 和 `error` 更新前調整 `error` & `data`，這時候的 `loading` 狀態還是 `true`。
+* `onFetchError` 可以處理同步與非同步行為。
+* 最後返回格式必須為
+```js
+{
+  data: ... ,
+  error: ...
+}
+```
 
 ```js
 const { data, error } = useConditionWatcher({
@@ -325,40 +354,99 @@ console.log(data) //[]
 console.log(error) //'Error Message'
 ```
 
-### Configs
-- `fetcher` (⚠️Required) : A promise returning function to fetch your data 
-- `conditions` (⚠️Required) : An object of conditions, also to be initial value
-- `defaultParams`: An object of fetcher's default
-parameters
-- `initialData`: `data` default value is null, and you can setting `data` default value by use this config
-- `immediate`: Setting the `immediate` to false will prevent the request until the `execute` function called. `immediate` default is `true`.
-- `manual`: You can use `manual` to disabled automatically fetch data
-- `history`: Sync conditions value to URL query string
-- `beforeFetch`: You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
-- `afterFetch`: You can modify data before update. also can use `mutate` modify too. But still recommend modify `data` at `afterFetch`.
-- `onFetchError`: Handle error, and you can modify data and error before update here.
+### 變異資料
+在一些情況下, mutations `data` 是提升用戶體驗的好方法，因為不需要等待 API 回傳結果。
 
-### Return Values
+使用 `mutate` function, 你可以修改 `data`。 當 `onFetchSuccess` 觸發時會再改變 `data`。
 
-- `conditions`( `reactive` ) : An object and returns a reactive proxy of conditions
-- `data`( `👁‍🗨 readonly & ⚠️ ref` ) : Data resolved by `config.fetcher`
-- `error`( `👁‍🗨 readonly & ref` ) : Error thrown by `config.fetcher`  
-- `loading`( `👁‍🗨 readonly & ref` ) : Request is fetching
-- `execute`: The function to trigger the request
-- `mutate`: You can use mutate() to directly modify `data` **( By default, data is readonly )**
-- `resetConditions`: Reset conditions to initial value
-- `onConditionsChange`: Will fire on conditions changed
-- `onFetchSuccess`: Will fire on fetch request success
-- `onFetchError`: Will fire on fetch request error
-- `onFetchFinally`: Will fire on fetch finished
+有兩種方式使用 `mutate` function:
 
-## Lifecycle
+- 第一種：完整修改 data.
+```js
+mutate(newData)
+```
+- 第二種：使用 callback function，會接受一個深拷貝的 `data` 資料，修改完後再返回結果
+```js
+const finalData = mutate((currentData) => {
+  currentData[0].name = 'runkids'
+  return currentData
+})
+
+console.log(finalData[0]name === data.value[0].name) //true
+```
+#### 🏄‍♂️ 範例：依據目前的資料來修改部分資料
+POST API 會返回更新後的結果，我們不需要重新執行 `execute` 更新結果。我們可以用 `mutate` 的第二種方式來修改部分改動。
+```js
+const { conditions, data, mutate } = useConditionWatcher({
+  fetcher: api.userInfo,
+  conditions,
+  initialData: []
+})
+
+async function updateUserName (userId, newName, rowIndex = 0) {
+  console.log(data.value) //before: [{ id: 1, name: 'runkids' }, { id: 2, name: 'vuejs' }]
+
+  const response = await api.updateUer(userId, newName)
+
+  // 🚫 `data.value[0] = response.data`
+  // 沒作用! 因為 `data` 是唯讀不可修改的.
+
+  // Easy to use function will receive deep clone data, and return updated data.
+  mutate(currentData => {
+    currentData[rowIndex] = response.data
+    return currentData
+  })
+
+  console.log(data.value) //after: [{ id: 1, name: 'mutate name' }, { id: 2, name: 'vuejs' }]
+}
+```
+
+### Conditions 改變事件
+
+`onConditionsChange` 可以幫助你處理 `conditions` 的變化。會回傳新值和舊值
+
+```js
+const { conditions, onConditionsChange } = useConditionWatcher({
+  fetcher,
+  conditions: {
+    page: 0
+  },
+})
+
+conditions.page = 1
+
+onConditionsChange((conditions, preConditions)=> {
+  console.log(conditions) // { page: 1}
+  console.log(preConditions) // { page: 0}
+})
+```
+
+### 請求事件
+
+`onFetchResponse`, `onFetchError` 和 `onFetchFinally` 會在請求期間觸發。
+
+```ts
+const { onFetchResponse, onFetchError, onFetchFinally } = useConditionWatcher(config)
+
+onFetchResponse((response) => {
+  console.log(response)
+})
+
+onFetchError((error) => {
+  console.error(error)
+})
+
+onFetchFinally(() => {
+  //todo
+})
+```
+## 生命週期
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
 
 - ##### `onConditionsChange`
 
-  Fire new conditions value and old conditions value.
+  `conditions` 變更時觸發，會返回新舊值。
 
   ```js
   onConditionsChange((cond, preCond)=> {
@@ -369,7 +457,7 @@ parameters
 
 - ##### `beforeFetch`
 
-  You can modify conditions before fetch, or you can call second of arguments to stop fetch this time.
+  可以讓你在請求之前再次修改 `conditions`，也可以在這個階段終止請求。
 
   ```js
   const { conditions } = useConditionWatcher({
@@ -391,8 +479,8 @@ parameters
 
 - ##### `afterFetch` & `onFetchSuccess`
 
-  `afterFetch` fire before `onFetchSuccess`<br/>
-  `afterFetch` can modify data before update.
+  `afterFetch` 會在 `onFetchSuccess` 前觸發<br/>
+  `afterFetch` 可以在`data` 更新前修改 `data`
   ||Type|Modify data before update| Dependent request |
   |-----|--------|------|------|
   |afterFetch| config | ⭕️ | ⭕️ |
@@ -422,8 +510,8 @@ parameters
 
 - ##### `onFetchError(config)` & `onFetchError(event)`
 
-  `config.onFetchError` fire before `event.onFetchError`<br/>
-  `config.onFetchError` can modify data and error before update.
+  `config.onFetchError` 會在 `event.onFetchError` 前觸發<br/>
+  `config.onFetchError` 可以攔截錯誤，可以在 `data` 和 `error` 更新前調整 `error` & `data`。
   ||Type|Modify data before update|Modify error before update|
   |-----|--------|------|------|
   |onFetchError| config | ⭕️ | ⭕️ |
@@ -448,7 +536,7 @@ parameters
 
 - ##### `onFetchFinally`
 
-  Will fire on fetch finished.
+  請求結束時觸發
 
   ```js
   onFetchFinally(async ()=> {
@@ -456,9 +544,9 @@ parameters
   })
   ```
 
-## Make It Reusable
+## 重複使用
 
-You might need to reuse the data in many places. It is incredibly easy to create reusable hooks of `vue-condition-watcher` :
+建立 `vue-condition-watcher` 的可重用的 hook 非常容易。
 
 ```js
 function useUserExpensesHistory (id) {
@@ -496,7 +584,7 @@ function useUserExpensesHistory (id) {
 }
 ```
 
-And use it in your components:
+接著在 components 使用:
 
 ```js
 <script setup>
@@ -527,15 +615,15 @@ And use it in your components:
 </template>
 ```
 
-Congratulations! 🥳 You have learned how to use composition-api with `vue-condition-watcher`.
+恭喜你! 🥳 你已經學會再次包裝 `vue-condition-watcher`.
 
-Now we can manage the paging information use `vue-condition-watcher` .
+現在我們來用 `vue-condition-watcher` 做分頁的處理.
 
-## Pagination
+## 分頁處理
 
-Here is an example use Django the limit and offset functions and Element UI.
+這個範例適用 Django the limit and offset functions 和 Element UI.
 
-Create `usePagination`
+建立 `usePagination`
 
 ```js
 function usePagination () {
@@ -617,7 +705,7 @@ function usePagination () {
 }
 ```
 
-And use it in your components:
+接著在 components 使用:
 
 ```js
 <script setup>
@@ -647,11 +735,19 @@ And use it in your components:
 </template>
 ```
 
-When daterange or limit changed, will reset offset to 0 and only fetch data again after reset offset.
-
+當 daterange or limit 改變時, 會將 offset 設置為 0，接著才會重新觸發請求。
 ## TDOD List
 
 - [ ] Cache
 - [ ] Prefetching
 - [ ] Automatic Revalidation
-- [ ] Pulling
+- [ ] Error Retry
+- [ ] Nuxt SSR SSG Support
+## Thanks
+
+This project is heavily inspired by the following awesome projects.
+
+- [vercel/swr](https://github.com/vercel/swr)
+## 📄 License
+
+[MIT License](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE) © 2020-PRESENT [Runkids](https://github.com/runkids)
