@@ -134,3 +134,16 @@ export function deepClone(obj): any {
     ? Array.from(obj)
     : clone
 }
+
+export function mergeObjects(a: any, b: any) {
+  return Object.assign({}, a, b)
+}
+
+export function sortObject(unordered) {
+  return Object.keys(unordered)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = unordered[key]
+      return obj
+    }, {})
+}

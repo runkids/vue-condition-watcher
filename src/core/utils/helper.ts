@@ -15,3 +15,16 @@ export const isObject = (val: unknown): val is Record<any, any> => val !== null 
 export const isServer = !hasWindow()
 export const rAF = (f: (...args: any[]) => void) =>
   hasRequestAnimationFrame() ? window['requestAnimationFrame'](f) : setTimeout(f, 1)
+
+export const isNoData = (data: unknown) => {
+  if (typeof data === 'string' || Array.isArray(data)) {
+    return data.length === 0
+  }
+  if ([null, undefined].includes(data)) {
+    return false
+  }
+  if (isObject(data)) {
+    return Object.keys.length === 0
+  }
+  return !data
+}

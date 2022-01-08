@@ -4,6 +4,15 @@ export type ConditionsType = {
   [key: string]: any
 }
 
+type ArgumentsTuple = [any, ...unknown[]] | readonly [any, ...unknown[]]
+export type Arguments = string | ArgumentsTuple | Record<any, any> | null | undefined | false
+export type Key = Arguments | (() => Arguments)
+export interface Cache<Data = any> {
+  get(key: Key): Data | null | undefined
+  set(key: Key, value: Data): void
+  delete(key: Key): void
+}
+
 export type Fn = () => void
 
 export type Conditions<T> = {
@@ -48,6 +57,7 @@ export interface Config<O, K> {
   pollingWhenHidden?: boolean
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
+  cacheProvider?: () => Cache<any> | Cache<any>
   beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
   afterFetch?: (data: any) => any
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
@@ -60,7 +70,7 @@ export interface UseConditionWatcherReturn<O> {
   readonly error: Ref<any | null>
   execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
-  resetConditions: VoidFunction
+  resetConditions: (conditions?: object) => void
   onConditionsChange: (fn: OnConditionsChangeContext<O>) => void
   onFetchSuccess: (fn: (response: any) => void) => void
   onFetchError: (fn: (error: any) => void) => void

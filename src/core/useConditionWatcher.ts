@@ -15,7 +15,8 @@ import { usePromiseQueue } from './hooks/usePromiseQueue'
 import { useHistory } from './hooks/useHistory'
 import { createEvents } from './utils/createEvents'
 import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
-import { containsProp, isServer, rAF } from './utils/helper'
+import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
+import { useCache } from './hooks/useCache'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O, K>
@@ -34,6 +35,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
       'pollingWhenHidden',
       'pollingWhenOffline',
       'revalidateOnFocus',
+      'cacheProvider',
       'beforeFetch',
       'afterFetch',
       'onFetchError'
@@ -56,12 +58,14 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     pollingWhenHidden: false,
     pollingWhenOffline: false,
     revalidateOnFocus: false,
+    cacheProvider: () => new Map(),
   }
 
   // update config
   if (isFetchConfig(config)) {
     watcherConfig = { ...watcherConfig, ...config }
   }
+  const cache = useCache(watcherConfig.cacheProvider())
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
   const _conditions = reactive<O>(watcherConfig.conditions)
@@ -71,7 +75,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data = shallowRef(watcherConfig.initialData || null)
+  const data = shallowRef(
+    cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || null
+  )
   const error = ref(null)
   const query = ref({})
 
@@ -92,8 +98,8 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     stopVisibilityEvent,
   } = createEvents()
 
-  const resetConditions = (): void => {
-    Object.assign(_conditions, backupIntiConditions)
+  const resetConditions = (cond?: object): void => {
+    Object.assign(_conditions, isObject(cond) && !cond.type ? cond : backupIntiConditions)
   }
 
   const loading = (isLoading: boolean): void => {
@@ -138,6 +144,10 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
 
     let responseData: any = null
 
+    if (cache.cached(query.value)) {
+      data.value = cache.get(query.value)
+    }
+
     return new Promise((resolve, reject) => {
       config
         .fetcher(finalConditions)
@@ -149,7 +159,12 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
           if (responseData === undefined) {
             console.warn(`[vue-condition-watcher]: "afterFetch" return value is ${responseData}. Please check it.`)
           }
-          data.value = responseData
+          if (!isEquivalent(data.value, responseData)) {
+            data.value = responseData
+          }
+          if (!isEquivalent(cache.get(query.value), responseData)) {
+            cache.set(query.value, responseData)
+          }
           responseEvent.trigger(responseData)
           return resolve(fetchResponse)
         })
@@ -183,10 +198,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     enqueue(() => conditionsChangeHandler({ ..._conditions }, throwOnFailed))
 
   function execute(throwOnFailed = false) {
-    if (!data || isServer) {
+    if (isDataEmpty(data.value) || isServer) {
       revalidate(throwOnFailed)
     } else {
-      // Delay the revalidate if we have data to return so we won't block
       rAF(() => revalidate(throwOnFailed))
     }
   }
@@ -250,6 +264,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     } else {
       data.value = arg
     }
+    cache.set({ ..._conditions }, data.value)
     return data.value
   }
 
@@ -294,9 +309,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const stopSubscribeFocus = focusEvent.on(() => {
     if (!isActive.value) return
     execute()
-    if (isHistoryOption()) {
-      //todo sync query.value
-    }
+    // if (isHistoryOption() && cache.cached({ ..._conditions })) {
+    //todo sync to query
+    // }
   })
 
   if (!watcherConfig.revalidateOnFocus) {

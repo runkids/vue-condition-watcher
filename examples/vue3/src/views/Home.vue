@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ElScrollbar } from 'element-plus'
 import { useConditionWatcher } from '../../../../src/index'
@@ -45,6 +45,16 @@ const {
     pollingWhenOffline: true,
     revalidateOnFocus: true,
     initialData: [],
+    cacheProvider: inject('cacheProvider'),
+    // cacheProvider: function localStorageProvider() {
+    //   // example by https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache
+    //   const map = new Map(JSON.parse(localStorage.getItem('app-cache') || '[]'))
+    //   window.addEventListener('beforeunload', () => {
+    //     const appCache = JSON.stringify(Array.from(map.entries()))
+    //     localStorage.setItem('app-cache', appCache)
+    //   })
+    //   return map
+    // },
     history: {
       sync: router,
     },
