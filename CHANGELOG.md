@@ -1,6 +1,25 @@
+### [1.4.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.3.0) (Prepare)
+### Changed
+  * Change `data` type: `ref` to `shallowRef`
+  * `mutate` now support callback function
+    ```js
+      const finalData = mutate((currentData) => {
+        currentData[0].name = 'runkids'
+        return currentData
+      })
+    ```
+### Features:
+
+* **Add new configs for Polling feature**:
+1. pollingInterval: default is 0
+2. pollingWhenHidden: default is false
+3. pollingWhenOffline: default is false
+* **Add new configs for Revalidate on Focu feature**:
+4. revalidateOnFocus: default is false
+
+---------------------------------
 ### [1.3.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.3.0) (2022-01-07)
 ### Features:
-------------------
 * **Add Configs**:
 1. `manual`: you can manual fetching data now,  just use `execute` to fetch data.
 2. `history`: the history mode you can sync conditions with URL, base on vue-router (V3 & V4 support)
@@ -9,7 +28,6 @@
 1. `mutate`: use `mutate` to directly modify data
 
 ## BREAKING CHANGES:
-------------------
 * **Modify**:
 1. Changed `data` from `shallowRef` to `ref`.
 
@@ -41,7 +59,7 @@
         }, 
       )
     ```
-
+---------------------------------
 
 ### [1.2.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.2.3) (2022-01-06)
 ### Fix
