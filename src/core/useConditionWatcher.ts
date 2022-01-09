@@ -9,6 +9,8 @@ import {
   unref,
   isRef,
   shallowRef,
+  ShallowRef,
+  computed,
 } from 'vue-demi'
 import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
 import { usePromiseQueue } from './hooks/usePromiseQueue'
@@ -53,7 +55,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     conditions: config.conditions,
     immediate: true,
     manual: false,
-    initialData: null,
+    initialData: undefined,
     pollingInterval: isRef(config.pollingInterval) ? config.pollingInterval : ref(config.pollingInterval || 0),
     pollingWhenHidden: false,
     pollingWhenOffline: false,
@@ -65,20 +67,19 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   if (isFetchConfig(config)) {
     watcherConfig = { ...watcherConfig, ...config }
   }
-  const cache = useCache(watcherConfig.cacheProvider())
+  const cache = useCache(watcherConfig.fetcher, watcherConfig.cacheProvider())
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
   const _conditions = reactive<O>(watcherConfig.conditions)
 
-  const isFinished = ref(false)
   const isFetching = ref(false)
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data = shallowRef(
-    cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || null
+  const data: ShallowRef = shallowRef(
+    cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || undefined
   )
-  const error = ref(null)
+  const error = ref(undefined)
   const query = ref({})
 
   const pollingTimer = ref()
@@ -102,16 +103,13 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     Object.assign(_conditions, isObject(cond) && !cond.type ? cond : backupIntiConditions)
   }
 
-  const loading = (isLoading: boolean): void => {
-    isFetching.value = isLoading
-    isFinished.value = !isLoading
-  }
+  const loading = computed(() => !error.value && !data.value)
 
   const conditionsChangeHandler = async (conditions, throwOnFailed = false) => {
     const checkThrowOnFailed = typeof throwOnFailed === 'boolean' ? throwOnFailed : false
     if (isFetching.value) return
-    loading(true)
-    error.value = null
+    isFetching.value = true
+    error.value = undefined
     const conditions2Object: Conditions<O> = conditions
     let customConditions: object = {}
     const deepCopyCondition: Conditions<O> = deepClone(conditions2Object)
@@ -122,11 +120,13 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
         isCanceled = true
       })
       if (isCanceled) {
-        loading(false)
-        return Promise.resolve(null)
+        // eslint-disable-next-line require-atomic-updates
+        isFetching.value = false
+        return Promise.resolve(undefined)
       }
       if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
-        loading(false)
+        // eslint-disable-next-line require-atomic-updates
+        isFetching.value = false
         throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
       }
     }
@@ -142,11 +142,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
     query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
     const finalConditions: object = createParams(query.value, watcherConfig.defaultParams)
 
-    let responseData: any = null
+    let responseData: any = undefined
 
-    if (cache.cached(query.value)) {
-      data.value = cache.get(query.value)
-    }
+    data.value = cache.cached(query.value) ? cache.get(query.value) : watcherConfig.initialData || undefined
 
     return new Promise((resolve, reject) => {
       config
@@ -172,7 +170,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
           if (typeof watcherConfig.onFetchError === 'function') {
             // eslint-disable-next-line @typescript-eslint/no-extra-semi
             ;({ data: responseData, error: fetchError } = await watcherConfig.onFetchError({
-              data: null,
+              data: undefined,
               error: fetchError,
             }))
             data.value = responseData || watcherConfig.initialData
@@ -182,10 +180,10 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
           if (checkThrowOnFailed) {
             return reject(fetchError)
           }
-          return resolve(null)
+          return resolve(undefined)
         })
         .finally(() => {
-          loading(false)
+          isFetching.value = false
           finallyEvent.trigger()
           // - Start polling with out setting to manual
           if (watcherConfig.manual) return
@@ -328,9 +326,10 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
 
   return {
     conditions: _conditions as UnwrapNestedRefs<O>,
-    loading: readonly(isFetching),
     data: readonly(data),
     error: readonly(error),
+    isFetching: readonly(isFetching),
+    loading,
     execute,
     mutate,
     resetConditions,

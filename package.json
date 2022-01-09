@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Vue composition API for automatic data fetching. With conditions as the core. Easily control and sync to URL query string by conditions",
   "main": "./dist/index.js",
   "module": "./esm/index.js",
@@ -59,6 +59,19 @@
   },
   "dependencies": {
     "vue-demi": "^0.12.1"
+  },
+  "peerDependencies": {
+    "@nuxtjs/composition-api": "^0.24.4",
+    "@vue/composition-api": "^1.0.0",
+    "vue": "^2.0.0 || >=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    },
+    "@nuxtjs/composition-api": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",

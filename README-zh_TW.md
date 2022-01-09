@@ -41,6 +41,7 @@
 - [請求事件](#請求事件)
 - [輪詢](#輪詢)
 - [緩存](#緩存)
+- [History 模式](#history-模式)
 - [生命週期](#生命週期)
 - [分頁處理](#分頁處理)
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
@@ -164,13 +165,17 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
  reactive 型態的物件 (基於 config 的 conditions)，是 `vue-conditions-watcher`主要核心，每當 `conditions` 改變都會觸發[生命週期](#lifecycle)。<br/>
 - `data`:<br/>
   Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  Default Value: `undefined`<br/>
   `config.fetcher` 的回傳結果<br/>
 - `error`:<br/>
   Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  Default Value: `undefined`<br/>
   `config.fetcher` 錯誤返回結果<br/>
-- `loading`:<br/>
+- `isFetching`:<br/>
   Type: `👁‍🗨 readonly & ⚠️ ref`<br/>
+  Default Value: `false`<br/>
   請求正在處理中的狀態<br/>
+- `loading`: 當 `!data.value & !error.value` 就會是 `true`
 - `execute`: 基於目前的 `conditions` 和 `defaultParams` 再次觸發請求。<br/>
 - `mutate`: 可以使用此方法修改 `data` <br/>
 **🔒 ( `data`預設是唯獨不可修改的 )**<br/>
@@ -535,6 +540,66 @@ useConditionWatcher({
   conditions,
   cacheProvider: localStorageProvider
 })
+```
+
+## History 模式
+你可以設定 `config.history` 啟用 History 模式，是基於 vue-router 的，支援 v3 和 v4 版本
+
+```js
+const router = useRouter()
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  history: {
+    sync: router
+  }
+})
+```
+
+你還可以設定 `history.ignore` 排除 `conditions` 部分的 `key＆value` 不要同步到 URL query string.
+```js
+const router = useRouter()
+
+useConditionWatcher({
+  fetcher,
+  conditions: {
+    users: ['runkids', 'hello']
+    limit: 20,
+    offset: 0
+  },
+  history: {
+    sync: router,
+    ignore: ['limit']
+  }
+})
+
+// the query string will be ?offset=0&users=runkids,hello
+```
+
+History mode 會轉換 `conditions`預設值的對應型別到 query string 而且會過濾掉 `undefined`, `null`, `''`, `[]` 這些類型的值.
+```js
+conditions: {
+  users: ['runkids', 'hello']
+  company: ''
+  limit: 20,
+  offset: 0
+}
+// the query string will be ?offset=0&limit=20&users=runkids,hello
+```
+
+每當你重新整理網頁還會自動同步 query string 到 `conditions`
+```
+URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
+```
+`conditions` 將變成
+```js
+{
+  users: ['runkids', 'hello']
+  company: 'vue'
+  limit: 10,
+  offset: 0
+}
 ```
 ## 生命週期
 

@@ -41,6 +41,7 @@ Vue composition API for automatic data fetching. With `conditions` as the core. 
 - [Fetch Event](#fetch-event)
 - [Polling](#polling)
 - [Cache](#cache)
+- [History Mode](#history-mode)
 - [Lifecycle](#lifecycle)
 - [Pagination](#pagination)
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
@@ -166,13 +167,17 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
  Reactive objects (conditions based on config) are the main core of `vue-conditions-watcher`. Whenever `conditions` changes, the [lifecycle](#lifecycle) will be triggered.<br/>
 - `data`:<br/>
 Type: `👁‍🗨 readonly & ref`<br/>
-The return result of `config.fetcher`<br/>
+Default Value: `undefined`<br/>
+The return result of `config.fetcher`, will be `undefined` again when conditions changed.<br/>
 - `error`:<br/>
 Type: `👁‍🗨 readonly & ref`<br/>
+Default Value: `undefined`<br/>
 `config.fetcher` error return result<br/>
-- `loading`:<br/>
+- `isFetching`:<br/>
 Type: `👁‍🗨 readonly & ref`<br/>
+Default Value: `false`<br/>
 The status of the request being processed<br/>
+- `loading`: When `!data.value & !error.value` will be `true`.
 - `execute`: Trigger the request again based on the current `conditions` and `defaultParams`.<br/>
 - `mutate`: `data` can be modified using this method<br/>
 **🔒 ( `data` default is only unmodifiable )**<br/>
@@ -523,6 +528,67 @@ useConditionWatcher({
   cacheProvider: localStorageProvider
 })
 ```
+
+## History Mode
+You can enable History mode by setting `config.history`, which is based on vue-router and supports v3 and v4 versions
+
+````js
+const router = useRouter()
+
+useConditionWatcher({
+  fetcher,
+  conditions,
+  history: {
+    sync: router
+  }
+})
+````
+
+You can also set `history.ignore` to exclude the `key&value` in the `conditions` section from being synced to the URL query string.
+````js
+const router = useRouter()
+
+useConditionWatcher({
+  fetcher,
+  conditions: {
+    users: ['runkids', 'hello']
+    limit: 20,
+    offset: 0
+  },
+  history: {
+    sync: router,
+    ignore: ['limit']
+  }
+})
+
+// the query string will be ?offset=0&users=runkids,hello
+````
+
+History mode will convert the corresponding types of `conditions` default values ​​to query strings and will filter out `undefined`, `null`, `''`, `[]` values.
+````js
+conditions: {
+  users: ['runkids', 'hello']
+  company: ''
+  limit: 20,
+  offset: 0
+}
+// the query string will be ?offset=0&limit=20&users=runkids,hello
+````
+
+Also automatically syncs the query string to `conditions` whenever you refresh the page
+````
+URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
+````
+`conditions` will become
+````js
+{
+  users: ['runkids', 'hello']
+  company: 'vue'
+  limit: 10,
+  offset: 0
+}
+````
+
 ## Lifecycle
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>

@@ -1,4 +1,14 @@
-### [1.4.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.0) (2022-01-09)
+### [1.4.2](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.2) (2022-01-10)
+  * Fix: Cache not work on globally.
+  ### Changed
+  * `loading`: when `!data.value & !error.value` will be `true`.
+  * `data`: change default value `null` to `undefined`
+  * `error`: change default value `null` to `undefined`
+
+  ### Add Return value
+  * `isFetching`: The status of the request being processed.
+
+### [1.4.1](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.1) (2022-01-09)
   * Fix bug for vue2
   ```
     error  in ./node_modules/vue-condition-watcher/esm/core/utils/helper.js

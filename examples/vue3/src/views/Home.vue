@@ -16,7 +16,7 @@ const pollingInterval= ref(0)
 
 const { 
   conditions, 
-  loading, 
+  isFetching, 
   data, 
   mutate,
   execute,
@@ -44,7 +44,6 @@ const {
     pollingWhenHidden: true,
     pollingWhenOffline: true,
     revalidateOnFocus: true,
-    initialData: [],
     cacheProvider: inject('cacheProvider'),
     // cacheProvider: function localStorageProvider() {
     //   // example by https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache
@@ -109,7 +108,7 @@ onFetchFinally(async () => {
 <template>
   <el-row>
     <el-col :span="4">
-      <el-checkbox-group v-model="conditions.gender" :disabled="loading" size="small">
+      <el-checkbox-group v-model="conditions.gender" :disabled="isFetching" size="small">
         <el-checkbox label="male" border>
           Male
         </el-checkbox>
@@ -119,7 +118,7 @@ onFetchFinally(async () => {
       </el-checkbox-group>
     </el-col>
     <el-col :span="8">
-      <el-radio-group v-model="pollingInterval" :disabled="loading" size="small">
+      <el-radio-group v-model="pollingInterval" :disabled="isFetching" size="small">
         <el-radio :label="0" border>
           Stop Interval
         </el-radio>
@@ -155,7 +154,7 @@ onFetchFinally(async () => {
         revalidateOnFocus: <span class="status">true</span>
       </div>
       <div>
-        Results Size: {{ data.length }}
+        Results Size: {{ data && data.length }}
       </div>
       <div>
         Count of data fetching : <span style="color: #E6A23C;">{{ fetchCounts }}</span>
@@ -164,7 +163,7 @@ onFetchFinally(async () => {
   </h4>
 
   <el-scrollbar max-height="60vh" ref="scrollbarRef">
-    <el-table :data="data" height="60vh" style="width: 100%" v-loading="loading">
+    <el-table :data="data || []" height="60vh" style="width: 100%" v-loading="isFetching">
       <el-table-column label="Index" v-slot="{ $index }">
         {{ $index + 1}}
       </el-table-column>

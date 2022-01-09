@@ -65,9 +65,10 @@ export interface Config<O, K> {
 
 export interface UseConditionWatcherReturn<O> {
   conditions: UnwrapNestedRefs<O>
-  readonly loading: Ref<boolean | false>
-  readonly data: Ref<any | null>
-  readonly error: Ref<any | null>
+  readonly isFetching: Ref<boolean>
+  readonly loading: Ref<boolean>
+  readonly data: Ref<any | undefined>
+  readonly error: Ref<any | undefined>
   execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
   resetConditions: (conditions?: object) => void

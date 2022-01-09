@@ -1,9 +1,10 @@
 import { Cache } from './../types'
-import { sortObject, stringifyQuery } from '../utils/common'
+import { serializeFunc, sortObject, stringifyQuery } from '../utils/common'
 
-export function useCache(provider: Cache) {
+export function useCache(fetcher: (params: object) => Promise<any>, provider: Cache) {
+  const baseKey = serializeFunc(fetcher)
   function formatString(key) {
-    return stringifyQuery(sortObject(key))
+    return `${baseKey}@${stringifyQuery(sortObject(key))}`
   }
   return {
     set: (key, value) => provider.set(formatString(key), value),
