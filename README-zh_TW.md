@@ -1,4 +1,4 @@
-[English](./README.md) | 繁體中文
+[English](./README.md) | 中文
 
 # vue-condition-watcher <img src="https://slackmojis.com/emojis/43271-glasses/download" width="40" />
 
@@ -20,6 +20,7 @@
   ✔ 輕鬆處理分頁的需求，簡單客製自己的分頁邏輯<br/>
   ✔ 當網頁重新聚焦或是網絡斷線恢復自動重新請求資料<br/>
   ✔ 支援輪詢，可動態調整輪詢週期<br/>
+  ✔ 緩存機制讓資料可以更快呈現，不用再等待 loading 動畫<br/>
   ✔ 不需要等待回傳結果，可手動改變 `data` 讓使用者體驗更好<br/>
   ✔ 支援 TypeScript<br/>
   ✔ 支援 Vue 2 & 3，感謝 [vue-demi](https://github.com/vueuse/vue-demi)
@@ -47,6 +48,7 @@
 - [Changelog](https://github.com/runkids/vue-condition-watcher/blob/master/CHANGELOG.md)
 
 ## Demo
+
 [👉 (推薦) 這邊下載 Vue3 版本範例](https://github.com/runkids/vue-condition-watcher/tree/master/examples/vue3) (使用 [Vite](https://github.com/vuejs/vite))
 
 ```bash
@@ -65,7 +67,7 @@ yarn serve
 
 ### 👉 線上 Demo
 
-[Go to stackblitz](https://stackblitz.com/edit/vitejs-vite-tsvfqu?devtoolsheight=33&embed=1&file=src/views/Home.vue)
+- [Demo with Vue 3 on StackBlitz](https://stackblitz.com/edit/vitejs-vite-tsvfqu?devtoolsheight=33&embed=1&file=src/views/Home.vue)
 
 ## 入門
 
@@ -142,6 +144,7 @@ const { conditions, data, error, loading, execute, resetConditions, onConditions
 ```
 
 ### Configs
+
 - `fetcher`: (⚠️ 必要)  請求資料的 promise function。
 - `conditions`: (⚠️ 必要) `conditions` 預設值。
 - `defaultParams`: 每次請求預設會帶上的參數，不可修改。
@@ -278,10 +281,10 @@ execute()
 ### 攔截請求
 
 `beforeFetch` 可以讓你在請求之前再次修改 `conditions`。
-* 第一個參數回傳一個深拷貝的 `conditions`，你可以任意的修改它且不會影響原本 `conditions`，你可以在這邊調整要給後端的 API 格式。
-* 第二個參數回傳一個 function，執行它將會終止這次請求。這在某些情況會很有用的。
-* `beforeFetch` 可以處理同步與非同步行為。
-* 必須返回修改後的 `conditions`
+- 第一個參數回傳一個深拷貝的 `conditions`，你可以任意的修改它且不會影響原本 `conditions`，你可以在這邊調整要給後端的 API 格式。
+- 第二個參數回傳一個 function，執行它將會終止這次請求。這在某些情況會很有用的。
+- `beforeFetch` 可以處理同步與非同步行為。
+- 必須返回修改後的 `conditions`
 
 ```js
 useConditionWatcher({
@@ -307,8 +310,8 @@ useConditionWatcher({
 ```
 
 `afterFetch` 可以在更新 `data` 前攔截請求，這時候的 `loading` 狀態還是 `true`。
-* 你可以在這邊做依賴請求 🎭，或是處理其他同步與非同步行為
-* 可以在這邊最後修改 `data`，返回的值將會是 `data` 的值
+- 你可以在這邊做依賴請求 🎭，或是處理其他同步與非同步行為
+- 可以在這邊最後修改 `data`，返回的值將會是 `data` 的值
 
 ```js
 const { data } = useConditionWatcher({
@@ -331,8 +334,9 @@ console.log(data) //[{message: 'Hello', sender: 'runkids'}]
 ```
 
 `onFetchError` 可以攔截錯誤，可以在 `data` 和 `error` 更新前調整 `error` & `data`，這時候的 `loading` 狀態還是 `true`。
-* `onFetchError` 可以處理同步與非同步行為。
-* 最後返回格式必須為
+- `onFetchError` 可以處理同步與非同步行為。
+- 最後返回格式必須為
+
 ```js
 {
   data: ... ,
@@ -361,6 +365,7 @@ console.log(error) //'Error Message'
 ```
 
 ### 變異資料
+
 在一些情況下, mutations `data` 是提升用戶體驗的好方法，因為不需要等待 API 回傳結果。
 
 使用 `mutate` function, 你可以修改 `data`。 當 `onFetchSuccess` 觸發時會再改變 `data`。
@@ -368,10 +373,13 @@ console.log(error) //'Error Message'
 有兩種方式使用 `mutate` function:
 
 - 第一種：完整修改 data.
+
 ```js
 mutate(newData)
 ```
+
 - 第二種：使用 callback function，會接受一個深拷貝的 `data` 資料，修改完後再返回結果
+
 ```js
 const finalData = mutate((currentData) => {
   currentData[0].name = 'runkids'
@@ -380,8 +388,11 @@ const finalData = mutate((currentData) => {
 
 console.log(finalData[0]name === data.value[0].name) //true
 ```
+
 #### 🏄‍♂️ 範例：依據目前的資料來修改部分資料
+
 POST API 會返回更新後的結果，我們不需要重新執行 `execute` 更新結果。我們可以用 `mutate` 的第二種方式來修改部分改動。
+
 ```js
 const { conditions, data, mutate } = useConditionWatcher({
   fetcher: api.userInfo,
@@ -447,7 +458,6 @@ onFetchFinally(() => {
 })
 ```
 
-
 ## 輪詢
 
 你可以透過設定 `pollingInterval` 啟用輪詢功能（當為 0 時會關閉此功能）
@@ -459,6 +469,7 @@ useConditionWatcher({
   pollingInterval: 1000
 })
 ```
+
 你還可以使用 `ref` 動態響應輪詢週期。
 
 ```js
@@ -498,12 +509,15 @@ useConditionWatcher({
   revalidateOnFocus: true // revalidateOnFocus default is false
 })
 ```
+
 ## 緩存
 
 `vue-condition-watcher` 預設會在當前組件緩存你的第一次數據。接著後面的請求會先使用緩存數據，背後默默請求新資料，等待最新回傳結果並比對緩存資料是否相同，達到類似預加載的效果。
 
 你也可以設定 `cacheProvider` 全局共用或是緩存資料在 `localStorage`，搭配輪詢可以達到分頁同步資料的效果。
+
 ###### Global Based
+
 ```js
 // App.vue
 <script lang="ts">
@@ -524,7 +538,9 @@ useConditionWatcher({
 })
 </script>
 ```
+
 ###### [LocalStorage Based](https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache)
+
 ```js
 function localStorageProvider() {
   const map = new Map(JSON.parse(localStorage.getItem('your-cache-key') || '[]'))
@@ -543,6 +559,7 @@ useConditionWatcher({
 ```
 
 ## History 模式
+
 你可以設定 `config.history` 啟用 History 模式，是基於 vue-router 的，支援 v3 和 v4 版本
 
 ```js
@@ -558,6 +575,7 @@ useConditionWatcher({
 ```
 
 你還可以設定 `history.ignore` 排除 `conditions` 部分的 `key＆value` 不要同步到 URL query string.
+
 ```js
 const router = useRouter()
 
@@ -578,6 +596,7 @@ useConditionWatcher({
 ```
 
 History mode 會轉換 `conditions`預設值的對應型別到 query string 而且會過濾掉 `undefined`, `null`, `''`, `[]` 這些類型的值.
+
 ```js
 conditions: {
   users: ['runkids', 'hello']
@@ -589,10 +608,13 @@ conditions: {
 ```
 
 每當你重新整理網頁還會自動同步 query string 到 `conditions`
+
 ```
 URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
 ```
+
 `conditions` 將變成
+
 ```js
 {
   users: ['runkids', 'hello']
@@ -601,6 +623,7 @@ URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
   offset: 0
 }
 ```
+
 ## 生命週期
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
@@ -897,6 +920,7 @@ function usePagination () {
 ```
 
 當 daterange or limit 改變時, 會將 offset 設置為 0，接著才會重新觸發請求。
+
 ## TDOD List
 
 - [ ] Cache
@@ -904,11 +928,13 @@ function usePagination () {
 - [ ] Automatic Revalidation
 - [ ] Error Retry
 - [ ] Nuxt SSR SSG Support
+
 ## Thanks
 
 This project is heavily inspired by the following awesome projects.
 
 - [vercel/swr](https://github.com/vercel/swr)
+
 ## 📄 License
 
 [MIT License](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE) © 2020-PRESENT [Runkids](https://github.com/runkids)

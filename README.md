@@ -1,4 +1,4 @@
-English | [繁體中文](./README-zh_TW.md)
+English | [中文](./README-zh_TW.md)
 
 # vue-condition-watcher <img src="https://slackmojis.com/emojis/43271-glasses/download" width="40" />
 
@@ -20,6 +20,7 @@ Vue composition API for automatic data fetching. With `conditions` as the core. 
   ✔ Easily handle paging needs, simply customize your own paging logic<br/>
   ✔ Automatically re-request data when web page is refocused or network disconnection resumes<br/>
   ✔ Support polling, the polling period can be adjusted dynamically<br/>
+  ✔ The caching mechanism allows data to be rendered faster without waiting for loading animations<br/>
   ✔ No need to wait for the return result, you can manually change `data` to make the user experience better<br/>
   ✔ TypeScript support. <br/>
   ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
@@ -66,7 +67,7 @@ yarn serve
 
 ### 👉 Online demo
 
-[Go to stackblitz](https://stackblitz.com/edit/vitejs-vite-tsvfqu?devtoolsheight=33&embed=1&file=src/views/Home.vue)
+  - [Demo with Vue 3 on StackBlitz](https://stackblitz.com/edit/vitejs-vite-tsvfqu?devtoolsheight=33&embed=1&file=src/views/Home.vue)
 
 ## Getting Started
 
@@ -248,6 +249,7 @@ function reset () {
   resetConditions()
 }
 ```
+
 ### Prevent Request
 
 Setting the `immediate` to false will prevent the request until the `execute`
@@ -279,11 +281,11 @@ execute()
 
 ### Intercepting Request
 
-The `beforeFetch` let you modify conditions before fetch. 
+The `beforeFetch` let you modify conditions before fetch.
 Receive two params:
+
 - Object of clone deep conditions.
 - Function called to stop fetch.
-
 
 ```js
 useConditionWatcher({
@@ -350,7 +352,9 @@ const { data, error } = useConditionWatcher({
 console.log(data) //[]
 console.log(error) //'Error Message'
 ```
+
 ### Mutations data
+
 In some cases, mutations to `data` is a good way to make the user experience better, you don't need wait for the remote data.
 
 Use `mutate` function, you can update `data`. While `onFetchSuccess` will replace `data` again.
@@ -358,10 +362,13 @@ Use `mutate` function, you can update `data`. While `onFetchSuccess` will replac
 Two way to use mutate function:
 
 - First way, force update current data.
+
 ```js
 mutate(newData)
 ```
+
 - Second way, use function will receive deep clone data, and return updated data.
+
 ```js
 const finalData = mutate((currentData) => {
   currentData[0].name = 'runkids'
@@ -370,8 +377,11 @@ const finalData = mutate((currentData) => {
 
 console.log(finalData[0]name === data.value[0].name) //true
 ```
+
 #### 🏄‍♂️ Example for update a part of your data based on the current data
+
 POST API will just return the updated data directly, so we don’t need to fetch list data again.
+
 ```js
 const { conditions, data, mutate } = useConditionWatcher({
   fetcher: api.userInfo,
@@ -397,6 +407,7 @@ async function updateUserName (userId, newName, rowIndex = 0) {
 }
 
 ```
+
 ### Conditions Change Event
 
 `onConditionsChange` can help you handle conditions changed.
@@ -439,6 +450,7 @@ onFetchFinally(() => {
 ```
 
 ## Polling
+
 You can use `pollingInterval` to automatically refetch data. Just enable it by setting `pollingInterval` value.
 
 ```js
@@ -448,6 +460,7 @@ useConditionWatcher({
   pollingInterval: 1000
 })
 ```
+
 And also you can use `ref`, it's will be reactivity.
 
 ```js
@@ -465,6 +478,7 @@ function startPolling () {
 
 onMounted(startPolling)
 ```
+
 The `vue-condition-watcher` default will disable polling when you leave the screen in focus or when the network is disconnected.
 
 You can turn off the default behavior by setting:
@@ -486,11 +500,15 @@ useConditionWatcher({
   revalidateOnFocus: true // revalidateOnFocus default is false
 })
 ```
+
 ## Cache
+
 The `vue-condition-watcher` preset will cache your first data in the current component. Then the following requests will use the cached data first, silently request new data behind, wait for the latest return result and compare whether the cached data is the same to achieve a similar preloading effect.
 
 You can also set `cacheProvider` by function to share globally or cache data in `localStorage`, and with polling, it can achieve the effect of paging and synchronizing data.
+
 ###### Global Based
+
 ```js
 // App.vue
 <script lang="ts">
@@ -511,7 +529,9 @@ useConditionWatcher({
 })
 </script>
 ```
+
 ###### [LocalStorage Based](https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache)
+
 ```js
 function localStorageProvider() {
   const map = new Map(JSON.parse(localStorage.getItem('your-cache-key') || '[]'))
@@ -530,6 +550,7 @@ useConditionWatcher({
 ```
 
 ## History Mode
+
 You can enable History mode by setting `config.history`, which is based on vue-router and supports v3 and v4 versions
 
 ````js
@@ -545,6 +566,7 @@ useConditionWatcher({
 ````
 
 You can also set `history.ignore` to exclude the `key&value` in the `conditions` section from being synced to the URL query string.
+
 ````js
 const router = useRouter()
 
@@ -565,6 +587,7 @@ useConditionWatcher({
 ````
 
 History mode will convert the corresponding types of `conditions` default values ​​to query strings and will filter out `undefined`, `null`, `''`, `[]` values.
+
 ````js
 conditions: {
   users: ['runkids', 'hello']
@@ -576,10 +599,13 @@ conditions: {
 ````
 
 Also automatically syncs the query string to `conditions` whenever you refresh the page
+
 ````
 URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
 ````
+
 `conditions` will become
+
 ````js
 {
   users: ['runkids', 'hello']
@@ -897,6 +923,7 @@ When daterange or limit changed, will reset offset to 0 and only fetch data agai
 This project is heavily inspired by the following awesome projects.
 
 - [vercel/swr](https://github.com/vercel/swr)
+
 ## 📄 License
 
 [MIT License](https://github.com/runkids/vue-condition-watcher/blob/master/LICENSE) © 2020-PRESENT [Runkids](https://github.com/runkids)
