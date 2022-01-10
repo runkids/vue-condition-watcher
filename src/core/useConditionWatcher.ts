@@ -13,12 +13,12 @@ import {
   computed,
 } from 'vue-demi'
 import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
-import { usePromiseQueue } from './hooks/usePromiseQueue'
-import { useHistory } from './hooks/useHistory'
+import { usePromiseQueue } from './composable/usePromiseQueue'
+import { useHistory } from './composable/useHistory'
+import { useCache } from './composable/useCache'
 import { createEvents } from './utils/createEvents'
 import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
-import { useCache } from './hooks/useCache'
 
 export default function useConditionWatcher<O extends object, K extends keyof O>(
   config: Config<O, K>
