@@ -1,3 +1,22 @@
+### [1.4.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.3) (2022-01-13)
+  * Fix: Sync query string to conditions convert type bug fix, need check the initial array value type before update conditions.
+  ```js
+    // If query string &types=1,2,3
+    const conditions = {
+      types: []
+    }
+    // the conditions.types convert value will be ['1', '2', '3']
+
+    const conditions = {
+      types: ['1']
+    }
+    // the conditions.types convert value will be ['1', '2', '3']
+
+    const conditions = {
+      types: [1]
+    }
+    // the conditions.types convert value will be [1, 2, 3]
+  ```
 ### [1.4.2](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.2) (2022-01-10)
   * Fix: Cache not work on globally.
   ### Changed
