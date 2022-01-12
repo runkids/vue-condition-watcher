@@ -5,6 +5,7 @@ import {
   syncQuery2Conditions,
   isEquivalent,
   deepClone,
+  typeOf,
 } from '../src/core/utils/common'
 
 describe('utils: isEquivalent', () => {
@@ -24,6 +25,37 @@ describe('utils: isEquivalent', () => {
       data: new Date(),
     }
     expect(isEquivalent(current, old)).toBeTruthy()
+  })
+})
+
+describe('utils: typeof', () => {
+  it(`Is array`, () => {
+    expect(typeOf([])).toEqual('array')
+  })
+  it(`Is date`, () => {
+    expect(typeOf(new Date())).toEqual('date')
+  })
+  it(`Is object`, () => {
+    expect(typeOf({})).toEqual('object')
+  })
+  it(`Is number`, () => {
+    expect(typeOf(1)).toEqual('number')
+  })
+  it(`Is string`, () => {
+    expect(typeOf('hi')).toEqual('string')
+  })
+  it(`Is null`, () => {
+    expect(typeOf(null)).toEqual('null')
+  })
+  it(`Is undefined`, () => {
+    expect(typeOf(undefined)).toEqual('undefined')
+  })
+  it(`Is function`, () => {
+    expect(
+      typeOf(() => {
+        //
+      })
+    ).toEqual('function')
   })
 })
 
@@ -102,7 +134,7 @@ describe('utils: syncQuery2Conditions', () => {
       age: 20,
       tags: ['react', 'vue'],
     }
-    syncQuery2Conditions(conditions, query)
+    syncQuery2Conditions(conditions, query, conditions)
     expect(conditions).toMatchObject({
       age: 50,
       tags: ['react', 'vue'],
@@ -116,22 +148,51 @@ describe('utils: syncQuery2Conditions', () => {
     const conditions = {
       date: new Date(),
     }
-    syncQuery2Conditions(conditions, query)
+    syncQuery2Conditions(conditions, query, conditions)
     expect(Object.prototype.toString.call(conditions.date) === '[object Date]').toBeTruthy()
+  })
+
+  it('should sync query object to conditions with Array<string>', () => {
+    const query = {
+      daterange: ['2020-01-02', '2020-01-03'],
+    }
+    const conditions = {
+      daterange: [],
+    }
+    syncQuery2Conditions(conditions, query, conditions)
+    expect(conditions.daterange).toMatchObject(['2020-01-02', '2020-01-03'])
+  })
+
+  it('should sync query object to conditions with Array<number>', () => {
+    const query = {
+      daterange: [1, 2],
+    }
+    const conditions = {
+      daterange: [],
+    }
+    syncQuery2Conditions(conditions, query, conditions)
+    expect(conditions.daterange).toMatchObject([1, 2])
   })
 
   it('if query is empty conditions should set init value', () => {
     const query = {}
     const conditions = {
       date: new Date(),
-      name: 'runkids',
-      tags: ['react'],
+      string: 'runkids',
+      array: ['react', 'vue'],
+      boolean: false,
+      undefined: undefined,
+      null: null,
     }
-    syncQuery2Conditions(conditions, query)
+    syncQuery2Conditions(conditions, query, conditions)
+
     expect(conditions).toMatchObject({
-      date: null,
-      name: '',
-      tags: [],
+      date: '',
+      string: '',
+      array: [],
+      boolean: '',
+      undefined: '',
+      null: '',
     })
   })
 })

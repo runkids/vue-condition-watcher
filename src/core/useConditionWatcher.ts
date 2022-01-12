@@ -272,9 +272,9 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
       sync: config.history.sync,
       ignore: config.history.ignore || [],
       navigation: config.history.navigation || 'push',
-      listener(parsedQuery) {
+      listener(parsedQuery: object) {
         const queryObject = Object.keys(parsedQuery).length ? parsedQuery : backupIntiConditions
-        syncQuery2Conditions(_conditions, queryObject)
+        syncQuery2Conditions(_conditions, queryObject, backupIntiConditions)
       },
     }
     useHistory(query, historyOption)

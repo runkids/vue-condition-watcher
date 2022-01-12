@@ -48,28 +48,57 @@ export function stringifyQuery(params: ConditionsType, ignoreKeys?: any[]): stri
     .join('&')
 }
 
-export function syncQuery2Conditions(conditions: ConditionsType, query: ConditionsType): void {
+export function typeOf(obj) {
+  return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase()
+}
+
+export function syncQuery2Conditions(
+  conditions: ConditionsType,
+  query: ConditionsType,
+  backupIntiConditions: ConditionsType
+): void {
   const conditions2Object = { ...conditions }
   const noQuery = Object.keys(query).length === 0
   Object.keys(conditions2Object).forEach((key) => {
     if (key in query || noQuery) {
-      if (conditions2Object[key] instanceof Date) {
-        conditions[key] = noQuery ? null : new Date(query[key])
-        return
+      const conditionType = typeOf(conditions2Object[key])
+      switch (conditionType) {
+        case 'date':
+          conditions[key] = noQuery ? '' : new Date(query[key])
+          break
+        case 'array':
+          conditions[key] =
+            noQuery || !query[key].length ? [] : typeOf(query[key]) === 'string' ? query[key].split(',') : query[key]
+
+          if (backupIntiConditions[key].length && conditions[key].length) {
+            let originArrayValueType = typeOf(backupIntiConditions[key][0])
+            conditions[key] = conditions[key].map((v: any) => {
+              switch (originArrayValueType) {
+                case 'number':
+                  return Number(v)
+                case 'date':
+                  return new Date(v)
+                case 'boolean':
+                  return v === 'true'
+                default:
+                  return String(v)
+              }
+            })
+          }
+          break
+        case 'string':
+          conditions[key] = noQuery ? '' : String(query[key])
+          break
+        case 'number':
+          conditions[key] = noQuery ? 0 : Number(query[key])
+          break
+        case 'boolean':
+          conditions[key] = noQuery ? '' : Boolean(query[key])
+          break
+        default:
+          conditions[key] = noQuery ? '' : query[key]
+          break
       }
-      conditions[key] = Array.isArray(conditions2Object[key])
-        ? noQuery || !query[key].length
-          ? []
-          : typeof query[key] === 'string'
-          ? query[key].split(',')
-          : query[key]
-        : typeof conditions2Object[key] === 'number'
-        ? noQuery
-          ? 0
-          : +query[key]
-        : noQuery
-        ? ''
-        : query[key]
     }
   })
 }

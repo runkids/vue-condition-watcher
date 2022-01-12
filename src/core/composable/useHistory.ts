@@ -15,7 +15,7 @@ function decode(text: string | number): string {
   return '' + text
 }
 
-function parseQuery(search: string) {
+function parseQuery(search: string): object {
   const query = {}
   if (search === '' || search === '?') return query
   const hasLeadingIM = search[0] === '?'
