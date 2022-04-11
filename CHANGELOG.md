@@ -1,3 +1,5 @@
+### [1.4.4](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.4) (2022-04-11)
+  * [chore(types): improve types #13](https://github.com/runkids/vue-condition-watcher/pull/13)
 ### [1.4.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.3) (2022-01-13)
   * Fix: Sync query string to conditions convert type bug fix, need check the initial array value type before update conditions.
   ```js
