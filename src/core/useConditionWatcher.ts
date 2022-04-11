@@ -20,10 +20,10 @@ import { createEvents } from './utils/createEvents'
 import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
 
-export default function useConditionWatcher<O extends object, K extends keyof O>(
-  config: Config<O, K>
-): UseConditionWatcherReturn<O> {
-  function isFetchConfig(obj: object): obj is Config<O, K> {
+export default function useConditionWatcher<O extends object, Result = unknown>(
+  config: Config<O, Result>
+): UseConditionWatcherReturn<O, Result> {
+  function isFetchConfig(obj: object): obj is Config<O, Result> {
     return containsProp(
       obj,
       'fetcher',
@@ -50,7 +50,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   }
 
   // default config
-  let watcherConfig: Config<O, K> = {
+  let watcherConfig: Config<O, Result> = {
     fetcher: config.fetcher,
     conditions: config.conditions,
     immediate: true,
@@ -76,7 +76,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data: ShallowRef = shallowRef(
+  const data: ShallowRef<Result> = shallowRef(
     cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || undefined
   )
   const error = ref(undefined)
@@ -255,7 +255,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
   const mutate = (...args): Mutate => {
     const arg = args[0]
     if (arg === undefined) {
-      return data.value
+      return data.value as any
     }
     if (typeof arg === 'function') {
       data.value = arg(deepClone(data.value))
@@ -263,7 +263,7 @@ export default function useConditionWatcher<O extends object, K extends keyof O>
       data.value = arg
     }
     cache.set({ ..._conditions }, data.value)
-    return data.value
+    return data.value as any
   }
 
   // - History mode base on vue-router

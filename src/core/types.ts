@@ -1,4 +1,4 @@
-import { Ref, UnwrapNestedRefs } from 'vue-demi'
+import { DeepReadonly, Ref, UnwrapNestedRefs } from 'vue-demi'
 
 export type ConditionsType = {
   [key: string]: any
@@ -45,29 +45,29 @@ export interface HistoryOptions<K> {
   ignore?: Array<K>
 }
 
-export interface Config<O, K> {
-  fetcher: (params: object) => Promise<any>
+export interface Config<O, Result> {
+  fetcher: (params: object) => Promise<Result>
   conditions?: O
   defaultParams?: object
   immediate?: boolean
   manual?: boolean
   initialData?: any
-  history?: HistoryOptions<K>
+  history?: HistoryOptions<keyof O>
   pollingInterval?: number | Ref<number>
   pollingWhenHidden?: boolean
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
   beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
-  afterFetch?: (data: any) => any
+  afterFetch?: (data: Result) => any
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
 
-export interface UseConditionWatcherReturn<O> {
+export interface UseConditionWatcherReturn<O, Result> {
   conditions: UnwrapNestedRefs<O>
   readonly isFetching: Ref<boolean>
   readonly loading: Ref<boolean>
-  readonly data: Ref<any | undefined>
+  readonly data: DeepReadonly<Ref<Result | undefined>>
   readonly error: Ref<any | undefined>
   execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
