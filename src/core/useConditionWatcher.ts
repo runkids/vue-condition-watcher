@@ -20,10 +20,14 @@ import { createEvents } from './utils/createEvents'
 import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
 
-export default function useConditionWatcher<O extends object, Result = unknown>(
-  config: Config<O, Result>
-): UseConditionWatcherReturn<O, Result> {
-  function isFetchConfig(obj: object): obj is Config<O, Result> {
+export default function useConditionWatcher<
+  Result extends unknown,
+  Cond extends Record<string, any>,
+  AfterResult extends unknown = Result
+>(
+  config: Config<Result, Cond, AfterResult>
+): UseConditionWatcherReturn<AfterResult extends Result ? Result : AfterResult, Cond> {
+  function isFetchConfig(obj: object): obj is typeof config {
     return containsProp(
       obj,
       'fetcher',
@@ -50,7 +54,7 @@ export default function useConditionWatcher<O extends object, Result = unknown>(
   }
 
   // default config
-  let watcherConfig: Config<O, Result> = {
+  let watcherConfig: typeof config = {
     fetcher: config.fetcher,
     conditions: config.conditions,
     immediate: true,
@@ -70,13 +74,13 @@ export default function useConditionWatcher<O extends object, Result = unknown>(
   const cache = useCache(watcherConfig.fetcher, watcherConfig.cacheProvider())
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
-  const _conditions = reactive<O>(watcherConfig.conditions)
+  const _conditions = reactive<Cond>(watcherConfig.conditions)
 
   const isFetching = ref(false)
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data: ShallowRef<Result> = shallowRef(
+  const data: ShallowRef<any> = shallowRef(
     cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || undefined
   )
   const error = ref(undefined)
@@ -110,9 +114,9 @@ export default function useConditionWatcher<O extends object, Result = unknown>(
     if (isFetching.value) return
     isFetching.value = true
     error.value = undefined
-    const conditions2Object: Conditions<O> = conditions
+    const conditions2Object: Conditions<Cond> = conditions
     let customConditions: object = {}
-    const deepCopyCondition: Conditions<O> = deepClone(conditions2Object)
+    const deepCopyCondition: Conditions<Cond> = deepClone(conditions2Object)
 
     if (typeof watcherConfig.beforeFetch === 'function') {
       let isCanceled = false
@@ -325,7 +329,7 @@ export default function useConditionWatcher<O extends object, Result = unknown>(
   })
 
   return {
-    conditions: _conditions as UnwrapNestedRefs<O>,
+    conditions: _conditions as UnwrapNestedRefs<Cond>,
     data: readonly(data),
     error: readonly(error),
     isFetching: readonly(isFetching),
