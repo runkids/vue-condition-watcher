@@ -1,3 +1,5 @@
+### [1.4.5](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.5) (2022-04-14)
+  * [chore(afterFetch & beforeFetch): improve types #14](https://github.com/runkids/vue-condition-watcher/pull/14)
 ### [1.4.4](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.4) (2022-04-11)
   * [chore(types): improve types #13](https://github.com/runkids/vue-condition-watcher/pull/13)
 ### [1.4.3](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.3) (2022-01-13)
