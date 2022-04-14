@@ -45,26 +45,26 @@ export interface HistoryOptions<K> {
   ignore?: Array<K>
 }
 
-export interface Config<O, Result> {
-  fetcher: (params: object) => Promise<Result>
-  conditions?: O
+export interface Config<Result = unknown, Cond = object, AfterResult extends unknown = Result> {
+  fetcher: (...args: any) => Promise<Result>
+  conditions?: Cond
   defaultParams?: object
   immediate?: boolean
   manual?: boolean
   initialData?: any
-  history?: HistoryOptions<keyof O>
+  history?: HistoryOptions<keyof Cond>
   pollingInterval?: number | Ref<number>
   pollingWhenHidden?: boolean
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
-  beforeFetch?: (conditions: O & ConditionsType, cancel: Fn) => ConditionsType
-  afterFetch?: (data: Result) => any
+  beforeFetch?: (conditions: Cond & ConditionsType, cancel: Fn) => ConditionsType
+  afterFetch?: (data: Result) => AfterResult extends Result ? Result : AfterResult
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
 
-export interface UseConditionWatcherReturn<O, Result> {
-  conditions: UnwrapNestedRefs<O>
+export interface UseConditionWatcherReturn<Result, Cond> {
+  conditions: UnwrapNestedRefs<Cond>
   readonly isFetching: Ref<boolean>
   readonly loading: Ref<boolean>
   readonly data: DeepReadonly<Ref<Result | undefined>>
@@ -72,7 +72,7 @@ export interface UseConditionWatcherReturn<O, Result> {
   execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
   resetConditions: (conditions?: object) => void
-  onConditionsChange: (fn: OnConditionsChangeContext<O>) => void
+  onConditionsChange: (fn: OnConditionsChangeContext<Cond>) => void
   onFetchSuccess: (fn: (response: any) => void) => void
   onFetchError: (fn: (error: any) => void) => void
   onFetchFinally: (fn: (error: any) => void) => void
