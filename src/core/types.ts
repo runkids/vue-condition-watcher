@@ -58,7 +58,7 @@ export interface Config<Result = unknown, Cond = object, AfterResult extends unk
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
-  beforeFetch?: (conditions: Cond & ConditionsType, cancel: Fn) => ConditionsType
+  beforeFetch?: (conditions: Cond, cancel: Fn) => Partial<Cond>
   afterFetch?: (data: Result) => AfterResult extends Result ? Result : AfterResult
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
