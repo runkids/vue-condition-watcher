@@ -1,4 +1,4 @@
-import { DeepReadonly, Ref, UnwrapNestedRefs } from 'vue-demi'
+import { Ref, UnwrapNestedRefs } from 'vue-demi'
 
 export type ConditionsType = {
   [key: string]: any
@@ -67,7 +67,7 @@ export interface UseConditionWatcherReturn<Result, Cond> {
   conditions: UnwrapNestedRefs<Cond>
   readonly isFetching: Ref<boolean>
   readonly loading: Ref<boolean>
-  readonly data: DeepReadonly<Ref<Result | undefined>>
+  readonly data: Readonly<Ref<Result | undefined>>
   readonly error: Ref<any | undefined>
   execute: (throwOnFailed?: boolean) => void
   mutate: Mutate
