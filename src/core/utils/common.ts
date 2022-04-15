@@ -1,4 +1,4 @@
-import { ConditionsType } from '../types'
+type ConditionsType = Record<string, any>
 
 declare global {
   interface ObjectConstructor {

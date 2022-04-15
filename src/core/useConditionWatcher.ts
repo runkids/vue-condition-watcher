@@ -21,13 +21,13 @@ import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
 
 export default function useConditionWatcher<
-  Result extends unknown,
   Cond extends Record<string, any>,
-  AfterResult extends unknown = Result
+  Result extends unknown,
+  AfterFetchResult extends unknown = Result
 >(
-  config: Config<Result, Cond, AfterResult>
-): UseConditionWatcherReturn<AfterResult extends Result ? Result : AfterResult, Cond> {
-  function isFetchConfig(obj: object): obj is typeof config {
+  config: Config<Cond, Result, AfterFetchResult>
+): UseConditionWatcherReturn<Cond, AfterFetchResult extends Result ? Result : AfterFetchResult> {
+  function isFetchConfig(obj: Record<string, any>): obj is typeof config {
     return containsProp(
       obj,
       'fetcher',
@@ -103,7 +103,7 @@ export default function useConditionWatcher<
     stopVisibilityEvent,
   } = createEvents()
 
-  const resetConditions = (cond?: object): void => {
+  const resetConditions = (cond?: Record<string, any>): void => {
     Object.assign(_conditions, isObject(cond) && !cond.type ? cond : backupIntiConditions)
   }
 
@@ -115,7 +115,7 @@ export default function useConditionWatcher<
     isFetching.value = true
     error.value = undefined
     const conditions2Object: Conditions<Cond> = conditions
-    let customConditions: object = {}
+    let customConditions: Record<string, any> = {}
     const deepCopyCondition: Conditions<Cond> = deepClone(conditions2Object)
 
     if (typeof watcherConfig.beforeFetch === 'function') {
@@ -144,7 +144,7 @@ export default function useConditionWatcher<
      * return result will be {age: 0}
      */
     query.value = filterNoneValueObject(validateCustomConditions ? customConditions : conditions2Object)
-    const finalConditions: object = createParams(query.value, watcherConfig.defaultParams)
+    const finalConditions: Record<string, any> = createParams(query.value, watcherConfig.defaultParams)
 
     let responseData: any = undefined
 
@@ -276,7 +276,7 @@ export default function useConditionWatcher<
       sync: config.history.sync,
       ignore: config.history.ignore || [],
       navigation: config.history.navigation || 'push',
-      listener(parsedQuery: object) {
+      listener(parsedQuery: Record<string, any>) {
         const queryObject = Object.keys(parsedQuery).length ? parsedQuery : backupIntiConditions
         syncQuery2Conditions(_conditions, queryObject, backupIntiConditions)
       },

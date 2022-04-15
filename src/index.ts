@@ -1,7 +1,7 @@
 export { default as useConditionWatcher } from './core/useConditionWatcher'
 
 export type {
-  Fn,
+  VoidFn,
   Conditions,
   OnFetchErrorContext,
   Config,

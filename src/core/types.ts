@@ -1,9 +1,5 @@
 import { Ref, UnwrapNestedRefs } from 'vue-demi'
 
-export type ConditionsType = {
-  [key: string]: any
-}
-
 type ArgumentsTuple = [any, ...unknown[]] | readonly [any, ...unknown[]]
 export type Arguments = string | ArgumentsTuple | Record<any, any> | null | undefined | false
 export type Key = Arguments | (() => Arguments)
@@ -13,13 +9,13 @@ export interface Cache<Data = any> {
   delete(key: Key): void
 }
 
-export type Fn = () => void
+export type VoidFn = () => void
 
 export type Conditions<T> = {
   [K in keyof T]: T[K]
 }
 
-export type OnConditionsChangeReturnValue<C> = Partial<UnwrapNestedRefs<C>> & ConditionsType
+export type OnConditionsChangeReturnValue<C> = Partial<UnwrapNestedRefs<C>>
 
 export type OnConditionsChangeContext<O> = (
   newConditions: OnConditionsChangeReturnValue<O>,
@@ -45,10 +41,10 @@ export interface HistoryOptions<K> {
   ignore?: Array<K>
 }
 
-export interface Config<Result = unknown, Cond = object, AfterResult extends unknown = Result> {
+export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetchResult extends unknown = Result> {
   fetcher: (...args: any) => Promise<Result>
   conditions?: Cond
-  defaultParams?: object
+  defaultParams?: Record<string, any>
   immediate?: boolean
   manual?: boolean
   initialData?: any
@@ -58,12 +54,16 @@ export interface Config<Result = unknown, Cond = object, AfterResult extends unk
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
-  beforeFetch?: (conditions: Cond, cancel: Fn) => Partial<Cond>
-  afterFetch?: (data: Result) => AfterResult extends Result ? Result : AfterResult
+  beforeFetch?: (conditions: Cond, cancel: VoidFn) => Promise<Partial<Cond>> | Partial<Cond>
+  afterFetch?: (
+    data: Result
+  ) => Promise<AfterFetchResult extends Result ? Result : AfterFetchResult> | AfterFetchResult extends Result
+    ? Result
+    : AfterFetchResult
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
 
-export interface UseConditionWatcherReturn<Result, Cond> {
+export interface UseConditionWatcherReturn<Cond, Result> {
   conditions: UnwrapNestedRefs<Cond>
   readonly isFetching: Ref<boolean>
   readonly loading: Ref<boolean>
