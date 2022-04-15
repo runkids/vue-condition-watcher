@@ -1,3 +1,6 @@
+### [1.4.7](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.7) (2022-04-15)
+  * Chore: Improve Types
+
 ### [1.4.6](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.6) (2022-04-14)
   * Fix: Type: DeepReadonly to Readonly
 
