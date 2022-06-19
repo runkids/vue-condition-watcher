@@ -624,6 +624,21 @@ URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
 }
 ```
 
+使用 `navigation` 可以 push 或是 replace 當前的位置. 預設值為 'push'
+```js
+useConditionWatcher({
+  fetcher,
+  conditions: {
+    limit: 20,
+    offset: 0
+  },
+  history: {
+    sync: router,
+    navigation: 'replace'
+  }
+})
+```
+
 ## 生命週期
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
@@ -923,9 +938,6 @@ function usePagination () {
 
 ## TDOD List
 
-- [ ] Cache
-- [ ] Prefetching
-- [ ] Automatic Revalidation
 - [ ] Error Retry
 - [ ] Nuxt SSR SSG Support
 

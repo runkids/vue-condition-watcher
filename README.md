@@ -615,6 +615,23 @@ URL query string: ?offset=0&limit=10&users=runkids,hello&company=vue
 }
 ````
 
+Use `navigation` to replace or push current location. The default value is 'push'
+```js
+useConditionWatcher({
+  fetcher,
+  conditions: {
+    limit: 20,
+    offset: 0
+  },
+  history: {
+    sync: router,
+    navigation: 'replace'
+  }
+})
+```
+
+
+
 ## Lifecycle
 
 <img src=".github/vue-condition-watcher_lifecycle.jpeg"/>
