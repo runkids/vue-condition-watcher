@@ -14,16 +14,13 @@
 	],
 	"extends": [
 		"eslint:recommended",
-		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"prettier",
-		"prettier/@typescript-eslint"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
 	],
 	"env": {
 		"es6": true,
 		"browser": true,
-		"node": true,
-		"jest": true
+		"node": true
 	},
 	"rules": {
 		"func-names": [
@@ -56,5 +53,6 @@
 				"extendDefaults": true
 			}
 		]
-	}
+	},
+  "ignorePatterns": ["dist/", "node_modules", "scripts", "examples"]
 }

@@ -1,16 +1,7 @@
 import { Ref, UnwrapNestedRefs } from 'vue-demi'
-
-type ArgumentsTuple = [any, ...unknown[]] | readonly [any, ...unknown[]]
-export type Arguments = string | ArgumentsTuple | Record<any, any> | null | undefined | false
-export type Key = Arguments | (() => Arguments)
-export interface Cache<Data = any> {
-  get(key: Key): Data | null | undefined
-  set(key: Key, value: Data): void
-  delete(key: Key): void
-}
+import { Cache, HistoryOptions } from 'vue-condition-watcher/_internal'
 
 export type VoidFn = () => void
-
 export type Conditions<T> = {
   [K in keyof T]: T[K]
 }
@@ -31,17 +22,7 @@ type MutateData = (newData: any) => void
 type MutateFunction = (arg: (oldData: any) => any) => void
 export interface Mutate extends MutateData, MutateFunction {}
 
-export interface HistoryOptions<K> {
-  sync: {
-    currentRoute: any
-    replace: (string) => any
-    push: (string) => any
-  }
-  navigation?: 'push' | 'replace'
-  ignore?: Array<K>
-}
-
-export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetchResult extends unknown = Result> {
+export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetchResult = Result> {
   fetcher: (...args: any) => Promise<Result>
   conditions?: Cond
   defaultParams?: Record<string, any>
@@ -54,7 +35,7 @@ export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetch
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
-  beforeFetch?: (conditions: Cond, cancel: VoidFn) => Promise<Partial<Cond>> | Partial<Cond>
+  beforeFetch?: (conditions: Partial<Cond>, cancel: VoidFn) => Promise<Partial<Cond>> | Partial<Cond>
   afterFetch?: (
     data: Result
   ) => Promise<AfterFetchResult extends Result ? Result : AfterFetchResult> | AfterFetchResult extends Result

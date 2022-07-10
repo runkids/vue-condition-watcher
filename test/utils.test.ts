@@ -6,7 +6,8 @@ import {
   isEquivalent,
   deepClone,
   typeOf,
-} from '../src/core/utils/common'
+} from 'vue-condition-watcher/_internal'
+import { describe, expect, test } from 'vitest'
 
 describe('utils: isEquivalent', () => {
   it(`Check Object Equality`, () => {

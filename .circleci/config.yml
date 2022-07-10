@@ -1,17 +1,34 @@
-version: 2.1
-orbs:
-  node: circleci/node@1.1.6
+version: 2
 jobs:
-  build-and-test:
-    executor:
-      name: node/default
+  setup:
+    docker:
+      - image: znck/pnpm:latest
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm test
+      - restore_cache:
+          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Install
+          command: pnpm install --frozen-lockfile
+      - save_cache:
+          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+  test:
+    docker:
+      - image: znck/pnpm:latest
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Test and Lint
+          command: pnpm test
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  version: 2
+  build_and_test:
+    jobs:
+      - setup
+      - test:
+          requires:
+            - setup

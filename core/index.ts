@@ -1,4 +1,5 @@
-export { default as useConditionWatcher } from './core/useConditionWatcher'
+import useConditionWatcher from './use-condition-watcher'
+export default useConditionWatcher
 
 export type {
   VoidFn,
@@ -8,4 +9,4 @@ export type {
   OnConditionsChangeReturnValue,
   OnConditionsChangeContext,
   UseConditionWatcherReturn,
-} from './core/types'
+} from './types'

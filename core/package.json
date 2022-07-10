@@ -1,0 +1,29 @@
+{
+  "name": "vue-condition-watcher-core",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": "./dist/index.mjs",
+  "private": true,
+  "scripts": {
+    "build": "bunchee index.ts --no-sourcemap",
+    "types:check": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "vue-condition-watcher": "*",
+    "vue-demi": "*",
+    "@vue/composition-api": "^1.1.0",
+    "@nuxtjs/composition-api": "^0.24.4",
+    "vue": "^2.6.0 || ^3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    },
+    "@nuxtjs/composition-api": {
+      "optional": true
+    }
+  }
+}

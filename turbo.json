@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "baseBranch": "origin/master",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"]
+    },
+    "types:check": {},
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalDependencies": [
+    "tsconfig.json",
+    "_internal/composable/**",
+    "_internal/utils/**",
+    "_internal/index.ts",
+    "_internal/types.ts"
+  ]
+}

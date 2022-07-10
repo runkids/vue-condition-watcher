@@ -14,17 +14,27 @@
     "noUnusedParameters": true,
     "downlevelIteration": true,
     "outDir": "./dist",
+    "rootDir": "core",
+    "baseUrl": ".",
     "types": [
-      "node", "jest"
+      "node",
+      "vitest",
+      "vitest/globals"
     ],
     "target": "es5",
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ]
+    "paths": {
+      "vue-condition-watcher": ["./core/index.ts"]
+    },
+    "typeRoots": ["./node_modules/@types"],
+    "incremental": true
   },
-  "exclude": ["dist", "node_modules", "test",],
+  "exclude": [
+    "node_modules",
+    "./**/dist"
+  ],
   "include": [
-    "src/**/*"
+    "core",
+    "_internal",
+    "vitest.config.ts"
   ]
 }

@@ -9,22 +9,21 @@ import {
   unref,
   isRef,
   shallowRef,
-  ShallowRef,
   computed,
+  getCurrentInstance,
 } from 'vue-demi'
 import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
-import { usePromiseQueue } from './composable/usePromiseQueue'
-import { useHistory } from './composable/useHistory'
-import { useCache } from './composable/useCache'
-import { createEvents } from './utils/createEvents'
-import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
-import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
+import { usePromiseQueue, useHistory, useCache, createEvents } from 'vue-condition-watcher/_internal'
+import {
+  filterNoneValueObject,
+  createParams,
+  syncQuery2Conditions,
+  isEquivalent,
+  deepClone,
+} from 'vue-condition-watcher/_internal'
+import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from 'vue-condition-watcher/_internal'
 
-export default function useConditionWatcher<
-  Cond extends Record<string, any>,
-  Result extends unknown,
-  AfterFetchResult extends unknown = Result
->(
+export default function useConditionWatcher<Cond extends Record<string, any>, Result, AfterFetchResult = Result>(
   config: Config<Cond, Result, AfterFetchResult>
 ): UseConditionWatcherReturn<Cond, AfterFetchResult extends Result ? Result : AfterFetchResult> {
   function isFetchConfig(obj: Record<string, any>): obj is typeof config {
@@ -80,7 +79,7 @@ export default function useConditionWatcher<
   const isOnline = ref(true)
   const isActive = ref(true)
 
-  const data: ShallowRef<any> = shallowRef(
+  const data = shallowRef(
     cache.cached(backupIntiConditions) ? cache.get(backupIntiConditions) : watcherConfig.initialData || undefined
   )
   const error = ref(undefined)
@@ -321,12 +320,14 @@ export default function useConditionWatcher<
     stopSubscribeFocus.off()
   }
 
-  onUnmounted(() => {
-    pollingTimer.value && pollingTimer.value()
-    stopFocusEvent()
-    stopReconnectEvent()
-    stopVisibilityEvent()
-  })
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      pollingTimer.value && pollingTimer.value()
+      stopFocusEvent()
+      stopReconnectEvent()
+      stopVisibilityEvent()
+    })
+  }
 
   return {
     conditions: _conditions as UnwrapNestedRefs<Cond>,
