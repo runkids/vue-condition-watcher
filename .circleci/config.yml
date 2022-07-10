@@ -2,7 +2,7 @@ version: 2
 jobs:
   setup:
     docker:
-      - image: znck/pnpm:latest
+      - image: gplane/pnpm:latest
     steps:
       - checkout
       - restore_cache:
@@ -16,7 +16,7 @@ jobs:
             - node_modules
   test:
     docker:
-      - image: znck/pnpm:latest
+      - image: gplane/pnpm:latest
     steps:
       - checkout
       - restore_cache:
