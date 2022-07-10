@@ -13,17 +13,17 @@ describe('Basic test of vue-condition-watcher', () => {
         results: 9,
       },
     }
-    const { conditions, data, error, loading, execute } = useConditionWatcher(config)
+    const { conditions, data, error, isLoading, execute } = useConditionWatcher(config)
 
     expect(isReactive(conditions)).toBeTruthy()
     expect(isRef(data)).toBeTruthy()
     expect(isRef(error)).toBeTruthy()
-    expect(isRef(loading)).toBeTruthy()
-    expect(loading.value).toBeTypeOf('boolean')
+    expect(isRef(isLoading)).toBeTruthy()
+    expect(isLoading.value).toBeTypeOf('boolean')
     expect(execute).toBeTypeOf('function')
   })
 
-  it(`Check data, error, loading is readonly`, () => {
+  it(`Check data, error, isLoading is readonly`, () => {
     const config = {
       fetcher: (params) => new Promise((resolve) => resolve(params)),
       conditions: {
@@ -32,11 +32,11 @@ describe('Basic test of vue-condition-watcher', () => {
       },
     }
 
-    const { data, error, loading } = useConditionWatcher(config)
+    const { data, error, isLoading } = useConditionWatcher(config)
 
     expect(isReadonly(data)).toBeTruthy()
     expect(isReadonly(error)).toBeTruthy()
-    expect(isReadonly(loading)).toBeTruthy()
+    expect(isReadonly(isLoading)).toBeTruthy()
   })
 
   it(`Condition should be change`, () => {
@@ -114,9 +114,9 @@ describe('Basic test of vue-condition-watcher', () => {
 //     })
 //   })
 
-//   it(`Loading state should return true until promise resolve`, () => {
+//   it(`isLoading state should return true until promise resolve`, () => {
 //     const vm = createApp({
-//       template: `<div>loading:{{loading}}, result:{{data}}</div>`,
+//       template: `<div>isLoading:{{isLoading}}, result:{{data}}</div>`,
 //       setup() {
 //         const config = {
 //           fetcher: () => new Promise((resolve) => setTimeout(() => resolve('ConditionWatcher'), 200)),
@@ -131,9 +131,9 @@ describe('Basic test of vue-condition-watcher', () => {
 
 //     doAsync(async () => {
 //       await tick(1)
-//       expect(vm.$el.textContent).toBe('loading:true, result:')
+//       expect(vm.$el.textContent).toBe('isLoading:true, result:')
 //       await tick(1)
-//       expect(vm.$el.textContent).toBe('loading:false, result:ConditionWatcher')
+//       expect(vm.$el.textContent).toBe('isLoading:false, result:ConditionWatcher')
 //     })
 //   })
 
