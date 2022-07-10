@@ -106,7 +106,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     Object.assign(_conditions, isObject(cond) && !cond.type ? cond : backupIntiConditions)
   }
 
-  const loading = computed(() => !error.value && !data.value)
+  const isLoading = computed(() => !error.value && !data.value)
 
   const conditionsChangeHandler = async (conditions, throwOnFailed = false) => {
     const checkThrowOnFailed = typeof throwOnFailed === 'boolean' ? throwOnFailed : false
@@ -334,7 +334,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     data: readonly(data),
     error: readonly(error),
     isFetching: readonly(isFetching),
-    loading,
+    isLoading,
     execute,
     mutate,
     resetConditions,

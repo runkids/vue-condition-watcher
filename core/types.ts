@@ -47,7 +47,7 @@ export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetch
 export interface UseConditionWatcherReturn<Cond, Result> {
   conditions: UnwrapNestedRefs<Cond>
   readonly isFetching: Ref<boolean>
-  readonly loading: Ref<boolean>
+  readonly isLoading: Ref<boolean>
   readonly data: Readonly<Ref<Result | undefined>>
   readonly error: Ref<any | undefined>
   execute: (throwOnFailed?: boolean) => void
