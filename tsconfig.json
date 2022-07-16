@@ -21,7 +21,7 @@
       "vitest",
       "vitest/globals"
     ],
-    "target": "es5",
+    "target": "es2017",
     "paths": {
       "vue-condition-watcher": ["./core/index.ts"]
     },

@@ -123,12 +123,10 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
         isCanceled = true
       })
       if (isCanceled) {
-        // eslint-disable-next-line require-atomic-updates
         isFetching.value = false
         return Promise.resolve(undefined)
       }
       if (!customConditions || typeof customConditions !== 'object' || customConditions.constructor !== Object) {
-        // eslint-disable-next-line require-atomic-updates
         isFetching.value = false
         throw new Error(`[vue-condition-watcher]: beforeFetch should return an object`)
       }
@@ -171,7 +169,6 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
         })
         .catch(async (fetchError) => {
           if (typeof watcherConfig.onFetchError === 'function') {
-            // eslint-disable-next-line @typescript-eslint/no-extra-semi
             ;({ data: responseData, error: fetchError } = await watcherConfig.onFetchError({
               data: undefined,
               error: fetchError,

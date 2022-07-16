@@ -19,14 +19,14 @@ importers:
       rimraf: ^3.0.2
       turbo: ^1.3.1
       typescript: ^4.6.4
-      vite: ^2.9.14
+      vite: ^3.0.0
       vitest: ^0.18.0
       vue: ^3.2.37
       vue-condition-watcher: workspace:*
       vue-demi: latest
       vue2: npm:vue@2.6.14
     dependencies:
-      vue-demi: 0.13.2_3nmzzoefrdru4lagmst3ha3a3q
+      vue-demi: 0.13.5_3nmzzoefrdru4lagmst3ha3a3q
     devDependencies:
       '@types/node': 17.0.45
       '@typescript-eslint/eslint-plugin': 5.30.5_4kxl66lm5rq3w3uv4rnh73m4am
@@ -43,7 +43,7 @@ importers:
       rimraf: 3.0.2
       turbo: 1.3.1
       typescript: 4.7.4
-      vite: 2.9.14
+      vite: 3.0.0
       vitest: 0.18.0_jsdom@20.0.0
       vue: 3.2.37
       vue-condition-watcher: 'link:'
@@ -5213,20 +5213,23 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite/2.9.14:
-    resolution: {integrity: sha512-P/UCjSpSMcE54r4mPak55hWAZPlyfS369svib/gpmz8/01L822lMPOJ/RYW6tLCe1RPvMvOsJ17erf55bKp4Hw==}
-    engines: {node: '>=12.2.0'}
+  /vite/3.0.0:
+    resolution: {integrity: sha512-M7phQhY3+fRZa0H+1WzI6N+/onruwPTBTMvaj7TzgZ0v2TE+N2sdLKxJOfOv9CckDWt5C4HmyQP81xB4dwRKzA==}
+    engines: {node: '>=14.18.0'}
     hasBin: true
     peerDependencies:
       less: '*'
       sass: '*'
       stylus: '*'
+      terser: ^5.4.0
     peerDependenciesMeta:
       less:
         optional: true
       sass:
         optional: true
       stylus:
+        optional: true
+      terser:
         optional: true
     dependencies:
       esbuild: 0.14.49
@@ -5268,16 +5271,17 @@ packages:
       local-pkg: 0.4.1
       tinypool: 0.2.2
       tinyspy: 0.3.3
-      vite: 2.9.14
+      vite: 3.0.0
     transitivePeerDependencies:
       - less
       - sass
       - stylus
       - supports-color
+      - terser
     dev: true
 
-  /vue-demi/0.13.2_3nmzzoefrdru4lagmst3ha3a3q:
-    resolution: {integrity: sha512-41ukrclEbMddAyP7PvxMSYqnOSzPV6r7GNnyTSKSCNTaz19GehxmTiXyP9kwHSUv2+Dr6hHqiUiF7L1VAw2KdQ==}
+  /vue-demi/0.13.5_3nmzzoefrdru4lagmst3ha3a3q:
+    resolution: {integrity: sha512-tO3K2bML3AwiHmVHeKCq6HLef2st4zBXIV5aEkoJl6HZ+gJWxWv2O8wLH8qrA3SX3lDoTDHNghLX1xZg83MXvw==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true

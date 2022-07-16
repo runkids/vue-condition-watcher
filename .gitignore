@@ -10,6 +10,7 @@ esm
 examples/**/yarn.lock
 examples/**/node_modules
 package-lock.json
+*.eslintcache
 */**/.turbo
 .turbo
 .rollup.cache
