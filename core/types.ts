@@ -1,6 +1,8 @@
 import { Ref, UnwrapNestedRefs } from 'vue-demi'
 import { Cache, HistoryOptions } from 'vue-condition-watcher/_internal'
 
+export type { HistoryOptions }
+
 export type VoidFn = () => void
 export type Conditions<T> = {
   [K in keyof T]: T[K]

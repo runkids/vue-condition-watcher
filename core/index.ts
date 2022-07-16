@@ -3,6 +3,7 @@ export default useConditionWatcher
 
 export type {
   VoidFn,
+  HistoryOptions,
   Conditions,
   OnFetchErrorContext,
   Config,
