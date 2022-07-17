@@ -37,7 +37,10 @@ export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetch
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
-  beforeFetch?: (conditions: Partial<Cond>, cancel: VoidFn) => Promise<Partial<Cond>> | Partial<Cond>
+  beforeFetch?: (
+    conditions: Partial<Cond> & Record<string, any>,
+    cancel: VoidFn
+  ) => Promise<Record<string, any>> | Record<string, any>
   afterFetch?: (
     data: Result
   ) => Promise<AfterFetchResult extends Result ? Result : AfterFetchResult> | AfterFetchResult extends Result

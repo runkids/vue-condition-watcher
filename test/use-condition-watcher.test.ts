@@ -65,7 +65,7 @@ describe('Basic test of vue-condition-watcher', () => {
     })
   })
 
-  it('Reset conditions to custom value and only assign if property exists.', () => {
+  it('Reset conditions to custom value and only assign if property exists', () => {
     const { conditions, resetConditions } = useConditionWatcher(basicTestConfig)
 
     conditions.results = 10
