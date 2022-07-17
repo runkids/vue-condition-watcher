@@ -14,14 +14,10 @@
   "peerDependencies": {
     "vue-demi": "*",
     "@vue/composition-api": "^1.1.0",
-    "@nuxtjs/composition-api": "^0.24.4",
-    "vue": "^2.6.0 || ^3.2.0"
+    "vue": "^2.0.0 || >=3.0.0"
   },
   "peerDependenciesMeta": {
     "@vue/composition-api": {
-      "optional": true
-    },
-    "@nuxtjs/composition-api": {
       "optional": true
     }
   }
