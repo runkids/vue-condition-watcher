@@ -173,6 +173,16 @@ export function sortObject(unordered) {
     }, {})
 }
 
+export function pick(obj: Record<string, any>, keys: string[]) {
+  const res = {}
+  keys.forEach((key) => {
+    if (key in obj) {
+      res[key] = obj[key]
+    }
+  })
+  return res
+}
+
 export function serializeFunc(fn) {
   //the source code from https://github.com/yahoo/serialize-javascript/blob/main/index.js
   const serializedFn = fn.toString()

@@ -20,6 +20,7 @@ import {
   syncQuery2Conditions,
   isEquivalent,
   deepClone,
+  pick,
 } from 'vue-condition-watcher/_internal'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from 'vue-condition-watcher/_internal'
 
@@ -103,7 +104,8 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
   } = createEvents()
 
   const resetConditions = (cond?: Record<string, any>): void => {
-    Object.assign(_conditions, isObject(cond) && !cond.type ? cond : backupIntiConditions)
+    const conditionKeys = Object.keys(_conditions)
+    Object.assign(_conditions, isObject(cond) ? pick(cond, conditionKeys) : backupIntiConditions)
   }
 
   const isLoading = computed(() => !error.value && !data.value)

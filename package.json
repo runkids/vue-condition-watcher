@@ -31,6 +31,7 @@
   "scripts": {
     "clean": "turbo run clean",
     "build": "turbo run build",
+    "watch": "turbo run watch --parallel",
     "types:check": "turbo run types:check",
     "format": "prettier --write ./**/*.ts",
     "lint": "eslint . --ext .ts --cache",
@@ -39,7 +40,6 @@
     "test:2": "vue-demi-switch 2 vue2 && vitest run",
     "test:3": "vue-demi-switch 3 && vitest run",
     "test:all": "pnpm format && pnpm build && pnpm test:3 && pnpm test:2 && vue-demi-switch 3",
-    "watch": "tsc --watch",
     "prepublishOnly": "pnpm clean && pnpm build",
     "publish-beta": "pnpm publish --tag beta"
   },

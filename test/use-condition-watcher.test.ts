@@ -2,18 +2,22 @@ import useConditionWatcher from 'vue-condition-watcher'
 import { isRef, isReactive, isReadonly, createApp, nextTick, defineComponent } from 'vue-demi'
 import type { VueWrapper } from '@vue/test-utils'
 import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 describe('Basic test of vue-condition-watcher', () => {
-  it(`Check return value type`, () => {
-    const config = {
+  let basicTestConfig = {}
+  beforeEach(() => {
+    basicTestConfig = {
       fetcher: (params) => new Promise((resolve) => resolve(params)),
       conditions: {
         gender: ['male'],
         results: 9,
       },
     }
-    const { conditions, data, error, isLoading, execute } = useConditionWatcher(config)
+  })
+
+  it(`Check return value type`, () => {
+    const { conditions, data, error, isLoading, execute } = useConditionWatcher(basicTestConfig)
 
     expect(isReactive(conditions)).toBeTruthy()
     expect(isRef(data)).toBeTruthy()
@@ -24,15 +28,7 @@ describe('Basic test of vue-condition-watcher', () => {
   })
 
   it(`Check data, error, isLoading is readonly`, () => {
-    const config = {
-      fetcher: (params) => new Promise((resolve) => resolve(params)),
-      conditions: {
-        gender: ['male'],
-        results: 9,
-      },
-    }
-
-    const { data, error, isLoading } = useConditionWatcher(config)
+    const { data, error, isLoading } = useConditionWatcher(basicTestConfig)
 
     expect(isReadonly(data)).toBeTruthy()
     expect(isReadonly(error)).toBeTruthy()
@@ -40,14 +36,7 @@ describe('Basic test of vue-condition-watcher', () => {
   })
 
   it(`Condition should be change`, () => {
-    const config = {
-      fetcher: (params) => new Promise((resolve) => resolve(params)),
-      conditions: {
-        gender: ['male'],
-        results: 9,
-      },
-    }
-    const { conditions } = useConditionWatcher(config)
+    const { conditions } = useConditionWatcher(basicTestConfig)
 
     expect(conditions).toMatchObject({
       gender: ['male'],
@@ -59,6 +48,39 @@ describe('Basic test of vue-condition-watcher', () => {
     expect(conditions).toMatchObject({
       gender: ['male', 'female'],
       results: 10,
+    })
+  })
+
+  it('Reset conditions to initial value', () => {
+    const { conditions, resetConditions } = useConditionWatcher(basicTestConfig)
+
+    conditions.results = 10
+    conditions.gender = ['male', 'female']
+
+    resetConditions()
+
+    expect(conditions).toMatchObject({
+      gender: ['male'],
+      results: 9,
+    })
+  })
+
+  it('Reset conditions to custom value and only assign if property exists.', () => {
+    const { conditions, resetConditions } = useConditionWatcher(basicTestConfig)
+
+    conditions.results = 10
+    conditions.gender = ['male', 'female']
+
+    resetConditions({
+      gender: ['female'],
+      results: 19,
+      type: '2',
+      useless: '12312321',
+    })
+
+    expect(conditions).toMatchObject({
+      gender: ['female'],
+      results: 19,
     })
   })
 })

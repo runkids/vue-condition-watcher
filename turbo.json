@@ -6,6 +6,9 @@
       "dependsOn": ["^build"]
     },
     "types:check": {},
+    "watch": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     }

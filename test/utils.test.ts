@@ -6,6 +6,7 @@ import {
   isEquivalent,
   deepClone,
   typeOf,
+  pick,
 } from 'vue-condition-watcher/_internal'
 import { describe, expect, test } from 'vitest'
 
@@ -194,6 +195,18 @@ describe('utils: syncQuery2Conditions', () => {
       boolean: '',
       undefined: '',
       null: '',
+    })
+  })
+})
+
+describe('utils: pick', () => {
+  it('Assign only if property exists in target object', () => {
+    const targetObj = { name: 'Runkids', age: 10 }
+    const resObj = pick({ age: 20, name: 'runkids', nickname: 'egg' }, Object.keys(targetObj))
+
+    expect(Object.assign(targetObj, resObj)).toMatchObject({
+      name: 'runkids',
+      age: 20,
     })
   })
 })
