@@ -1,38 +1,45 @@
 import useConditionWatcher from 'vue-condition-watcher'
-import { isRef, isReactive, isReadonly, createApp, nextTick, defineComponent } from 'vue-demi'
+import { isRef, isReactive, isReadonly, defineComponent, isVue3 } from 'vue-demi'
 import type { VueWrapper } from '@vue/test-utils'
-import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi, beforeEach } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { describe, expect, beforeEach } from 'vitest'
 
 describe('Basic test of vue-condition-watcher', () => {
-  let basicTestConfig = {}
+  let basicTestConfig: any = {}
   beforeEach(() => {
     basicTestConfig = {
-      fetcher: (params) => new Promise((resolve) => resolve(params)),
+      fetcher: (params) => Promise.resolve(params),
       conditions: {
         gender: ['male'],
         results: 9,
+      },
+      defaultParams: {
+        name: 'runkids',
       },
     }
   })
 
   it(`Check return value type`, () => {
-    const { conditions, data, error, isLoading, execute } = useConditionWatcher(basicTestConfig)
+    const { conditions, data, error, isLoading, execute, isFetching } = useConditionWatcher(basicTestConfig)
 
     expect(isReactive(conditions)).toBeTruthy()
     expect(isRef(data)).toBeTruthy()
     expect(isRef(error)).toBeTruthy()
     expect(isRef(isLoading)).toBeTruthy()
+    expect(isRef(isFetching)).toBeTruthy()
     expect(isLoading.value).toBeTypeOf('boolean')
+    expect(isLoading.value).toBe(true)
+    expect(isFetching.value).toBe(false)
     expect(execute).toBeTypeOf('function')
   })
 
-  it(`Check data, error, isLoading is readonly`, () => {
-    const { data, error, isLoading } = useConditionWatcher(basicTestConfig)
+  it(`Check data, error, isLoading, isFetching is readonly`, () => {
+    const { data, error, isLoading, isFetching } = useConditionWatcher(basicTestConfig)
 
     expect(isReadonly(data)).toBeTruthy()
     expect(isReadonly(error)).toBeTruthy()
     expect(isReadonly(isLoading)).toBeTruthy()
+    expect(isReadonly(isFetching)).toBeTruthy()
   })
 
   it(`Condition should be change`, () => {
@@ -84,6 +91,47 @@ describe('Basic test of vue-condition-watcher', () => {
     })
   })
 })
+
+if (isVue3) {
+  describe('useConditionWatcher', () => {
+    const App = defineComponent({
+      template: `<div>{{ data }}</div>`,
+      setup() {
+        const { data, conditions } = useConditionWatcher({
+          fetcher: (params) => Promise.resolve(`Hello, world! ${params.name}!`),
+          conditions: {
+            name: '',
+          },
+        })
+        return {
+          data,
+          conditions,
+        }
+      },
+    })
+
+    let wrapper: VueWrapper<any>
+
+    beforeEach(() => {
+      wrapper = mount(App)
+    })
+
+    afterEach(() => {
+      wrapper.unmount()
+    })
+
+    it('Should be defined', async () => {
+      expect(wrapper).toBeDefined()
+    })
+
+    it('Refetch after conditions value changed.', async () => {
+      expect(wrapper.text()).toContain('')
+      wrapper.vm.conditions.name = 'RUNKIDS'
+      await flushPromises()
+      expect(wrapper.text()).toContain(`Hello, world! RUNKIDS!`)
+    })
+  })
+}
 
 // const tick = async (times: number) => {
 //   for (let _ in [...Array(times).keys()]) {
