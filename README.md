@@ -113,7 +113,7 @@ createApp({
     const fetcher = params => axios.get('/user/', {params})
     const router = useRouter()
 
-    const { conditions, data, loading, error } = useConditionWatcher(
+    const { conditions, data, loading, execute, error } = useConditionWatcher(
       {
         fetcher,
         conditions: {
@@ -124,7 +124,7 @@ createApp({
         }
       }
     )
-    return { conditions, data, loading, error }
+    return { conditions, data, loading, execute, error }
   },
 })
 .use(router)
