@@ -2,9 +2,9 @@
 import { ref, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ElScrollbar } from 'element-plus'
-// import { useConditionWatcher } from '../../../../src/index'
-import { useConditionWatcher } from 'vue-condition-watcher'
-import api from '../api'
+import useConditionWatcher  from '../../../../core/index'
+// import { useConditionWatcher } from 'vue-condition-watcher'
+import api, { Result, Users } from '../api'
 
 const router = useRouter()
 const payload = ref('')
@@ -25,7 +25,7 @@ const {
   onConditionsChange, 
   onFetchSuccess, 
   onFetchError 
-} = useConditionWatcher(
+} = useConditionWatcher<{gender: string[]; page: number}, Result, Users>(
   {
     fetcher: (params) => {
       payload.value = JSON.stringify(params)
@@ -45,15 +45,6 @@ const {
     pollingWhenOffline: true,
     revalidateOnFocus: true,
     cacheProvider: inject('cacheProvider'),
-    // cacheProvider: function localStorageProvider() {
-    //   // example by https://swr.vercel.app/docs/advanced/cache#localstorage-based-persistent-cache
-    //   const map = new Map(JSON.parse(localStorage.getItem('app-cache') || '[]'))
-    //   window.addEventListener('beforeunload', () => {
-    //     const appCache = JSON.stringify(Array.from(map.entries()))
-    //     localStorage.setItem('app-cache', appCache)
-    //   })
-    //   return map
-    // },
     history: {
       sync: router,
     },
@@ -132,7 +123,7 @@ onFetchFinally(async () => {
     </el-col>
     <el-col :span="6">
       <el-button type="primary" @click="execute" size="small">Refresh</el-button>
-      <el-button type="primary" @click="resetConditions" size="small">Reset Conditions</el-button>
+      <el-button type="primary" @click="resetConditions()" size="small">Reset Conditions</el-button>
       <el-button type="primary" @click="updateFirstRowData" size="small">Mutate First Row Data</el-button>
     </el-col>
   </el-row>

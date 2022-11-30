@@ -1,28 +1,28 @@
+import { Conditions, Config, Mutate, UseConditionWatcherReturn } from './types'
 import {
-  reactive,
-  ref,
-  watch,
-  readonly,
   UnwrapNestedRefs,
-  onUnmounted,
-  watchEffect,
-  unref,
-  isRef,
-  shallowRef,
   computed,
   getCurrentInstance,
+  isRef,
+  onUnmounted,
+  reactive,
+  readonly,
+  ref,
+  shallowRef,
+  unref,
+  watch,
+  watchEffect,
 } from 'vue-demi'
-import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
-import { usePromiseQueue, useHistory, useCache, createEvents } from 'vue-condition-watcher/_internal'
-import {
-  filterNoneValueObject,
-  createParams,
-  syncQuery2Conditions,
-  isEquivalent,
-  deepClone,
-  pick,
-} from 'vue-condition-watcher/_internal'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from 'vue-condition-watcher/_internal'
+import { createEvents, useCache, useHistory, usePromiseQueue } from 'vue-condition-watcher/_internal'
+import {
+  createParams,
+  deepClone,
+  filterNoneValueObject,
+  isEquivalent,
+  pick,
+  syncQuery2Conditions,
+} from 'vue-condition-watcher/_internal'
 
 export default function useConditionWatcher<Cond extends Record<string, any>, Result, AfterFetchResult = Result>(
   config: Config<Cond, Result, AfterFetchResult>
@@ -209,11 +209,13 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     if (pollingTimer.value) return
 
     watchEffect((onCleanup) => {
-      if (unref(watcherConfig.pollingInterval)) {
+      const pollingInterval = unref(watcherConfig.pollingInterval)
+
+      if (pollingInterval) {
         pollingTimer.value = (() => {
           let timerId = null
           function next() {
-            const interval = unref(watcherConfig.pollingInterval)
+            const interval = pollingInterval
             if (interval && timerId !== -1) {
               timerId = setTimeout(nun, interval)
             }
@@ -249,15 +251,15 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
    *  - 1.
    *     mutate(newData)
    *  - 2.
-   *     mutate((currentData) => {
-   *        currentData[0].name = 'runkids'
-   *        return currentData
+   *     mutate((draft) => {
+   *        draft[0].name = 'runkids'
+   *        return draft
    *     })
    */
-  const mutate = (...args): Mutate => {
+  const mutate = (...args): Mutate<Result> => {
     const arg = args[0]
     if (arg === undefined) {
-      return data.value as any
+      return data.value
     }
     if (typeof arg === 'function') {
       data.value = arg(deepClone(data.value))
@@ -265,7 +267,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
       data.value = arg
     }
     cache.set({ ..._conditions }, data.value)
-    return data.value as any
+    return data.value
   }
 
   // - History mode base on vue-router

@@ -1,5 +1,5 @@
-import { Ref, UnwrapNestedRefs } from 'vue-demi'
 import { Cache, HistoryOptions } from 'vue-condition-watcher/_internal'
+import { Ref, UnwrapNestedRefs } from 'vue-demi'
 
 export type { HistoryOptions }
 
@@ -7,6 +7,11 @@ export type VoidFn = () => void
 export type Conditions<T> = {
   [K in keyof T]: T[K]
 }
+export type FinalResult<Result, AfterFetchResult> =
+  | Promise<AfterFetchResult extends Result ? Result : AfterFetchResult>
+  | AfterFetchResult extends Result
+  ? Result
+  : AfterFetchResult
 
 export type OnConditionsChangeReturnValue<C> = Partial<UnwrapNestedRefs<C>>
 
@@ -20,9 +25,9 @@ export interface OnFetchErrorContext<T = any, E = any> {
   data: T | null
 }
 
+type MutateFunction<T> = (arg: (oldData: T) => any) => void
 type MutateData = (newData: any) => void
-type MutateFunction = (arg: (oldData: any) => any) => void
-export interface Mutate extends MutateData, MutateFunction {}
+export interface Mutate<T> extends MutateFunction<T>, MutateData {}
 
 export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetchResult = Result> {
   fetcher: (...args: any) => Promise<Result>
@@ -41,11 +46,7 @@ export interface Config<Cond = Record<string, any>, Result = unknown, AfterFetch
     conditions: Partial<Cond> & Record<string, any>,
     cancel: VoidFn
   ) => Promise<Record<string, any>> | Record<string, any>
-  afterFetch?: (
-    data: Result
-  ) => Promise<AfterFetchResult extends Result ? Result : AfterFetchResult> | AfterFetchResult extends Result
-    ? Result
-    : AfterFetchResult
+  afterFetch?: (data: Result) => FinalResult<Result, AfterFetchResult>
   onFetchError?: (ctx: OnFetchErrorContext) => Promise<Partial<OnFetchErrorContext>> | Partial<OnFetchErrorContext>
 }
 
@@ -56,7 +57,7 @@ export interface UseConditionWatcherReturn<Cond, Result> {
   readonly data: Readonly<Ref<Result | undefined>>
   readonly error: Ref<any | undefined>
   execute: (throwOnFailed?: boolean) => void
-  mutate: Mutate
+  mutate: Mutate<Result>
   resetConditions: (conditions?: object) => void
   onConditionsChange: (fn: OnConditionsChangeContext<Cond>) => void
   onFetchSuccess: (fn: (response: any) => void) => void
