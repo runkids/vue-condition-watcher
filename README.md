@@ -370,9 +370,9 @@ mutate(newData)
 - Second way, use function will receive deep clone data, and return updated data.
 
 ```js
-const finalData = mutate((currentData) => {
-  currentData[0].name = 'runkids'
-  return currentData
+const finalData = mutate((draft) => {
+  draft[0].name = 'runkids'
+  return draft
 })
 
 console.log(finalData[0]name === data.value[0].name) //true
@@ -398,9 +398,9 @@ async function updateUserName (userId, newName, rowIndex = 0) {
   // Not work! Because `data` is read only.
 
   // Easy to use function will receive deep clone data, and return updated data.
-  mutate(currentData => {
-    currentData[rowIndex] = response.data
-    return currentData
+  mutate(draft => {
+    draft[rowIndex] = response.data
+    return draft
   })
 
   console.log(data.value) //after: [{ id: 1, name: 'mutate name' }, { id: 2, name: 'vuejs' }]

@@ -381,9 +381,9 @@ mutate(newData)
 - 第二種：使用 callback function，會接受一個深拷貝的 `data` 資料，修改完後再返回結果
 
 ```js
-const finalData = mutate((currentData) => {
-  currentData[0].name = 'runkids'
-  return currentData
+const finalData = mutate((draft) => {
+  draft[0].name = 'runkids'
+  return draft
 })
 
 console.log(finalData[0]name === data.value[0].name) //true
@@ -409,9 +409,9 @@ async function updateUserName (userId, newName, rowIndex = 0) {
   // 沒作用! 因為 `data` 是唯讀不可修改的.
 
   // Easy to use function will receive deep clone data, and return updated data.
-  mutate(currentData => {
-    currentData[rowIndex] = response.data
-    return currentData
+  mutate(draft => {
+    draft[rowIndex] = response.data
+    return draft
   })
 
   console.log(data.value) //after: [{ id: 1, name: 'mutate name' }, { id: 2, name: 'vuejs' }]
