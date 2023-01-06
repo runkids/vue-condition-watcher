@@ -1,24 +1,25 @@
+import { Conditions, Config, Mutate, UseConditionWatcherReturn } from './types'
 import {
-  reactive,
-  ref,
-  watch,
-  readonly,
-  UnwrapNestedRefs,
-  onUnmounted,
-  watchEffect,
-  unref,
-  isRef,
-  shallowRef,
   ShallowRef,
+  UnwrapNestedRefs,
   computed,
+  isRef,
+  onUnmounted,
+  reactive,
+  readonly,
+  ref,
+  shallowRef,
+  unref,
+  watch,
+  watchEffect,
 } from 'vue-demi'
-import { Config, UseConditionWatcherReturn, Conditions, Mutate } from './types'
-import { usePromiseQueue } from './composable/usePromiseQueue'
-import { useHistory } from './composable/useHistory'
-import { useCache } from './composable/useCache'
-import { createEvents } from './utils/createEvents'
-import { filterNoneValueObject, createParams, syncQuery2Conditions, isEquivalent, deepClone } from './utils/common'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from './utils/helper'
+import { createParams, deepClone, filterNoneValueObject, isEquivalent, syncQuery2Conditions } from './utils/common'
+
+import { createEvents } from './utils/createEvents'
+import { useCache } from './composable/useCache'
+import { useHistory } from './composable/useHistory'
+import { usePromiseQueue } from './composable/usePromiseQueue'
 
 export default function useConditionWatcher<
   Cond extends Record<string, any>,
@@ -189,9 +190,6 @@ export default function useConditionWatcher<
         .finally(() => {
           isFetching.value = false
           finallyEvent.trigger()
-          // - Start polling with out setting to manual
-          if (watcherConfig.manual) return
-          polling()
         })
     })
   }
@@ -207,9 +205,8 @@ export default function useConditionWatcher<
     }
   }
 
-  function polling() {
-    if (pollingTimer.value) return
-
+  // - Start polling with out setting to manual
+  if (!watcherConfig.manual) {
     watchEffect((onCleanup) => {
       if (unref(watcherConfig.pollingInterval)) {
         pollingTimer.value = (() => {
