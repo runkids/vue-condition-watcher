@@ -1,3 +1,6 @@
+### [1.5.0](https://github.com/runkids/vue-condition-watcher/releases/tag/1.5.0) (2023-01-06)
+  * Fix: `watchEffect` maximum recursive updates exceeded.
+   
 ### [1.4.7](https://github.com/runkids/vue-condition-watcher/releases/tag/1.4.7) (2022-04-15)
   * Chore: Improve Types
 
