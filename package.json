@@ -1,6 +1,6 @@
 {
   "name": "vue-condition-watcher",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "description": "Vue composition API for automatic data fetching. With conditions as the core. Easily control and sync to URL query string by conditions",
   "main": "./core/dist/index.js",
   "module": "./core/dist/index.esm.js",
@@ -40,7 +40,7 @@
     "test:2": "vue-demi-switch 2 vue2 && vitest run",
     "test:3": "vue-demi-switch 3 && vitest run",
     "test:all": "pnpm format && pnpm build && pnpm test:3 && pnpm test:2 && vue-demi-switch 3",
-    "prepublishOnly": "pnpm clean && pnpm build",
+    "prepublishOnly": "pnpm format && pnpm clean && pnpm build",
     "publish-beta": "pnpm publish --tag beta"
   },
   "repository": {
@@ -97,7 +97,7 @@
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
     "vitest": "^0.18.0",
-    "vue": "^3.2.37",
+    "vue": "^3.2.45",
     "vue-condition-watcher": "workspace:*",
     "vue2": "npm:vue@2.6.14"
   },

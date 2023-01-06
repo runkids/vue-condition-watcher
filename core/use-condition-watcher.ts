@@ -187,9 +187,6 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
         .finally(() => {
           isFetching.value = false
           finallyEvent.trigger()
-          // - Start polling with out setting to manual
-          if (watcherConfig.manual) return
-          polling()
         })
     })
   }
@@ -205,12 +202,10 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     }
   }
 
-  function polling() {
-    if (pollingTimer.value) return
-
+  // - Start polling with out setting to manual
+  if (!watcherConfig.manual) {
     watchEffect((onCleanup) => {
       const pollingInterval = unref(watcherConfig.pollingInterval)
-
       if (pollingInterval) {
         pollingTimer.value = (() => {
           let timerId = null
