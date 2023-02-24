@@ -6,24 +6,24 @@ English | [中文](./README-zh_TW.md)
 
 ## Introduction
 
-Vue composition API for automatic data fetching. With `conditions` as the core. Easily control and sync to URL query string by `conditions`
+Data fetching with Vue Composition API. Power of `conditions` to easily control and sync to the URL query string.
 > requires Node.js 12.0.0 or higher.
 
 ## Features
 
-  ✔ Automatically fetch data whenever `conditions` changes<br>
-  ✔ `null` `undefined` `[]` `''` will be automatically filtered out before sending the request<br>
-  ✔ Refreshing the page will automatically initialize `conditions` according to the query string of the URL, and will automatically correspond to the type ( string, number, array, date )<br>
-  ✔ Whenever `conditions` changes, the URL query string will be automatically synchronized, and the previous page and next page will work normally<br>
-  ✔ Avoid `race condition`, ensure requests are first in, first out, and can also avoid repeated requests<br>
-  ✔ Do Dependent Request before updating `data`<br/>
-  ✔ Easily handle paging needs, simply customize your own paging logic<br/>
-  ✔ Automatically re-request data when web page is refocused or network disconnection resumes<br/>
-  ✔ Support polling, the polling period can be adjusted dynamically<br/>
-  ✔ The caching mechanism allows data to be rendered faster without waiting for loading animations<br/>
-  ✔ No need to wait for the return result, you can manually change `data` to make the user experience better<br/>
-  ✔ TypeScript support. <br/>
-  ✔ Works for Vue 2 & 3 by the power of [vue-demi](https://github.com/vueuse/vue-demi)
+  ✔ Automatically fetch data whenever `conditions` change.<br>
+  ✔ Automatically filter out `null`, `undefined`, `[]`, and `''` before sending the request.<br>
+  ✔ Refresh the page to automatically initialize `conditions` according to the query string of the URL, and correspond to the type (string, number, array, date).<br>
+  ✔ Whenever `conditions` change, the URL query string will be automatically synchronized, and the previous page and next page will work normally.<br>
+  ✔ Avoid race conditions, ensure requests are first in, first out, and can also avoid repeated requests.<br>
+  ✔ Perform dependent requests before updating data.<br/>
+  ✔ Easily handle paging needs by customizing your own paging logic.<br/>
+  ✔ Automatically refetch data when the web page is refocused or network disconnection resumes.<br/>
+  ✔ Support polling, with the polling period adjustable dynamically.<br/>
+  ✔ The caching mechanism allows `data` to be rendered faster without waiting for loading animations.<br/>
+  ✔ No need to wait for the return result; you can manually change `data` to improve the user experience.<br/>
+  ✔ TypeScript support.<br/>
+  ✔ Works for Vue 2 & 3 through the power of [vue-demi](https://github.com/vueuse/vue-demi).
   
   <img src=".github/vue-conditions-watcher.gif"/>
 
@@ -93,49 +93,47 @@ https://unpkg.com/vue-condition-watcher/dist/index.js
 
 ### Quick Start
 
-This is a simple example for `vue-next` and `vue-router-next`
+You can start by creating a fetcher function using the native `fetch` or libraries like `Axios`. Then, import the `useConditionWatcher` function and start using it. Here's an example:
 
-First you need to create a fetcher function, use the native `fetch` or libs like Axios. Then import `useConditionWatcher` and start using it.
+```html
+<script setup>
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+import { useConditionWatcher } from 'vue-condition-watcher'
 
-```javascript
-createApp({
-  template: `
-    <div class="filter">
-      <input v-model="conditions.name">
-      <button @click="execute">Refetch</button>
-    </div>
-    <div class="container">
-      {{ !loading ? data : 'Loading...' }}
-    </div>
-    <div v-if="error">{{ error }}</div>
-  `,
-  setup() {
-    const fetcher = params => axios.get('/user/', {params})
-    const router = useRouter()
+const fetcher = params => axios.get('/user/', {params})
+const router = useRouter()
 
-    const { conditions, data, loading, execute, error } = useConditionWatcher(
-      {
-        fetcher,
-        conditions: {
-          name: ''
-        },
-        history: {
-          sync: router
-        }
-      }
-    )
-    return { conditions, data, loading, execute, error }
-  },
-})
-.use(router)
-.mount(document.createElement('div'))
+const { conditions, data, loading, execute, error } = useConditionWatcher(
+  {
+    fetcher,
+    conditions: {
+      name: ''
+    },
+    history: {
+      sync: router
+    }
+  }
+)
+</script>
+
+<template>
+  <div class="filter">
+    <input v-model="conditions.name">
+    <button @click="execute">Refetch</button>
+  </div>
+  <div class="container">
+    {{ !loading ? data : 'Loading...' }}
+  </div>
+  <div v-if="error">{{ error }}</div>
+</template>
 ```
 
-You can use the value of `data`, `error`, and `loading` to determine the current state of the request.
+The `useConditionWatcher` function returns an object with three properties: `data`, `error`, and `loading`. You can use these values to determine the current state of the request.
 
-When the `conditions.name` value changes, will fire the `lifecycle` to fetching data again.
+When the value of `conditions.name` changes, `useConditionWatcher` will automatically refetch the data.
 
-Use `config.history` of sync to `sync: router`. Will store the conditions within the URL query string every time conditions change.
+You can use the `config.history` option to sync the conditions object with the router. This will store the conditions object within the URL query string every time it changes.
 
 ### Basic Usage
 
