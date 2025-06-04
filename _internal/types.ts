@@ -2,8 +2,13 @@ type ArgumentsTuple = [any, ...unknown[]] | readonly [any, ...unknown[]]
 export type Arguments = string | ArgumentsTuple | Record<any, any> | null | undefined | false
 export type Key = Arguments | (() => Arguments)
 export interface Cache<Data = any> {
-  get(key: Key): Data | null | undefined
-  set(key: Key, value: Data): void
+  /** Check if a value exists and not expired */
+  has(key: Key): boolean
+  /** Get cached value */
+  get(key: Key): Data | undefined
+  /** Set cache value with optional ttl(ms) */
+  set(key: Key, value: Data, ttl?: number): void
+  /** Delete cache entry */
   delete(key: Key): void
 }
 

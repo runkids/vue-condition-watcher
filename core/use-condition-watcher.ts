@@ -14,7 +14,7 @@ import {
   watchEffect,
 } from 'vue-demi'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from 'vue-condition-watcher/_internal'
-import { createEvents, useCache, useHistory, usePromiseQueue } from 'vue-condition-watcher/_internal'
+import { createEvents, useCache, useHistory, usePromiseQueue, MemoryCache } from 'vue-condition-watcher/_internal'
 import {
   createParams,
   deepClone,
@@ -24,9 +24,13 @@ import {
   syncQuery2Conditions,
 } from 'vue-condition-watcher/_internal'
 
-export default function useConditionWatcher<Cond extends Record<string, any>, Result, AfterFetchResult = Result>(
-  config: Config<Cond, Result, AfterFetchResult>
-): UseConditionWatcherReturn<Cond, AfterFetchResult extends Result ? Result : AfterFetchResult> {
+export default function useConditionWatcher<
+  ConditionT extends Record<string, any>,
+  ResponseT,
+  TransformedT = ResponseT
+>(
+  config: Config<ConditionT, ResponseT, TransformedT>
+): UseConditionWatcherReturn<ConditionT, TransformedT extends ResponseT ? ResponseT : TransformedT> {
   function isFetchConfig(obj: Record<string, any>): obj is typeof config {
     return containsProp(
       obj,
@@ -64,7 +68,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     pollingWhenHidden: false,
     pollingWhenOffline: false,
     revalidateOnFocus: false,
-    cacheProvider: () => new Map(),
+    cacheProvider: () => new MemoryCache(),
   }
 
   // update config
@@ -74,7 +78,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
   const cache = useCache(watcherConfig.fetcher, watcherConfig.cacheProvider())
 
   const backupIntiConditions = deepClone(watcherConfig.conditions)
-  const _conditions = reactive<Cond>(watcherConfig.conditions)
+  const _conditions = reactive<ConditionT>(watcherConfig.conditions)
 
   const isFetching = ref(false)
   const isOnline = ref(true)
@@ -115,9 +119,9 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
     if (isFetching.value) return
     isFetching.value = true
     error.value = undefined
-    const conditions2Object: Conditions<Cond> = conditions
+    const conditions2Object: Conditions<ConditionT> = conditions
     let customConditions: Record<string, any> = {}
-    const deepCopyCondition: Conditions<Cond> = deepClone(conditions2Object)
+    const deepCopyCondition: Conditions<ConditionT> = deepClone(conditions2Object)
 
     if (typeof watcherConfig.beforeFetch === 'function') {
       let isCanceled = false
@@ -251,7 +255,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
    *        return draft
    *     })
    */
-  const mutate = (...args): Mutate<Result> => {
+  const mutate = (...args): Mutate<TransformedT extends ResponseT ? ResponseT : TransformedT> => {
     const arg = args[0]
     if (arg === undefined) {
       return data.value
@@ -326,7 +330,7 @@ export default function useConditionWatcher<Cond extends Record<string, any>, Re
   }
 
   return {
-    conditions: _conditions as UnwrapNestedRefs<Cond>,
+    conditions: _conditions as UnwrapNestedRefs<ConditionT>,
     data: readonly(data),
     error: readonly(error),
     isFetching: readonly(isFetching),
