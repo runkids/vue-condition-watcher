@@ -183,29 +183,3 @@ export function pick(obj: Record<string, any>, keys: string[]) {
   return res
 }
 
-export function serializeFunc(fn) {
-  //the source code from https://github.com/yahoo/serialize-javascript/blob/main/index.js
-  const serializedFn = fn.toString()
-  if (/function.*?\(/.test(serializedFn)) {
-    return serializedFn
-  }
-  if (/.*?=>.*?/.test(serializedFn)) {
-    return serializedFn
-  }
-  const argsStartsAt = serializedFn.indexOf('(')
-  const def = serializedFn
-    .substr(0, argsStartsAt)
-    .trim()
-    .split(' ')
-    .filter((val) => val.length > 0)
-  const nonReservedSymbols = def.filter((val) => ['*', 'async'].indexOf(val) === -1)
-  if (nonReservedSymbols.length > 0) {
-    return (
-      (def.indexOf('async') > -1 ? 'async ' : '') +
-      'function' +
-      (def.join('').indexOf('*') > -1 ? '*' : '') +
-      serializedFn.substr(argsStartsAt)
-    )
-  }
-  return serializedFn
-}
