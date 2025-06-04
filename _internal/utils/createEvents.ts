@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+/**
+ * Unified event hooks for focus, visibility and reconnect events.
+ * Also provides custom event channels for fetch lifecycle.
+ */
 import { hasDocument, hasWindow, isDocumentVisibility } from './helper'
 
 // These function inspired from VueUse's `createEventHook`

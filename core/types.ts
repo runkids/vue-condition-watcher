@@ -46,6 +46,10 @@ export interface Config<ConditionT = Record<string, any>, ResponseT = unknown, T
   pollingWhenOffline?: boolean
   revalidateOnFocus?: boolean
   cacheProvider?: () => Cache<any>
+  /**
+   * Time-to-live in milliseconds for cache entries.
+   */
+  cacheTtl?: number
   beforeFetch?: (
     conditions: Partial<ConditionT> & Record<string, any>,
     cancel: VoidFn
