@@ -41,11 +41,12 @@ function createFocusEvent(eventHook) {
 }
 
 function createVisibilityEvent(eventHook) {
+  const handler = () => eventHook.trigger(isDocumentVisibility())
   if (hasDoc && document.addEventListener) {
-    document.addEventListener('visibilitychange', () => eventHook.trigger(isDocumentVisibility()))
+    document.addEventListener('visibilitychange', handler)
   }
   return () => {
-    document.removeEventListener('visibilitychange', () => eventHook.trigger(isDocumentVisibility()))
+    document.removeEventListener('visibilitychange', handler)
   }
 }
 
