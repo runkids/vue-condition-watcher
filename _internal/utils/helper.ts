@@ -24,7 +24,7 @@ export const isNoData = (data: unknown) => {
     return false
   }
   if (isObject(data)) {
-    return Object.keys.length === 0
+    return Object.keys(data).length === 0
   }
   return !data
 }

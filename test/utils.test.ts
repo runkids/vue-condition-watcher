@@ -7,6 +7,7 @@ import {
   deepClone,
   typeOf,
   pick,
+  isNoData,
 } from 'vue-condition-watcher/_internal'
 import { describe, expect, test } from 'vitest'
 
@@ -208,5 +209,16 @@ describe('utils: pick', () => {
       name: 'runkids',
       age: 20,
     })
+  })
+})
+
+describe('utils: isNoData', () => {
+  test('should return true for empty object', () => {
+    expect(isNoData({})).toBe(true)
+  })
+
+  test('should return true for undefined', () => {
+    // undefined data should be treated as no data
+    expect(isNoData(undefined)).toBe(true)
   })
 })
