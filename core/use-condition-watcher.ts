@@ -1,4 +1,4 @@
-import { Conditions, Config, Mutate, UseConditionWatcherReturn } from './types'
+import { Conditions, Config, Mutate, UseConditionWatcherReturn, VoidFn } from './types'
 import {
   UnwrapNestedRefs,
   computed,
@@ -14,7 +14,7 @@ import {
   watchEffect,
 } from 'vue-demi'
 import { containsProp, isNoData as isDataEmpty, isObject, isServer, rAF } from 'vue-condition-watcher/_internal'
-import { createEvents, useCache, useHistory, usePromiseQueue, MemoryCache } from 'vue-condition-watcher/_internal'
+import { createEvents, useCache, useHistory, usePromiseQueue, usePolling, MemoryCache } from 'vue-condition-watcher/_internal'
 import {
   createParams,
   deepClone,
@@ -69,6 +69,7 @@ export default function useConditionWatcher<
     pollingWhenOffline: false,
     revalidateOnFocus: false,
     cacheProvider: () => new MemoryCache(),
+    cacheTtl: undefined,
   }
 
   // update config
@@ -90,7 +91,7 @@ export default function useConditionWatcher<
   const error = ref(undefined)
   const query = ref({})
 
-  const pollingTimer = ref()
+  let stopPolling: VoidFn = () => {}
 
   const { enqueue } = usePromiseQueue()
   // - create fetch event & condition event & web event
@@ -168,7 +169,7 @@ export default function useConditionWatcher<
             data.value = responseData
           }
           if (!isEquivalent(cache.get(query.value), responseData)) {
-            cache.set(query.value, responseData)
+            cache.set(query.value, responseData, watcherConfig.cacheTtl)
           }
           responseEvent.trigger(responseData)
           return resolve(fetchResponse)
@@ -208,37 +209,14 @@ export default function useConditionWatcher<
 
   // - Start polling with out setting to manual
   if (!watcherConfig.manual) {
-    watchEffect((onCleanup) => {
-      const pollingInterval = unref(watcherConfig.pollingInterval)
-      if (pollingInterval) {
-        pollingTimer.value = (() => {
-          let timerId = null
-          function next() {
-            const interval = pollingInterval
-            if (interval && timerId !== -1) {
-              timerId = setTimeout(nun, interval)
-            }
-          }
-          function nun() {
-            // Only run when the page is visible, online and not errored.
-            if (
-              !error.value &&
-              (watcherConfig.pollingWhenHidden || isActive.value) &&
-              (watcherConfig.pollingWhenOffline || isOnline.value)
-            ) {
-              revalidate().then(next)
-            } else {
-              next()
-            }
-          }
-          next()
-          return () => timerId && clearTimeout(timerId)
-        })()
-      }
-
-      onCleanup(() => {
-        pollingTimer.value && pollingTimer.value()
-      })
+    stopPolling = usePolling({
+      interval: watcherConfig.pollingInterval,
+      whenHidden: watcherConfig.pollingWhenHidden,
+      whenOffline: watcherConfig.pollingWhenOffline,
+      isActive,
+      isOnline,
+      error,
+      callback: () => revalidate(),
     })
   }
 
@@ -265,7 +243,7 @@ export default function useConditionWatcher<
     } else {
       data.value = arg
     }
-    cache.set({ ..._conditions }, data.value)
+    cache.set({ ..._conditions }, data.value, watcherConfig.cacheTtl)
     return data.value
   }
 
@@ -322,7 +300,7 @@ export default function useConditionWatcher<
 
   if (getCurrentInstance()) {
     onUnmounted(() => {
-      pollingTimer.value && pollingTimer.value()
+      stopPolling()
       stopFocusEvent()
       stopReconnectEvent()
       stopVisibilityEvent()
